@@ -1,0 +1,14 @@
+## Interface: 30100
+## Title: Doolittle
+## Notes: Comprehensive mount and minipet manager and randomizer.
+## Author: Malefactor @ Draenor US
+## Version: 0.1
+## SavedVariables: DoolittleDB
+## OptionalDeps: Ace3
+## X-Embeds: Ace3
+
+embeds.xml
+Locales/locales.xml
+
+WowheadData.lua
+Doolittle.lua
