@@ -38,13 +38,88 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Doolittle")
 local options = {
 	name = "Doolittle",
 	handler = Doolittle,
-	type = 'group',
+	type = "group",
 	args = {
+		mount = {
+			name = L["CMD_MOUNT"],
+			desc = L["CMD_MOUNT_DESC"],
+			type = "execute",
+			func = "CmdMount",
+		},
+
+		options = {
+			name = L["OPTIONS"],
+			type = "group",
+			args = {
+				flying = {
+					name = L["TYPE_FLYING"],
+					type = "group",
+					args = {
+						fastest = {
+							name = L["OPT_FASTEST_ONLY"],
+							type = "toggle",
+							order = 0,
+							width = "full",
+							get = function(info) return Doolittle.db.profile.flying.fastest end,
+							set = function(info, value) Doolittle.db.profile.flying.fastest = value end,
+						},
+
+						speed60 = {
+							name = L["OPT_INCLUDE_SPEED"](60),
+							type = "toggle",
+							order = 60,
+							width = "full",
+							disabled = function(info) return Doolittle.db.profile.flying.fastest end,
+							get = function(info) return Doolittle.db.profile.flying.speed60 end,
+							set = function(info, value) Doolittle.db.profile.flying.speed60 = value end,
+						},
+
+						speed280 = {
+							name = L["OPT_INCLUDE_SPEED"](280),
+							type = "toggle",
+							order = 280,
+							width = "full",
+							disabled = function(info) return Doolittle.db.profile.flying.fastest end,
+							get = function(info) return Doolittle.db.profile.flying.speed280 end,
+							set = function(info, value) Doolittle.db.profile.flying.speed280 = value end,
+						},
+
+						speed310 = {
+							name = L["OPT_INCLUDE_SPEED"](310),
+							type = "toggle",
+							order = 310,
+							width = "full",
+							disabled = function(info) return Doolittle.db.profile.flying.fastest end,
+							get = function(info) return Doolittle.db.profile.flying.speed310 end,
+							set = function(info, value) Doolittle.db.profile.flying.speed310 = value end,
+						},
+					},
+				},
+			},
+		},
 	},
 }
 
 local defaults = {
+	profile = {
+		flying = {
+			fastest = true,
+			speed60 = false,
+			speed280 = true,
+			speed310 = true,
+		},
+
+		ground = {
+			fastest = true,
+			speed0 = false,
+			speed60 = true,
+			speed100 = true,
+		},
+	},
 }
+
+function Doolittle:CmdMount()
+end
 
 function Doolittle:OnDisable()
 end
@@ -59,4 +134,6 @@ function Doolittle:OnInitialize()
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("Doolittle", options, {"doolittle"})
 	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Doolittle", options)
 	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Doolittle", "Doolittle")
+
+	--TODO: read mount/pet data
 end

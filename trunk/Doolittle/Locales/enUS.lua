@@ -37,6 +37,13 @@ if not L then
 	return
 end
 
-L["Include X% mounts"] = function(speed)
-	return "Include " .. speed .. "% mounts"
-end
+L["CMD_MOUNT"] = "Mount"
+L["CMD_MOUNT_DESC"] = "Hop into the saddle of a random mount."
+
+L["OPTIONS"] = "Options"
+L["OPT_FASTEST_ONLY"] = "Include fastest only"
+L["OPT_INCLUDE_SPEED"] = function(speed) return "Include " .. speed .. "% mounts" end
+
+L["TYPE_FLYING"] = "Flying"
+L["TYPE_GROUND"] = "Ground"
+L["TYPE_SWIMMING"] = "Swimming"
