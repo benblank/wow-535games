@@ -792,23 +792,39 @@ Doolittle.wowhead = {
 			[26055] = { -- Yellow Qiraji Battle Tank
 				ground = 100,
 			},
+			[48778] = { -- Acherus Deathcharger
+				ground = 100,
+			},
+			[23214] = { -- Charger
+				ground = 100,
+			},
+			[23161] = { -- Dreadsteed
+				ground = 100,
+			},
+			[5784] = { -- Felsteed
+				ground = 60,
+			},
+			[34767] = { -- Summon Charger
+				ground = 100,
+			},
+			[34769] = { -- Summon Warhorse
+				ground = 60,
+			},
+			[13819] = { -- Warhorse
+				ground = 60,
+			},
 		},
 		speeds = {
 			flying = {
-				[60] = false,
-				[280] = true,
-				[310] = true,
 			},
 			ground = {
-				[0] = false,
 				[60] = true,
 				[100] = true,
 			},
 			swimming = {
-				[60] = true,
 			},
 		},
 	},
 }
 
--- Generated on Sat, 16 May 2009 22:26:55 -0700 in 46.678707838058 seconds
+-- Generated on Sun, 17 May 2009 09:53:24 -0700 in 77.043298959732 seconds
