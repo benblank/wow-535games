@@ -40,7 +40,7 @@ end
 L["CMD_MOUNT"] = "Mount"
 L["CMD_MOUNT_DESC"] = "Hop into the saddle of a random mount."
 
-L["OPTIONS"] = "Options"
+L["OPT_MOUNTS"] = "Mounts"
 L["OPT_FASTEST_ONLY"] = "Include fastest only"
 L["OPT_INCLUDE_SPEED"] = function(speed) return "Include " .. speed .. "% mounts" end
 
