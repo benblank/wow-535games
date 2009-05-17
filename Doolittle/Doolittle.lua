@@ -47,51 +47,54 @@ local options = {
 			func = "CmdMount",
 		},
 
-		options = {
-			name = L["OPTIONS"],
+		mounts = {
+			name = L["OPT_MOUNTS"],
 			type = "group",
-			args = {
-			},
+			args = {},
 		},
 	},
 }
 
 local defaults = {
 	profile = {
+		mounts = {},
 	},
 }
 
 -- generate options and defaults
-for type, speeds in pairs(WowheadMountSpeeds) do
-	defaults.profile[type] = {fastest = true}
-	options.args.options.args[type] = {
-		name = L["TYPE_" .. type:upper()],
-		type = "group",
-		args = {
-			fastest = {
-				name = L["OPT_FASTEST_ONLY"],
-				type = "toggle",
-				order = 0,
-				width = "full",
-				get = function(info) return Doolittle.db.profile[type].fastest end,
-				set = function(info, value) Doolittle.db.profile[type].fastest = value end,
+function Doolittle:BuildOptionsAndDefaults()
+	for type, speeds in pairs(self.wowhead.mounts.speeds) do
+		defaults.profile.mounts[type] = {fastest = true}
+		options.args.mounts.args[type] = {
+			name = L["TYPE_" .. type:upper()],
+			type = "group",
+			inline = true,
+			args = {
+				fastest = {
+					name = L["OPT_FASTEST_ONLY"],
+					type = "toggle",
+					order = 50,
+					width = "full",
+					get = function(info) return Doolittle.db.profile.mounts[type].fastest end,
+					set = function(info, value) Doolittle.db.profile.mounts[type].fastest = value end,
+				},
 			},
-		},
-	}
-
-	for speed, default in pairs(speeds) do
-		local sspeed = "speed" .. speed
-
-		defaults.profile[type][sspeed] = default
-		options.args.options.args[type].args[sspeed] = {
-			name = L["OPT_INCLUDE_SPEED"](speed),
-			type = "toggle",
-			order = speed or 1,
-			width = "full",
-			disabled = function(info) return Doolittle.db.profile[type].fastest end,
-			get = function(info) return Doolittle.db.profile[type][sspeed] end,
-			set = function(info, value) Doolittle.db.profile[type][sspeed] = value end,
 		}
+
+		for speed, default in pairs(speeds) do
+			local sspeed = "speed" .. speed
+
+			defaults.profile.mounts[type][sspeed] = default
+			options.args.mounts.args[type].args[sspeed] = {
+				name = L["OPT_INCLUDE_SPEED"](speed),
+				type = "toggle",
+				order = 1000 + speed,
+				width = "full",
+				disabled = function(info) return Doolittle.db.profile.mounts[type].fastest end,
+				get = function(info) return Doolittle.db.profile.mounts[type][sspeed] end,
+				set = function(info, value) Doolittle.db.profile.mounts[type][sspeed] = value end,
+			}
+		end
 	end
 end
 
@@ -105,6 +108,8 @@ function Doolittle:OnEnable()
 end
 
 function Doolittle:OnInitialize()
+	self:BuildOptionsAndDefaults() -- MUST be before AceDB call
+
 	self.db = LibStub("AceDB-3.0"):New("DoolittleDB", defaults)
 	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 
