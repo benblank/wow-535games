@@ -3,7 +3,7 @@
 WowheadMountData = {}
 
 WowheadMountData[60025] = {} -- Albino Drake
-WowheadMountData[60025]['air'] = 280
+WowheadMountData[60025]['flying'] = 280
 
 WowheadMountData[43688] = {} -- Amani War Bear
 WowheadMountData[43688]['ground'] = 100
@@ -12,10 +12,10 @@ WowheadMountData[16056] = {} -- Ancient Frostsaber
 WowheadMountData[16056]['ground'] = 100
 
 WowheadMountData[63844] = {} -- Argent Hippogryph
-WowheadMountData[63844]['air'] = 280
+WowheadMountData[63844]['flying'] = 280
 
 WowheadMountData[61230] = {} -- Armored Blue Wind Rider
-WowheadMountData[61230]['air'] = 280
+WowheadMountData[61230]['flying'] = 280
 
 WowheadMountData[60114] = {} -- Armored Brown Bear
 WowheadMountData[60114]['ground'] = 100
@@ -24,16 +24,16 @@ WowheadMountData[60116] = {} -- Armored Brown Bear
 WowheadMountData[60116]['ground'] = 100
 
 WowheadMountData[61229] = {} -- Armored Snowy Gryphon
-WowheadMountData[61229]['air'] = 280
+WowheadMountData[61229]['flying'] = 280
 
 WowheadMountData[40192] = {} -- Ashes of Al'ar
-WowheadMountData[40192]['air'] = 310
+WowheadMountData[40192]['flying'] = 310
 
 WowheadMountData[59567] = {} -- Azure Drake
-WowheadMountData[59567]['air'] = 280
+WowheadMountData[59567]['flying'] = 280
 
 WowheadMountData[41514] = {} -- Azure Netherwing Drake
-WowheadMountData[41514]['air'] = 280
+WowheadMountData[41514]['flying'] = 280
 
 WowheadMountData[51412] = {} -- Big Battle Bear
 WowheadMountData[51412]['ground'] = 100
@@ -41,17 +41,14 @@ WowheadMountData[51412]['ground'] = 100
 WowheadMountData[58983] = {} -- Big Blizzard Bear
 WowheadMountData[58983]['ground'] = -1
 
-WowheadMountData[64987] = {} -- Big Blizzard Bear [PH]
-WowheadMountData[64987]['ground'] = -1
-
 WowheadMountData[22719] = {} -- Black Battlestrider
 WowheadMountData[22719]['ground'] = 100
 
 WowheadMountData[62048] = {} -- Black Dragonhawk Mount
-WowheadMountData[62048]['air'] = 280
+WowheadMountData[62048]['flying'] = 280
 
 WowheadMountData[59650] = {} -- Black Drake
-WowheadMountData[59650]['air'] = 280
+WowheadMountData[59650]['flying'] = 280
 
 WowheadMountData[35022] = {} -- Black Hawkstrider
 WowheadMountData[35022]['ground'] = 60
@@ -63,7 +60,7 @@ WowheadMountData[59572] = {} -- Black Polar Bear
 WowheadMountData[59572]['ground'] = 100
 
 WowheadMountData[59976] = {} -- Black Proto-Drake
-WowheadMountData[59976]['air'] = 310
+WowheadMountData[59976]['flying'] = 310
 
 WowheadMountData[26656] = {} -- Black Qiraji Battle Tank
 WowheadMountData[26656]['ground'] = 100
@@ -120,10 +117,10 @@ WowheadMountData[64658] = {} -- Black Wolf
 WowheadMountData[64658]['ground'] = 60
 
 WowheadMountData[61996] = {} -- Blue Dragonhawk
-WowheadMountData[61996]['air'] = 280
+WowheadMountData[61996]['flying'] = 280
 
 WowheadMountData[59568] = {} -- Blue Drake
-WowheadMountData[59568]['air'] = 280
+WowheadMountData[59568]['flying'] = 280
 
 WowheadMountData[35020] = {} -- Blue Hawkstrider
 WowheadMountData[35020]['ground'] = 60
@@ -135,7 +132,7 @@ WowheadMountData[33630] = {} -- Blue Mechanostrider
 WowheadMountData[33630]['ground'] = 60
 
 WowheadMountData[59996] = {} -- Blue Proto-Drake
-WowheadMountData[59996]['air'] = 280
+WowheadMountData[59996]['flying'] = 280
 
 WowheadMountData[25953] = {} -- Blue Qiraji Battle Tank
 WowheadMountData[25953]['ground'] = 100
@@ -144,7 +141,7 @@ WowheadMountData[6897] = {} -- Blue Ram
 WowheadMountData[6897]['ground'] = 60
 
 WowheadMountData[39803] = {} -- Blue Riding Nether Ray
-WowheadMountData[39803]['air'] = 280
+WowheadMountData[39803]['flying'] = 280
 
 WowheadMountData[17463] = {} -- Blue Skeletal Horse
 WowheadMountData[17463]['ground'] = 60
@@ -153,7 +150,7 @@ WowheadMountData[64656] = {} -- Blue Skeletal Warhorse
 WowheadMountData[64656]['ground'] = 100
 
 WowheadMountData[32244] = {} -- Blue Wind Rider
-WowheadMountData[32244]['air'] = 60
+WowheadMountData[32244]['flying'] = 60
 
 WowheadMountData[50869] = {} -- Brewfest Kodo
 WowheadMountData[50869]['ground'] = 60
@@ -168,7 +165,7 @@ WowheadMountData[49378] = {} -- Brewfest Riding Kodo
 WowheadMountData[49378]['ground'] = 60
 
 WowheadMountData[59569] = {} -- Bronze Drake
-WowheadMountData[59569]['air'] = 280
+WowheadMountData[59569]['flying'] = 280
 
 WowheadMountData[34406] = {} -- Brown Elekk
 WowheadMountData[34406]['ground'] = 60
@@ -192,16 +189,16 @@ WowheadMountData[6654] = {} -- Brown Wolf
 WowheadMountData[6654]['ground'] = 60
 
 WowheadMountData[58615] = {} -- Brutal Nether Drake
-WowheadMountData[58615]['air'] = 310
+WowheadMountData[58615]['flying'] = 310
 
 WowheadMountData[43927] = {} -- Cenarion War Hippogryph
-WowheadMountData[43927]['air'] = 280
+WowheadMountData[43927]['flying'] = 280
 
 WowheadMountData[6648] = {} -- Chestnut Mare
 WowheadMountData[6648]['ground'] = 60
 
 WowheadMountData[41515] = {} -- Cobalt Netherwing Drake
-WowheadMountData[41515]['air'] = 280
+WowheadMountData[41515]['flying'] = 280
 
 WowheadMountData[39315] = {} -- Cobalt Riding Talbuk
 WowheadMountData[39315]['ground'] = 100
@@ -216,13 +213,13 @@ WowheadMountData[34790] = {} -- Dark War Talbuk
 WowheadMountData[34790]['ground'] = 100
 
 WowheadMountData[64927] = {} -- Deadly Gladiator's Frostwyrm
-WowheadMountData[64927]['air'] = 310
+WowheadMountData[64927]['flying'] = 310
 
 WowheadMountData[6653] = {} -- Dire Wolf
 WowheadMountData[6653]['ground'] = 60
 
 WowheadMountData[32239] = {} -- Ebon Gryphon
-WowheadMountData[32239]['air'] = 60
+WowheadMountData[32239]['flying'] = 60
 
 WowheadMountData[8395] = {} -- Emerald Raptor
 WowheadMountData[8395]['ground'] = 60
@@ -234,10 +231,10 @@ WowheadMountData[17458] = {} -- Fluorescent Green Mechanostrider
 WowheadMountData[17458]['ground'] = 60
 
 WowheadMountData[61451] = {} -- Flying Carpet
-WowheadMountData[61451]['air'] = 60
+WowheadMountData[61451]['flying'] = 60
 
 WowheadMountData[44153] = {} -- Flying Machine
-WowheadMountData[44153]['air'] = 60
+WowheadMountData[44153]['flying'] = 60
 
 WowheadMountData[63643] = {} -- Forsaken Warhorse
 WowheadMountData[63643]['ground'] = 100
@@ -246,16 +243,16 @@ WowheadMountData[17460] = {} -- Frost Ram
 WowheadMountData[17460]['ground'] = 100
 
 WowheadMountData[43810] = {} -- Frost Wyrm
-WowheadMountData[43810]['air'] = 280
+WowheadMountData[43810]['flying'] = 280
 
 WowheadMountData[23509] = {} -- Frostwolf Howler
 WowheadMountData[23509]['ground'] = 100
 
 WowheadMountData[51960] = {} -- Frostwyrm Mount
-WowheadMountData[51960]['air'] = 280
+WowheadMountData[51960]['flying'] = 280
 
 WowheadMountData[32235] = {} -- Golden Gryphon
-WowheadMountData[32235]['air'] = 60
+WowheadMountData[32235]['flying'] = 60
 
 WowheadMountData[16060] = {} -- Golden Sabercat
 WowheadMountData[16060]['ground'] = 60
@@ -342,22 +339,22 @@ WowheadMountData[17453] = {} -- Green Mechanostrider
 WowheadMountData[17453]['ground'] = 60
 
 WowheadMountData[61294] = {} -- Green Proto-Drake
-WowheadMountData[61294]['air'] = 280
+WowheadMountData[61294]['flying'] = 280
 
 WowheadMountData[26056] = {} -- Green Qiraji Battle Tank
 WowheadMountData[26056]['ground'] = 100
 
 WowheadMountData[39798] = {} -- Green Riding Nether Ray
-WowheadMountData[39798]['air'] = 280
+WowheadMountData[39798]['flying'] = 280
 
 WowheadMountData[17465] = {} -- Green Skeletal Warhorse
 WowheadMountData[17465]['ground'] = 100
 
 WowheadMountData[32245] = {} -- Green Wind Rider
-WowheadMountData[32245]['air'] = 60
+WowheadMountData[32245]['flying'] = 60
 
 WowheadMountData[48025] = {} -- Headless Horseman's Mount
-WowheadMountData[48025]['air'] = -1
+WowheadMountData[48025]['flying'] = -1
 WowheadMountData[48025]['ground'] = -1
 
 WowheadMountData[59797] = {} -- Ice Mammoth
@@ -370,7 +367,7 @@ WowheadMountData[17459] = {} -- Icy Blue Mechanostrider Mod A
 WowheadMountData[17459]['ground'] = 100
 
 WowheadMountData[63956] = {} -- Ironbound Proto-Drake
-WowheadMountData[63956]['air'] = 310
+WowheadMountData[63956]['flying'] = 310
 
 WowheadMountData[10795] = {} -- Ivory Raptor
 WowheadMountData[10795]['ground'] = 60
@@ -379,7 +376,7 @@ WowheadMountData[17450] = {} -- Ivory Raptor
 WowheadMountData[17450]['ground'] = 100
 
 WowheadMountData[61309] = {} -- Magnificent Flying Carpet
-WowheadMountData[61309]['air'] = 280
+WowheadMountData[61309]['flying'] = 280
 
 WowheadMountData[55531] = {} -- Mechano-hog
 WowheadMountData[55531]['ground'] = 100
@@ -388,13 +385,13 @@ WowheadMountData[60424] = {} -- Mekgineer's Chopper
 WowheadMountData[60424]['ground'] = 100
 
 WowheadMountData[44317] = {} -- Merciless Nether Drake
-WowheadMountData[44317]['air'] = 310
+WowheadMountData[44317]['flying'] = 310
 
 WowheadMountData[44744] = {} -- Merciless Nether Drake
-WowheadMountData[44744]['air'] = 310
+WowheadMountData[44744]['flying'] = 310
 
 WowheadMountData[63796] = {} -- Mimiron's Head
-WowheadMountData[63796]['air'] = 310
+WowheadMountData[63796]['flying'] = 310
 
 WowheadMountData[16084] = {} -- Mottled Red Raptor
 WowheadMountData[16084]['ground'] = 100
@@ -403,16 +400,13 @@ WowheadMountData[29059] = {} -- Naxxramas Deathcharger
 WowheadMountData[29059]['ground'] = 100
 
 WowheadMountData[3363] = {} -- Nether Drake
-WowheadMountData[3363]['air'] = 310
-
-WowheadMountData[28828] = {} -- Nether Drake
-WowheadMountData[28828]['ground'] = 300
+WowheadMountData[3363]['flying'] = 310
 
 WowheadMountData[10798] = {} -- Obsidian Raptor
 WowheadMountData[10798]['ground'] = 60
 
 WowheadMountData[41513] = {} -- Onyx Netherwing Drake
-WowheadMountData[41513]['air'] = 280
+WowheadMountData[41513]['flying'] = 280
 
 WowheadMountData[471] = {} -- Palamino
 WowheadMountData[471]['ground'] = 60
@@ -421,13 +415,13 @@ WowheadMountData[16082] = {} -- Palomino
 WowheadMountData[16082]['ground'] = 100
 
 WowheadMountData[32345] = {} -- Peep the Phoenix Mount
-WowheadMountData[32345]['air'] = 310
+WowheadMountData[32345]['flying'] = 310
 
 WowheadMountData[472] = {} -- Pinto
 WowheadMountData[472]['ground'] = 60
 
 WowheadMountData[60021] = {} -- Plagued Proto-Drake
-WowheadMountData[60021]['air'] = 310
+WowheadMountData[60021]['flying'] = 310
 
 WowheadMountData[16058] = {} -- Primal Leopard
 WowheadMountData[16058]['ground'] = 60
@@ -442,10 +436,10 @@ WowheadMountData[17455] = {} -- Purple Mechanostrider
 WowheadMountData[17455]['ground'] = 60
 
 WowheadMountData[41516] = {} -- Purple Netherwing Drake
-WowheadMountData[41516]['air'] = 280
+WowheadMountData[41516]['flying'] = 280
 
 WowheadMountData[39801] = {} -- Purple Riding Nether Ray
-WowheadMountData[39801]['air'] = 280
+WowheadMountData[39801]['flying'] = 280
 
 WowheadMountData[23246] = {} -- Purple Skeletal Warhorse
 WowheadMountData[23246]['ground'] = 100
@@ -457,10 +451,10 @@ WowheadMountData[17456] = {} -- Red and Blue Mechanostrider
 WowheadMountData[17456]['ground'] = 60
 
 WowheadMountData[61997] = {} -- Red Dragonhawk
-WowheadMountData[61997]['air'] = 280
+WowheadMountData[61997]['flying'] = 280
 
 WowheadMountData[59570] = {} -- Red Drake
-WowheadMountData[59570]['air'] = 280
+WowheadMountData[59570]['flying'] = 280
 
 WowheadMountData[34795] = {} -- Red Hawkstrider
 WowheadMountData[34795]['ground'] = 60
@@ -469,13 +463,13 @@ WowheadMountData[10873] = {} -- Red Mechanostrider
 WowheadMountData[10873]['ground'] = 60
 
 WowheadMountData[59961] = {} -- Red Proto-Drake
-WowheadMountData[59961]['air'] = 280
+WowheadMountData[59961]['flying'] = 280
 
 WowheadMountData[26054] = {} -- Red Qiraji Battle Tank
 WowheadMountData[26054]['ground'] = 100
 
 WowheadMountData[39800] = {} -- Red Riding Nether Ray
-WowheadMountData[39800]['air'] = 280
+WowheadMountData[39800]['flying'] = 280
 
 WowheadMountData[17462] = {} -- Red Skeletal Horse
 WowheadMountData[17462]['ground'] = 60
@@ -499,13 +493,13 @@ WowheadMountData[17481] = {} -- Rivendare's Deathcharger
 WowheadMountData[17481]['ground'] = 100
 
 WowheadMountData[63963] = {} -- Rusted Proto-Drake
-WowheadMountData[63963]['air'] = 310
+WowheadMountData[63963]['flying'] = 310
 
 WowheadMountData[64731] = {} -- Sea Turtle
-WowheadMountData[64731]['water'] = 60
+WowheadMountData[64731]['swimming'] = 60
 
 WowheadMountData[39802] = {} -- Silver Riding Nether Ray
-WowheadMountData[39802]['air'] = 280
+WowheadMountData[39802]['flying'] = 280
 
 WowheadMountData[39317] = {} -- Silver Riding Talbuk
 WowheadMountData[39317]['ground'] = 100
@@ -517,7 +511,7 @@ WowheadMountData[8980] = {} -- Skeletal Horse
 WowheadMountData[8980]['ground'] = 60
 
 WowheadMountData[32240] = {} -- Snowy Gryphon
-WowheadMountData[32240]['air'] = 60
+WowheadMountData[32240]['flying'] = 60
 
 WowheadMountData[42776] = {} -- Spectral Tiger
 WowheadMountData[42776]['ground'] = 60
@@ -538,7 +532,7 @@ WowheadMountData[10793] = {} -- Striped Nightsaber
 WowheadMountData[10793]['ground'] = 60
 
 WowheadMountData[32242] = {} -- Swift Blue Gryphon
-WowheadMountData[32242]['air'] = 280
+WowheadMountData[32242]['flying'] = 280
 
 WowheadMountData[23241] = {} -- Swift Blue Raptor
 WowheadMountData[23241]['ground'] = 100
@@ -577,7 +571,7 @@ WowheadMountData[23252] = {} -- Swift Gray Wolf
 WowheadMountData[23252]['ground'] = 100
 
 WowheadMountData[32290] = {} -- Swift Green Gryphon
-WowheadMountData[32290]['air'] = 280
+WowheadMountData[32290]['flying'] = 280
 
 WowheadMountData[35025] = {} -- Swift Green Hawkstrider
 WowheadMountData[35025]['ground'] = 100
@@ -586,7 +580,7 @@ WowheadMountData[23225] = {} -- Swift Green Mechanostrider
 WowheadMountData[23225]['ground'] = 100
 
 WowheadMountData[32295] = {} -- Swift Green Wind Rider
-WowheadMountData[32295]['air'] = 280
+WowheadMountData[32295]['flying'] = 280
 
 WowheadMountData[63636] = {} -- Swift Ironforge Ram
 WowheadMountData[63636]['ground'] = 100
@@ -595,10 +589,10 @@ WowheadMountData[23219] = {} -- Swift Mistsaber
 WowheadMountData[23219]['ground'] = 100
 
 WowheadMountData[61442] = {} -- Swift Mooncloth Carpet
-WowheadMountData[61442]['air'] = 280
+WowheadMountData[61442]['flying'] = 280
 
 WowheadMountData[37015] = {} -- Swift Nether Drake
-WowheadMountData[37015]['air'] = 310
+WowheadMountData[37015]['flying'] = 310
 
 WowheadMountData[23242] = {} -- Swift Olive Raptor
 WowheadMountData[23242]['ground'] = 100
@@ -616,25 +610,25 @@ WowheadMountData[33660] = {} -- Swift Pink Hawkstrider
 WowheadMountData[33660]['ground'] = 100
 
 WowheadMountData[32292] = {} -- Swift Purple Gryphon
-WowheadMountData[32292]['air'] = 280
+WowheadMountData[32292]['flying'] = 280
 
 WowheadMountData[35027] = {} -- Swift Purple Hawkstrider
 WowheadMountData[35027]['ground'] = 100
 
 WowheadMountData[32297] = {} -- Swift Purple Wind Rider
-WowheadMountData[32297]['air'] = 280
+WowheadMountData[32297]['flying'] = 280
 
 WowheadMountData[24242] = {} -- Swift Razzashi Raptor
 WowheadMountData[24242]['ground'] = 100
 
 WowheadMountData[32289] = {} -- Swift Red Gryphon
-WowheadMountData[32289]['air'] = 280
+WowheadMountData[32289]['flying'] = 280
 
 WowheadMountData[32246] = {} -- Swift Red Wind Rider
-WowheadMountData[32246]['air'] = 280
+WowheadMountData[32246]['flying'] = 280
 
 WowheadMountData[61444] = {} -- Swift Shadoweave Carpet
-WowheadMountData[61444]['air'] = 280
+WowheadMountData[61444]['flying'] = 280
 
 WowheadMountData[63642] = {} -- Swift Silvermoon Hawkstrider
 WowheadMountData[63642]['ground'] = 100
@@ -643,7 +637,7 @@ WowheadMountData[42777] = {} -- Swift Spectral Tiger
 WowheadMountData[42777]['ground'] = 100
 
 WowheadMountData[61446] = {} -- Swift Spellfire Carpet
-WowheadMountData[61446]['air'] = 280
+WowheadMountData[61446]['flying'] = 280
 
 WowheadMountData[23338] = {} -- Swift Stormsaber
 WowheadMountData[23338]['ground'] = 100
@@ -673,7 +667,7 @@ WowheadMountData[23222] = {} -- Swift Yellow Mechanostrider
 WowheadMountData[23222]['ground'] = 100
 
 WowheadMountData[32296] = {} -- Swift Yellow Wind Rider
-WowheadMountData[32296]['air'] = 280
+WowheadMountData[32296]['flying'] = 280
 
 WowheadMountData[48954] = {} -- Swift Zhevra
 WowheadMountData[48954]['ground'] = 100
@@ -694,7 +688,7 @@ WowheadMountData[16059] = {} -- Tawny Sabercat
 WowheadMountData[16059]['ground'] = 60
 
 WowheadMountData[32243] = {} -- Tawny Wind Rider
-WowheadMountData[32243]['air'] = 60
+WowheadMountData[32243]['flying'] = 60
 
 WowheadMountData[18992] = {} -- Teal Kodo
 WowheadMountData[18992]['ground'] = 100
@@ -703,7 +697,7 @@ WowheadMountData[580] = {} -- Timber Wolf
 WowheadMountData[580]['ground'] = 60
 
 WowheadMountData[60002] = {} -- Time-Lost Proto-Drake
-WowheadMountData[60002]['air'] = 280
+WowheadMountData[60002]['flying'] = 280
 
 WowheadMountData[61425] = {} -- Traveler's Tundra Mammoth
 WowheadMountData[61425]['ground'] = 100
@@ -712,7 +706,7 @@ WowheadMountData[61447] = {} -- Traveler's Tundra Mammoth
 WowheadMountData[61447]['ground'] = 100
 
 WowheadMountData[44151] = {} -- Turbo-Charged Flying Machine
-WowheadMountData[44151]['air'] = 280
+WowheadMountData[44151]['flying'] = 280
 
 WowheadMountData[63638] = {} -- Turbostrider
 WowheadMountData[63638]['ground'] = 100
@@ -721,25 +715,25 @@ WowheadMountData[10796] = {} -- Turquoise Raptor
 WowheadMountData[10796]['ground'] = 60
 
 WowheadMountData[59571] = {} -- Twilight Drake
-WowheadMountData[59571]['air'] = 280
+WowheadMountData[59571]['flying'] = 280
 
 WowheadMountData[17454] = {} -- Unpainted Mechanostrider
 WowheadMountData[17454]['ground'] = 60
 
 WowheadMountData[49193] = {} -- Vengeful Nether Drake
-WowheadMountData[49193]['air'] = 310
+WowheadMountData[49193]['flying'] = 310
 
 WowheadMountData[64659] = {} -- Venomhide Ravasaur
 WowheadMountData[64659]['ground'] = 100
 
 WowheadMountData[41517] = {} -- Veridian Netherwing Drake
-WowheadMountData[41517]['air'] = 280
+WowheadMountData[41517]['flying'] = 280
 
 WowheadMountData[41518] = {} -- Violet Netherwing Drake
-WowheadMountData[41518]['air'] = 280
+WowheadMountData[41518]['flying'] = 280
 
 WowheadMountData[60024] = {} -- Violet Proto-Drake
-WowheadMountData[60024]['air'] = 310
+WowheadMountData[60024]['flying'] = 310
 
 WowheadMountData[10799] = {} -- Violet Raptor
 WowheadMountData[10799]['ground'] = 60
@@ -769,7 +763,7 @@ WowheadMountData[34897] = {} -- White War Talbuk
 WowheadMountData[34897]['ground'] = 100
 
 WowheadMountData[54729] = {} -- Winged Steed of the Ebon Blade
-WowheadMountData[54729]['air'] = -1
+WowheadMountData[54729]['flying'] = -1
 
 WowheadMountData[581] = {} -- Winter Wolf
 WowheadMountData[581]['ground'] = 60
@@ -787,12 +781,28 @@ WowheadMountData[59793] = {} -- Wooly Mammoth
 WowheadMountData[59793]['ground'] = 100
 
 WowheadMountData[46197] = {} -- X-51 Nether-Rocket
-WowheadMountData[46197]['air'] = 60
+WowheadMountData[46197]['flying'] = 60
 
 WowheadMountData[46199] = {} -- X-51 Nether-Rocket X-TREME
-WowheadMountData[46199]['air'] = 280
+WowheadMountData[46199]['flying'] = 280
 
 WowheadMountData[26055] = {} -- Yellow Qiraji Battle Tank
 WowheadMountData[26055]['ground'] = 100
 
--- Generated in 53.255148172379 seconds
+WowheadMountSpeeds = {
+	flying = {
+		[60] = false,
+		[280] = true,
+		[310] = true,
+	},
+	ground = {
+		[0] = false,
+		[60] = true,
+		[100] = true,
+	},
+	swimming = {
+		[60] = true,
+	},
+}
+
+-- Generated in 50.542541027069 seconds

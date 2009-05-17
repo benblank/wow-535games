@@ -61,23 +61,8 @@ local defaults = {
 	},
 }
 
--- build options
-
-local types = {
-	flying = {
-		[60] = false,
-		[280] = true,
-		[310] = true,
-	},
-
-	ground = {
-		[0] = false,
-		[60] = true,
-		[100] = true,
-	},
-}
-
-for type, speeds in pairs(types) do
+-- generate options and defaults
+for type, speeds in pairs(WowheadMountSpeeds) do
 	defaults.profile[type] = {fastest = true}
 	options.args.options.args[type] = {
 		name = L["TYPE_" .. type:upper()],
