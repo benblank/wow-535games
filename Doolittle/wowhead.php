@@ -53,12 +53,13 @@ DONE;
 
 ob_start();
 
+$speeds = array('flying' => array(), 'ground' => array(), 'swimming' => array());
+
 foreach (array("http://www.wowhead.com/?spells=-5", "http://www.wowhead.com/?spells&filter=minle=2;me=21") as $url) {
 	$mdoc = new DOMDocument();
 	@$mdoc->loadHTMLFile($url);
 
 	$mpath = new DOMXPath($mdoc);
-	$speeds = array('flying' => array(), 'ground' => array(), 'swimming' => array());
 
 	foreach($mpath->query("//div[@class='listview-void']/a") as $mnode) {
 		$path = $mnode->attributes->getNamedItem("href")->value;

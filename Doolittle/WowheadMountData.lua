@@ -816,15 +816,20 @@ Doolittle.wowhead = {
 		},
 		speeds = {
 			flying = {
+				[60] = false,
+				[280] = true,
+				[310] = true,
 			},
 			ground = {
+				[0] = false,
 				[60] = true,
 				[100] = true,
 			},
 			swimming = {
+				[60] = true,
 			},
 		},
 	},
 }
 
--- Generated on Sun, 17 May 2009 09:53:24 -0700 in 77.043298959732 seconds
+-- Generated on Sun, 17 May 2009 10:16:00 -0700 in 57.443286895752 seconds

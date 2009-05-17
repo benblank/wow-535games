@@ -31,7 +31,7 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 -- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Doolittle = LibStub("AceAddon-3.0"):NewAddon("Doolittle", "AceEvent-3.0")
+Doolittle = LibStub("AceAddon-3.0"):NewAddon("Doolittle", "AceConsole-3.0", "AceEvent-3.0")
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Doolittle")
 
@@ -44,6 +44,7 @@ local options = {
 			name = L["CMD_MOUNT"],
 			desc = L["CMD_MOUNT_DESC"],
 			type = "execute",
+			dialogHidden = true,
 			func = "CmdMount",
 		},
 
@@ -57,26 +58,73 @@ local options = {
 
 local defaults = {
 	profile = {
-		mounts = {},
+		mounts = {
+			ratings = {
+				["*"] = 0,
+			},
+		},
 	},
 }
 
--- generate options and defaults
+local orders = {
+	flying   = 1000,
+	ground   = 2000,
+	swimming = 3000,
+}
+
+function Doolittle:AddMount(id, spell, type, speed, icon, name)
+	self.mounts[id] = spell
+
+	local args = options.args.mounts.args
+	local ratings = self.db.profile.mounts.ratings
+	local typespeed = type .. speed
+
+	if not args[typespeed] then
+		args[typespeed] = {
+			name = L["TYPE_" .. type:upper()] .. " (" .. speed .. "%)",
+			type = "group",
+			order = orders[type] + speed,
+			args = {
+				zero = {
+					name = L["OPT_ZERO"],
+					type = "description",
+					order = 0,
+				},
+			},
+		}
+	end
+
+	args[typespeed].args["spell" .. spell] = {
+		name = name,
+		type = "range",
+		min = 0,
+		max = 4,
+		step = 1,
+		get = function(info) return ratings[spell] end,
+		set = function(info, value) ratings[spell] = value end,
+	}
+end
+
 function Doolittle:BuildOptionsAndDefaults()
+	local args = options.args.mounts.args
+	local mounts = defaults.profile.mounts
+
 	for type, speeds in pairs(self.wowhead.mounts.speeds) do
-		defaults.profile.mounts[type] = {fastest = true}
-		options.args.mounts.args[type] = {
+		mounts[type] = {fastest = true}
+
+		args[type] = {
 			name = L["TYPE_" .. type:upper()],
 			type = "group",
 			inline = true,
 			args = {
 				fastest = {
 					name = L["OPT_FASTEST_ONLY"],
+					desc = L["OPT_FASTEST_ONLY_DESC"],
 					type = "toggle",
 					order = 50,
 					width = "full",
-					get = function(info) return Doolittle.db.profile.mounts[type].fastest end,
-					set = function(info, value) Doolittle.db.profile.mounts[type].fastest = value end,
+					get = function(info) return self.db.profile.mounts[type].fastest end,
+					set = function(info, value) self.db.profile.mounts[type].fastest = value end,
 				},
 			},
 		}
@@ -84,21 +132,49 @@ function Doolittle:BuildOptionsAndDefaults()
 		for speed, default in pairs(speeds) do
 			local sspeed = "speed" .. speed
 
-			defaults.profile.mounts[type][sspeed] = default
-			options.args.mounts.args[type].args[sspeed] = {
+			mounts[type][sspeed] = default
+
+			args[type].args[sspeed] = {
 				name = L["OPT_INCLUDE_SPEED"](speed),
 				type = "toggle",
 				order = 1000 + speed,
 				width = "full",
-				disabled = function(info) return Doolittle.db.profile.mounts[type].fastest end,
-				get = function(info) return Doolittle.db.profile.mounts[type][sspeed] end,
-				set = function(info, value) Doolittle.db.profile.mounts[type][sspeed] = value end,
+				disabled = function(info) return self.db.profile.mounts[type].fastest end,
+				get = function(info) return self.db.profile.mounts[type][sspeed] end,
+				set = function(info, value) self.db.profile.mounts[type][sspeed] = value end,
 			}
 		end
 	end
 end
 
 function Doolittle:CmdMount()
+end
+
+function Doolittle:GetMounts()
+	local count = GetNumCompanions("MOUNT")
+
+	self.mounts = {}
+
+	if count then
+		local _, name, spell, icon, speeds
+
+		for id = 1, count do
+			_, name, spell, icon, _ = GetCompanionInfo("MOUNT", id)
+
+			speeds = self.wowhead.mounts.data[spell]
+
+			if not speeds then
+				self:Print("Unrecognized mount: " .. name .. " (" .. spell .. ")")
+			end
+
+			for type, speed in pairs(self.wowhead.mounts.data[spell]) do
+				if speed == -1 then
+				else
+					self:AddMount(id, spell, type, speed, icon, name)
+				end
+			end
+		end
+	end
 end
 
 function Doolittle:OnDisable()
@@ -117,5 +193,5 @@ function Doolittle:OnInitialize()
 	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Doolittle", options)
 	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Doolittle", "Doolittle")
 
-	--TODO: read mount/pet data
+	self:GetMounts()
 end
