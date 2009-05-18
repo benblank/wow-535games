@@ -51,7 +51,23 @@ local options = {
 		mounts = {
 			name = L["OPT_MOUNTS"],
 			type = "group",
-			args = {},
+			args = {
+				dismountkey = {
+					name = L["OPT_DISMOUNT"],
+					desc = L["OPT_DISMOUNT_DESC"],
+					type = "select",
+					order = 50,
+					style = "dropdown",
+					get = function(info) return Doolittle.db.profile.mounts.dismountkey end,
+					set = function(info, value) Doolittle.db.profile.mounts.dismountkey = value end,
+					values = {
+						--TODO: "none" option
+						alt = L["KEY_ALT"],
+						ctrl = L["KEY_CTRL"],
+						shift = L["KEY_SHIFT"],
+					},
+				},
+			},
 		},
 	},
 }
@@ -59,6 +75,8 @@ local options = {
 local defaults = {
 	profile = {
 		mounts = {
+			dismountkey = "shift",
+
 			ratings = {
 				["*"] = 0,
 			},
@@ -148,6 +166,32 @@ function Doolittle:BuildOptionsAndDefaults()
 end
 
 function Doolittle:CmdMount()
+	local zone = GetRealZoneText()
+	local subzone = GetSubZoneText()
+	local command, _ = SecureCmdOptionParse("[mounted,flying,nomodifier:" .. self.db.profile.mounts.dismountkey .. "]error-flying;[mounted]dismount;[combat]error-combat;[indoors]error-indoors;[swimming]swimming;[flyable]flying;ground")
+
+self:Print(command)
+	if command == "dismount" then
+		Dismount()
+		return
+	elseif command == "error-combat" then
+		self:DisplayError(ERR_NOT_IN_COMBAT)
+		return
+	elseif command == "error-flying" then
+self:Print("error-flying")
+		self:DisplayError(L["ERROR_FLYING"](L["KEY_" .. self.db.profile.mounts.dismountkey:upper()]))
+		return
+	elseif command == "error-indoors" then
+		self:DisplayError(SPELL_FAILED_NO_MOUNTS_ALLOWED)
+		return
+	elseif command == "flying" and (zone == L["ZONE_WINTERGRASP"] or (zone == L["ZONE_DALARAN"] and subzone ~= L["ZONE_KRASUS_LANDING"])) then
+		command = "ground"
+	end
+end
+
+function Doolittle:DisplayError(message)
+self:Print("Error: " .. message)
+	UIErrorsFrame:AddMessage(message, 1.0, 0.1, 0.1, 1.0)
 end
 
 function Doolittle:GetMounts()
@@ -169,6 +213,10 @@ function Doolittle:GetMounts()
 
 			for type, speed in pairs(self.wowhead.mounts.data[spell]) do
 				if speed == -1 then
+					--BUG: this includes adjustable-speed mounts in the ground0 / flying310 brackets, which is incorrect
+					for speed, _ in pairs(self.wowhead.mounts.speeds[type]) do
+						self:AddMount(id, spell, type, speed, icon, name)
+					end
 				else
 					self:AddMount(id, spell, type, speed, icon, name)
 				end
