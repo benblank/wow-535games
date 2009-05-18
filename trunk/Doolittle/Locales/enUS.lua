@@ -40,7 +40,15 @@ end
 L["CMD_MOUNT"] = "Mount"
 L["CMD_MOUNT_DESC"] = "Hop into the saddle of a random mount."
 
+L["ERROR_FLYING"] = function(key) return "Hold \"" .. key .. "\" to dismount while flying." end
+
+L["KEY_ALT"] = "Alt"
+L["KEY_CTRL"] = "Control"
+L["KEY_SHIFT"] = "Shift"
+
 L["OPT_MOUNTS"] = "Mounts"
+L["OPT_DISMOUNT"] = "Dismount key"
+L["OPT_DISMOUNT_DESC"] = "Hold this key to dismount even when flying."
 L["OPT_FASTEST_ONLY"] = "Include fastest only"
 L["OPT_FASTEST_ONLY_DESC"] = "If checked, all speed category settings for this mount type will be ignored."
 L["OPT_INCLUDE_SPEED"] = function(speed) return "Include " .. speed .. "% mounts" end
@@ -49,3 +57,7 @@ L["OPT_ZERO"] = "A rating of 0 means \"unrated\".  Unrated mounts have normal od
 L["TYPE_FLYING"] = "Flying"
 L["TYPE_GROUND"] = "Ground"
 L["TYPE_SWIMMING"] = "Swimming"
+
+L["ZONE_DALARAN"] = "Dalaran"
+L["ZONE_KRASUS_LANDING"] = "Krasus' Landing"
+L["ZONE_WINTERGRASP"] = "Lake Wintergrasp"
