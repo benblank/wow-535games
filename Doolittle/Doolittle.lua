@@ -67,6 +67,66 @@ local options = {
 						shift = L["KEY_SHIFT"],
 					},
 				},
+
+				weights = {
+					name = L["OPT_WEIGHTS"],
+					desc = L["OPT_WEIGHTS_DESC"],
+					type = "group",
+					order = 50,
+					inline = true,
+					args = {
+						rating0 = {
+							name = L["OPT_WEIGHT_FOR"](0),
+							type = "range",
+							width = "full",
+							min = 0,
+							max = 10,
+							step = 1,
+							get = function(info) return Doolittle.db.profile.mounts.weights[0] end,
+							set = function(info, value) Doolittle.db.profile.mounts.weights[0] = value end,
+						},
+						rating1 = {
+							name = L["OPT_WEIGHT_FOR"](1),
+							type = "range",
+							width = "full",
+							min = 0,
+							max = 10,
+							step = 1,
+							get = function(info) return Doolittle.db.profile.mounts.weights[1] end,
+							set = function(info, value) Doolittle.db.profile.mounts.weights[1] = value end,
+						},
+						rating2 = {
+							name = L["OPT_WEIGHT_FOR"](2),
+							type = "range",
+							width = "full",
+							min = 0,
+							max = 10,
+							step = 1,
+							get = function(info) return Doolittle.db.profile.mounts.weights[2] end,
+							set = function(info, value) Doolittle.db.profile.mounts.weights[2] = value end,
+						},
+						rating3 = {
+							name = L["OPT_WEIGHT_FOR"](3),
+							type = "range",
+							width = "full",
+							min = 0,
+							max = 10,
+							step = 1,
+							get = function(info) return Doolittle.db.profile.mounts.weights[3] end,
+							set = function(info, value) Doolittle.db.profile.mounts.weights[3] = value end,
+						},
+						rating4 = {
+							name = L["OPT_WEIGHT_FOR"](4),
+							type = "range",
+							width = "full",
+							min = 0,
+							max = 10,
+							step = 1,
+							get = function(info) return Doolittle.db.profile.mounts.weights[4] end,
+							set = function(info, value) Doolittle.db.profile.mounts.weights[4] = value end,
+						},
+					},
+				},
 			},
 		},
 	},
@@ -80,6 +140,14 @@ local defaults = {
 			ratings = {
 				["*"] = 0,
 			},
+
+			weights = {
+				[0] = 4,
+				[1] = 1,
+				[2] = 2,
+				[3] = 4,
+				[4] = 8,
+			},
 		},
 	},
 }
@@ -91,7 +159,11 @@ local orders = {
 }
 
 function Doolittle:AddMount(id, spell, type, speed, icon, name)
-	self.mounts[id] = spell
+	if not self.mounts[type] then
+		self.mounts[type] = {}
+	end
+
+	self.mounts[type][spell] = id
 
 	local args = options.args.mounts.args
 	local ratings = self.db.profile.mounts.ratings
@@ -115,6 +187,7 @@ function Doolittle:AddMount(id, spell, type, speed, icon, name)
 	args[typespeed].args["spell" .. spell] = {
 		name = name,
 		type = "range",
+		width = "full",
 		min = 0,
 		max = 4,
 		step = 1,
@@ -170,7 +243,6 @@ function Doolittle:CmdMount()
 	local subzone = GetSubZoneText()
 	local command, _ = SecureCmdOptionParse("[mounted,flying,nomodifier:" .. self.db.profile.mounts.dismountkey .. "]error-flying;[mounted]dismount;[combat]error-combat;[indoors]error-indoors;[swimming]swimming;[flyable]flying;ground")
 
-self:Print(command)
 	if command == "dismount" then
 		Dismount()
 		return
@@ -178,7 +250,6 @@ self:Print(command)
 		self:DisplayError(ERR_NOT_IN_COMBAT)
 		return
 	elseif command == "error-flying" then
-self:Print("error-flying")
 		self:DisplayError(L["ERROR_FLYING"](L["KEY_" .. self.db.profile.mounts.dismountkey:upper()]))
 		return
 	elseif command == "error-indoors" then
@@ -187,10 +258,29 @@ self:Print("error-flying")
 	elseif command == "flying" and (zone == L["ZONE_WINTERGRASP"] or (zone == L["ZONE_DALARAN"] and subzone ~= L["ZONE_KRASUS_LANDING"])) then
 		command = "ground"
 	end
+
+	local type = self.mounts[command]
+
+	if not type then
+		--TODO: no mounts of type
+		return
+	end
+
+	local mounts = self.db.profile.mounts
+	local tickets = {}
+
+	--TODO: restrict to selected speed brackets
+	--TODO: randomize to rating, then randomize within rating?
+	for spell, id in pairs(type) do
+		for i = 1, mounts.weights[mounts.ratings[spell]] do
+			table.insert(tickets, id)
+		end
+	end
+
+	CallCompanion("MOUNT", tickets[math.random(#tickets) - 1])
 end
 
 function Doolittle:DisplayError(message)
-self:Print("Error: " .. message)
 	UIErrorsFrame:AddMessage(message, 1.0, 0.1, 0.1, 1.0)
 end
 
