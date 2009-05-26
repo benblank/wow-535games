@@ -10,5 +10,6 @@
 embeds.xml
 Locales\locales.xml
 
+Pool.lua
 Doolittle.lua
 WowheadMountData.lua
