@@ -49,7 +49,7 @@ local options = {
 		},
 
 		mounts = {
-			name = L["OPT_MOUNTS"],
+			name = MOUNTS,
 			type = "group",
 			args = {
 				dismountkey = {
@@ -60,11 +60,11 @@ local options = {
 					style = "dropdown",
 					get = function(info) return Doolittle.db.profile.mounts.dismountkey end,
 					set = function(info, value) Doolittle.db.profile.mounts.dismountkey = value end,
-					values = {
-						--TODO: "none" option
-						alt = L["KEY_ALT"],
-						ctrl = L["KEY_CTRL"],
-						shift = L["KEY_SHIFT"],
+					values = { --BUG: these display sorted in GUI; NONE_KEY should appear first
+						none = NONE_KEY,
+						alt = ALT_KEY,
+						ctrl = CTRL_KEY,
+						shift = SHIFT_KEY,
 					},
 				},
 
@@ -142,11 +142,12 @@ local defaults = {
 			},
 
 			weights = {
-				[0] = 4,
-				[1] = 1,
+				[0] = 5,
+				[1] = 0,
 				[2] = 2,
-				[3] = 4,
+				[3] = 5,
 				[4] = 8,
+				[5] = 10,
 			},
 		},
 	},
@@ -241,7 +242,14 @@ end
 function Doolittle:CmdMount()
 	local zone = GetRealZoneText()
 	local subzone = GetSubZoneText()
-	local command, _ = SecureCmdOptionParse("[mounted,flying,nomodifier:" .. self.db.profile.mounts.dismountkey .. "]error-flying;[mounted]dismount;[combat]error-combat;[indoors]error-indoors;[swimming]swimming;[flyable]flying;ground")
+	local macro = "[mounted]dismount;[combat]error-combat;[indoors]error-indoors;[swimming]swimming;[flyable]flying;ground"
+	local dismountkey = self.db.profile.mounts.dismountkey
+
+	if dismountkey ~= "none" then
+		macro = "[mounted,flying,nomodifier:" .. dismountkey .. "]error-flying;" .. macro
+	end
+
+	local command, _ = SecureCmdOptionParse(macro)
 
 	if command == "dismount" then
 		Dismount()
@@ -250,7 +258,7 @@ function Doolittle:CmdMount()
 		self:DisplayError(ERR_NOT_IN_COMBAT)
 		return
 	elseif command == "error-flying" then
-		self:DisplayError(L["ERROR_FLYING"](L["KEY_" .. self.db.profile.mounts.dismountkey:upper()]))
+		self:DisplayError(L["ERROR_FLYING"](L["KEY_" .. dismountkey:upper()]))
 		return
 	elseif command == "error-indoors" then
 		self:DisplayError(SPELL_FAILED_NO_MOUNTS_ALLOWED)

@@ -37,16 +37,11 @@ if not L then
 	return
 end
 
-L["CMD_MOUNT"] = "Mount"
+L["CMD_MOUNT"] = "Mount" -- not using MOUNT from GlobalStrings because that appears to be intended as a noun whereas this is a verb
 L["CMD_MOUNT_DESC"] = "Hop into the saddle of a random mount."
 
-L["ERROR_FLYING"] = function(key) return "Hold \"" .. key .. "\" to dismount while flying." end
+L["ERROR_FLYING"] = function(key) return "Hold the " .. key .. " to dismount while flying." end
 
-L["KEY_ALT"] = "Alt"
-L["KEY_CTRL"] = "Control"
-L["KEY_SHIFT"] = "Shift"
-
-L["OPT_MOUNTS"] = "Mounts"
 L["OPT_DISMOUNT"] = "Dismount key"
 L["OPT_DISMOUNT_DESC"] = "Hold this key to dismount even when flying."
 L["OPT_FASTEST_ONLY"] = "Include fastest only"
@@ -63,4 +58,4 @@ L["TYPE_SWIMMING"] = "Swimming"
 
 L["ZONE_DALARAN"] = "Dalaran"
 L["ZONE_KRASUS_LANDING"] = "Krasus' Landing"
-L["ZONE_WINTERGRASP"] = "Lake Wintergrasp"
+L["ZONE_WINTERGRASP"] = "Wintergrasp"
