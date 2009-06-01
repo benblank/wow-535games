@@ -76,6 +76,28 @@ function mt.__mul(a, b)
 	return c
 end
 
+function mt.__sub(a, b)
+	local c = Pool{}
+
+	if gmt(a) == mt then
+		for k in pairs(a) do c[k] = true end
+	elseif type(a) == "table" then
+		for _, v in ipairs(a) do c[v] = true end
+	else
+		c[a] = true
+	end
+
+	if gmt(b) == mt then
+		for k in pairs(b) do c[k] = nil end
+	elseif type(b) == "table" then
+		for _, v in ipairs(b) do c[v] = nil end
+	else
+		c[b] = nil
+	end
+
+	return c
+end
+
 function mt.__tostring(a)
 	local keys = {}
 

@@ -190,7 +190,7 @@ function Doolittle:AddMount(id, spell, type, speed, icon, name)
 		type = "range",
 		width = "full",
 		min = 0,
-		max = 4,
+		max = 5,
 		step = 1,
 		get = function(info) return ratings[spell] end,
 		set = function(info, value) ratings[spell] = value end,
