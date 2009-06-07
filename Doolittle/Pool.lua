@@ -59,7 +59,7 @@ end
 function mt.__call(a)
 	local keys = {}
 
-	for k, _ in pairs(a) do table.insert(keys, k) end
+	for k in pairs(a) do table.insert(keys, k) end
 
 	return keys[math.random(#keys)]
 end
@@ -71,7 +71,7 @@ function mt.__mul(a, b)
 
 	local c = Pool{}
 
-	for k, _ in pairs(a) do c[k] = b[k] end
+	for k in pairs(a) do c[k] = b[k] end
 
 	return c
 end

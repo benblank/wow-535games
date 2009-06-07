@@ -42,7 +42,7 @@ L["CMD_MOUNT_DESC"] = "Hop into the saddle of a random mount."
 
 L["ERROR_FLYING"] = function(key) return "Hold the " .. key .. " to dismount while flying." end
 
-L["OPT_DISMOUNT"] = "Dismount key"
+L["OPT_DISMOUNT"] = "Dismount-in-flight key"
 L["OPT_DISMOUNT_DESC"] = "Hold this key to dismount even when flying."
 L["OPT_FASTEST_ONLY"] = "Include fastest only"
 L["OPT_FASTEST_ONLY_DESC"] = "If checked, all speed category settings for this mount type will be ignored."
