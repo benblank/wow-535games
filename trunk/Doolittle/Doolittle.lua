@@ -201,7 +201,7 @@ function Doolittle:BuildOptionsAndDefaults()
 	local args = options.args.mounts.args
 	local mounts = defaults.profile.mounts
 
-	for type, speeds in pairs(self.wowhead.mounts.speeds) do
+	for type, speeds in pairs(self.mounts.speeds) do
 		mounts[type] = {fastest = true}
 
 		args[type] = {
@@ -292,45 +292,29 @@ function Doolittle:DisplayError(message)
 	UIErrorsFrame:AddMessage(message, 1.0, 0.1, 0.1, 1.0)
 end
 
-function Doolittle:GetMounts()
-	local count = GetNumCompanions("MOUNT")
+function Doolittle:MapType(type)
+	return type:lower() .. "s"
+end
 
-	self.mounts = {}
-
-	if count then
-		local _, name, spell, icon, speeds
-
-		for id = 1, count do
-			_, name, spell, icon, _ = GetCompanionInfo("MOUNT", id)
-
-			speeds = self.wowhead.mounts.data[spell]
-
-			if not speeds then
-				self:Print("Unrecognized mount: " .. name .. " (" .. spell .. ")")
-			end
-
-			for type, speed in pairs(self.wowhead.mounts.data[spell]) do
-				if speed == -1 then
-					--BUG: this includes adjustable-speed mounts in the ground0 / flying310 brackets, which is incorrect
-					for speed, _ in pairs(self.wowhead.mounts.speeds[type]) do
-						self:AddMount(id, spell, type, speed, icon, name)
-					end
-				else
-					self:AddMount(id, spell, type, speed, icon, name)
-				end
-			end
-		end
+function Doolittle:OnCompanionUpdate(event, type)
+	if type == nil then
+		self:ScanCompanions("CRITTER")
+		self:ScanCompanions("MOUNT")
+	else
+		self:ScanCompanions(type)
 	end
 end
 
 function Doolittle:OnDisable()
+	self:Print("Disabled")
 end
 
 function Doolittle:OnEnable()
+	self:Print("Enabled")
 end
 
 function Doolittle:OnInitialize()
-	self:BuildOptionsAndDefaults() -- MUST be before AceDB call
+	self:BuildOptionsAndDefaults() -- sets defaults; MUST be before AceDB call
 
 	self.db = LibStub("AceDB-3.0"):New("DoolittleDB", defaults)
 	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
@@ -339,5 +323,36 @@ function Doolittle:OnInitialize()
 	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Doolittle", options)
 	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Doolittle", "Doolittle")
 
-	self:GetMounts()
+	self:OnCompanionUpdate() -- COMPANION_UPDATE does not fire on UI reload
 end
+
+function Doolittle:ScanCompanions(type)
+	local count = GetNumCompanions(type)
+	local known = {}
+
+	if count then
+		local _, name, spell, icon, speeds
+
+		for id = 1, count do
+			_, name, spell, icon, _ = GetCompanionInfo(type, id)
+
+			known[spell] = {id, name, icon}
+		end
+	end
+
+	type = self:MapType(type)
+
+	-- these two if blocks can be removed once critters have been added to CompanionData.php
+	if not self[type] then
+		self[type] = {}
+	end
+
+	if not self[type].pools then
+		self[type].pools = {}
+	end
+
+	self[type].pools.known = known
+end
+
+Doolittle:RegisterEvent("COMPANION_LEARNED", "OnCompanionUpdate")
+Doolittle:RegisterEvent("COMPANION_UPDATE", "OnCompanionUpdate")
