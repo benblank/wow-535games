@@ -31,8 +31,9 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 -- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Doolittle = LibStub("AceAddon-3.0"):NewAddon("Doolittle", "AceConsole-3.0", "AceEvent-3.0")
+Doolittle = LibStub("AceAddon-3.0"):NewAddon("Doolittle", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 
+local AceGUI = LibStub("AceGUI-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Doolittle")
 
 local options = {
@@ -134,6 +135,21 @@ local options = {
 
 local defaults = {
 	profile = {
+		critters = {
+			ratings = {
+				["*"] = 0,
+			},
+
+			weights = {
+				[0] = 5,
+				[1] = 0,
+				[2] = 2,
+				[3] = 5,
+				[4] = 8,
+				[5] = 10,
+			},
+		},
+
 		mounts = {
 			dismountkey = "shift",
 
@@ -158,44 +174,6 @@ local orders = {
 	ground   = 2000,
 	swimming = 3000,
 }
-
-function Doolittle:AddMount(id, spell, type, speed, icon, name)
-	if not self.mounts[type] then
-		self.mounts[type] = {}
-	end
-
-	self.mounts[type][spell] = id
-
-	local args = options.args.mounts.args
-	local ratings = self.db.profile.mounts.ratings
-	local typespeed = type .. speed
-
-	if not args[typespeed] then
-		args[typespeed] = {
-			name = L["TYPE_" .. type:upper()] .. " (" .. speed .. "%)",
-			type = "group",
-			order = orders[type] + speed,
-			args = {
-				zero = {
-					name = L["OPT_ZERO"],
-					type = "description",
-					order = 0,
-				},
-			},
-		}
-	end
-
-	args[typespeed].args["spell" .. spell] = {
-		name = name,
-		type = "range",
-		width = "full",
-		min = 0,
-		max = 5,
-		step = 1,
-		get = function(info) return ratings[spell] end,
-		set = function(info, value) ratings[spell] = value end,
-	}
-end
 
 function Doolittle:BuildOptionsAndDefaults()
 	local args = options.args.mounts.args
@@ -292,25 +270,38 @@ function Doolittle:DisplayError(message)
 	UIErrorsFrame:AddMessage(message, 1.0, 0.1, 0.1, 1.0)
 end
 
-function Doolittle:MapType(type)
-	return type:lower() .. "s"
+function Doolittle:GetRating(which)
+	return self.db.profile[which[1]].ratings[which[2]]
 end
 
-function Doolittle:OnCompanionUpdate(event, type)
-	if type == nil then
+function Doolittle:GetSelected()
+	local mode = PetPaperDollFrameCompanionFrame.mode:lower() .. "s"
+	local spell = ((mode == "mounts") and PetPaperDollFrameCompanionFrame.idMount or PetPaperDollFrameCompanionFrame.idCritter)
+
+	return {mode, spell}
+end
+
+function Doolittle:OnCompanionUpdate(event, mode)
+	if mode == nil then
 		self:ScanCompanions("CRITTER")
 		self:ScanCompanions("MOUNT")
 	else
-		self:ScanCompanions(type)
+		self:ScanCompanions(mode)
 	end
 end
 
 function Doolittle:OnDisable()
-	self:Print("Disabled")
+	AceGUI:Release(self.slider)
 end
 
 function Doolittle:OnEnable()
-	self:Print("Enabled")
+	self.slider = AceGUI:Create("Slider")
+	self.slider:SetSliderValues(0,5,1)
+	self.slider.frame:SetParent(CompanionModelFrame)
+	self.slider:SetPoint("TOPRIGHT")
+
+	local this = self
+	self.slider:SetCallback("OnValueChanged", function(info) this:SetRating(this:GetSelected(), info.value) end)
 end
 
 function Doolittle:OnInitialize()
@@ -326,33 +317,44 @@ function Doolittle:OnInitialize()
 	self:OnCompanionUpdate() -- COMPANION_UPDATE does not fire on UI reload
 end
 
-function Doolittle:ScanCompanions(type)
-	local count = GetNumCompanions(type)
-	local known = {}
+function Doolittle:OnPreviewUpdate()
+	self.slider:SetValue(self:GetRating(self:GetSelected()))
+end
+
+function Doolittle:ScanCompanions(mode)
+	local count = GetNumCompanions(mode)
+	local known = Pool{}
 
 	if count then
 		local _, name, spell, icon, speeds
 
 		for id = 1, count do
-			_, name, spell, icon, _ = GetCompanionInfo(type, id)
+			_, name, spell, icon, _ = GetCompanionInfo(mode, id)
 
 			known[spell] = {id, name, icon}
 		end
 	end
 
-	type = self:MapType(type)
+	mode = mode:lower() .. "s"
 
 	-- these two if blocks can be removed once critters have been added to CompanionData.php
-	if not self[type] then
-		self[type] = {}
+	if not self[mode] then
+		self[mode] = {}
 	end
 
-	if not self[type].pools then
-		self[type].pools = {}
+	if not self[mode].pools then
+		self[mode].pools = {}
 	end
 
-	self[type].pools.known = known
+	self[mode].pools.known = known
+end
+
+function Doolittle:SetRating(which, value)
+	self.db.profile[which[1]].ratings[which[2]] = value
 end
 
 Doolittle:RegisterEvent("COMPANION_LEARNED", "OnCompanionUpdate")
 Doolittle:RegisterEvent("COMPANION_UPDATE", "OnCompanionUpdate")
+
+-- there's no real need for this to be a secure hook, but it has no side effects
+Doolittle:SecureHook("PetPaperDollFrame_UpdateCompanionPreview", "OnPreviewUpdate")
