@@ -1,0 +1,13 @@
+## Interface: 30100
+## Title: Junkyard
+## Notes: Flexible junk seller and vendor helper.
+## Author: Malefactor @ Draenor US
+## Version: 0.1
+## SavedVariables: JunkyardDB
+## OptionalDeps: Ace3
+## X-Embeds: Ace3
+
+embeds.xml
+Locales\locales.xml
+
+Junkyard.lua
