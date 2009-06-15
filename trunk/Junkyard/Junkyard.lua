@@ -33,6 +33,8 @@
 
 Junkyard = LibStub("AceAddon-3.0"):NewAddon("Junkyard", "AceConsole-3.0", "AceEvent-3.0")
 
+local L = LibStub("AceLocale-3.0"):GetLocale("Junkyard")
+
 local options = {
 	name = "Junkyard",
 	handler = Junkyard,
@@ -42,22 +44,110 @@ local options = {
 			name = L["CMD_SELL"],
 			desc = L["CMD_SELL_DESC"],
 			type = "execute",
+			order = 10,
 			dialogHidden = true,
 			func = "CmdSell",
+		},
+
+		sep1 = {
+			name = "",
+			type = "header",
+			order = 20,
+			dialogHidden = true,
+		},
+
+		auto = {
+			name = L["OPT_AUTO"],
+			type = "toggle",
+			order = 30,
+			width = "full",
+			get = function(info) return Junkyard.db.profile.auto end,
+			set = function(info, value) Junkyard.db.profile.auto = value end,
+		},
+
+		prompt = {
+			name = L["OPT_PROMPT"],
+			type = "toggle",
+			order = 30,
+			width = "full",
+			get = function(info) return Junkyard.db.profile.prompt end,
+			set = function(info, value) Junkyard.db.profile.prompt = value end,
+		},
+
+		sep2 = {
+			name = "",
+			type = "header",
+			order = 40,
+		},
+
+		junk = {
+			name = L["OPT_JUNK"],
+			desc = L["OPT_JUNK_DESC"],
+			type = "toggle",
+			order = 50,
+			width = "full",
+			get = function(info) return Junkyard.db.profile.junk end,
+			set = function(info, value) Junkyard.db.profile.junk = value end,
+		},
+
+		unusable = {
+			name = L["OPT_UNUSABLE"],
+			desc = L["OPT_UNUSABLE_DESC"],
+			type = "toggle",
+			order = 60,
+			width = "full",
+			get = function(info) return Junkyard.db.profile.unusable end,
+			set = function(info, value) Junkyard.db.profile.unusable = value end,
+		},
+
+		light = {
+			name = L["OPT_LIGHT"],
+			desc = L["OPT_LIGHT_DESC"],
+			type = "toggle",
+			order = 70,
+			width = "full",
+			get = function(info) return Junkyard.db.profile.light end,
+			set = function(info, value) Junkyard.db.profile.light = value end,
+		},
+
+		sep3 = {
+			name = "",
+			type = "header",
+			order = 80,
+		},
+
+		["no-enchanted"] = {
+			name = L["OPT_ENCHANTED"],
+			desc = L["OPT_ENCHANTED_DESC"],
+			type = "toggle",
+			order = 90,
+			width = "full",
+			get = function(info) return Junkyard.db.profile.no_enchanted end,
+			set = function(info, value) Junkyard.db.profile.no_enchanted = value end,
+		},
+
+		["no-gemmed"] = {
+			name = L["OPT_GEMMED"],
+			desc = L["OPT_GEMMED_DESC"],
+			type = "toggle",
+			order = 100,
+			width = "full",
+			get = function(info) return Junkyard.db.profile.no_gemmed end,
+			set = function(info, value) Junkyard.db.profile.no_gemmed = value end,
 		},
 	},
 }
 
---[[ options
-	X Automatically sell when talking to a vendor
-	-------
-	X Sell "poor"-quality items
-	X Sell unequippable soulbound items
-	x Sell inappropriate soulbound items
-	-------
-	X Don't sell enchanted items
-	X Don't sell gemmed items
-]]
+local defaults = {
+	profile = {
+		auto = "ask",
+		junk = true,
+		unusable = true,
+		light = false,
+		no_enchanted = true,
+		no_gemmed = true,
+	},
+}
 
 function Junkyard:CmdSell()
 	if GetMerchantItemLink(1) == nil then
@@ -65,44 +155,72 @@ function Junkyard:CmdSell()
 		return
 	end
 
-	local _, enchanted, equip, gem1, gem2, gem3, gem4, gemmed, level, link, name, quality, sell, slot, slots, subtype, type
+	local _, class, enchanted, equip, gem1, gem2, gem3, gem4, gemmed, level, link, name, quality, req, sell, slot, slots, soulbound, subtype, type
 
 	for bag = 0, NUM_BAG_SLOTS do
-		sell = false
 		slots = GetContainerNumSlots(bag)
 
-		for slot = ?, slots do
+		for slot = 1, slots do
+			sell = false
+
 			link = GetContainerItemLink(bag, slot)
-			name, _, quality, level, _, type, subtype, _, equip, _ = GetItemInfo(link)
+			name, _, quality, _, req, type, subtype, _, equip, _ = GetItemInfo(link)
 			enchanted, gem1, gem2, gem3, gem4 = link.match("item:%d+:(%d+):(%d+):(%d+):(%d+):(%d+)")
 			enchanted = int(enchanted)
 			gemmed = int(gem1) or int(gem2) or int(gem3) or int(gem4)
 
-			if self.db.profile.sell_junk and not quality then
+			if self.db.profile.unusable or self.db.profile.light then
+				_, class = UnitClass("player")
+				level = UnitLevel("player")
+
+				self.tooltip:ClearLines()
+				self.tooltip:SetBagItem(bag, slot)
+				soulbound = getglobal("JunkyardTooltipTextLeft2"):GetText() == ITEM_SOULBOUND
+			end
+
+			if self.db.profile.junk and not quality then
 				sell = true
 			end
 
-			-- cloaks don't come in different subtypes, so skip them
-			if (self.db.profile.sell_unusable or self.db.profile.sell_TODO) and type == L["Armor"] and equip ~= "INVTYPE_CLOAK" then
-				--TODO: determine whether item can be equipped
+			if self.db.profile.light and type == L["Armor"] and soulbound and level > self.armor[class][subtype] then
+				sell = true
 			end
 
-			if (self.db.profile.sell_unusable or self.db.profile.sell_TODO) and type == L["Weapon"] then
-				--TODO: determine whether item can be equipped
+			if self.db.profile.unusable and type == L["Armor"] and soulbound and not self.armor[class][subtype] then
+				sell = true
 			end
 
-			if not self.db.profile.sell_enchanted and enchanted then
+			if self.db.profile.unusable and type == L["Weapon"] and soulbound and not self.weapons[class][subtype] then
+				sell = true
+			end
+
+			if self.db.profile.no_enchanted and enchanted then
 				sell = false
 			end
 
-			if
-				not self.db.profile.sell_gemmed and gemmed then
+			if self.db.profile.no_gemmed and gemmed then
 				sell = false
+			end
+
+			if sell then
+				self:Print("I would be selling " .. link .. " if I weren't alpha code.")
 			end
 		end
 	end
 end
 
-function Doolittle:DisplayError(message)
+function Junkyard:DisplayError(message)
 	UIErrorsFrame:AddMessage(message, 1.0, 0.1, 0.1, 1.0)
+end
+
+function Junkyard:OnInitialize()
+	self.db = LibStub("AceDB-3.0"):New("JunkyardDB", defaults)
+	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+
+	LibStub("AceConfig-3.0"):RegisterOptionsTable("Junkyard", options, {"junkyard"})
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Junkyard", options)
+	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Junkyard", "Junkyard")
+
+	self.tooltip = CreateFrame("GameTooltip", "JunkyardTooltip")
+	self.tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 end
