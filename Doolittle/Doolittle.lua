@@ -314,6 +314,12 @@ function Doolittle:OnInitialize()
 	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Doolittle", options)
 	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Doolittle", "Doolittle")
 
+	Doolittle:RegisterEvent("COMPANION_LEARNED", "OnCompanionUpdate")
+	Doolittle:RegisterEvent("COMPANION_UPDATE", "OnCompanionUpdate")
+
+	-- there's no real need for this to be a secure hook, but it has no side effects
+	Doolittle:SecureHook("PetPaperDollFrame_UpdateCompanionPreview", "OnPreviewUpdate")
+
 	self:OnCompanionUpdate() -- COMPANION_UPDATE does not fire on UI reload
 end
 
@@ -352,9 +358,3 @@ end
 function Doolittle:SetRating(which, value)
 	self.db.profile[which[1]].ratings[which[2]] = value
 end
-
-Doolittle:RegisterEvent("COMPANION_LEARNED", "OnCompanionUpdate")
-Doolittle:RegisterEvent("COMPANION_UPDATE", "OnCompanionUpdate")
-
--- there's no real need for this to be a secure hook, but it has no side effects
-Doolittle:SecureHook("PetPaperDollFrame_UpdateCompanionPreview", "OnPreviewUpdate")
