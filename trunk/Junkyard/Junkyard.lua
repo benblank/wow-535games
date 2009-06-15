@@ -34,6 +34,7 @@
 Junkyard = LibStub("AceAddon-3.0"):NewAddon("Junkyard", "AceConsole-3.0", "AceEvent-3.0")
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Junkyard")
+local LBIR = LibStub("LibBabble-Inventory-3.0"):GetReverseLookupTable()
 
 local options = {
 	name = "Junkyard",
@@ -172,6 +173,8 @@ function Junkyard:CmdSell()
 			if self.db.profile.unusable or self.db.profile.light then
 				_, class = UnitClass("player")
 				level = UnitLevel("player")
+				type = LBIR[type]
+				subtype = LBIR[subtype]
 
 				self.tooltip:ClearLines()
 				self.tooltip:SetBagItem(bag, slot)
@@ -182,15 +185,15 @@ function Junkyard:CmdSell()
 				sell = true
 			end
 
-			if self.db.profile.light and type == L["Armor"] and soulbound and level > self.armor[class][subtype] then
+			if self.db.profile.light and type == "Armor" and soulbound and level >= self.armor[class][subtype] then
 				sell = true
 			end
 
-			if self.db.profile.unusable and type == L["Armor"] and soulbound and not self.armor[class][subtype] then
+			if self.db.profile.unusable and type == "Armor" and soulbound and not self.armor[class][subtype] then
 				sell = true
 			end
 
-			if self.db.profile.unusable and type == L["Weapon"] and soulbound and not self.weapons[class][subtype] then
+			if self.db.profile.unusable and type == "Weapon" and soulbound and not self.weapons[class][subtype] then
 				sell = true
 			end
 
