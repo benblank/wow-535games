@@ -33,6 +33,7 @@
 
 Junkyard = LibStub("AceAddon-3.0"):NewAddon("Junkyard", "AceConsole-3.0", "AceEvent-3.0")
 
+local AceGUI = LibStub("AceGUI-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Junkyard")
 local LBIR = LibStub("LibBabble-Inventory-3.0"):GetReverseLookupTable()
 
@@ -68,11 +69,21 @@ local options = {
 
 		prompt = {
 			name = L["OPT_PROMPT"],
+			desc = L["OPT_PROMPT_DESC"],
 			type = "toggle",
-			order = 30,
+			order = 31,
 			width = "full",
 			get = function(info) return Junkyard.db.profile.prompt end,
 			set = function(info, value) Junkyard.db.profile.prompt = value end,
+		},
+
+		repair = {
+			name = L["OPT_REPAIR"],
+			type = "toggle",
+			order = 32,
+			width = "full",
+			get = function(info) return Junkyard.db.profile.repair end,
+			set = function(info, value) Junkyard.db.profile.repair = value end,
 		},
 
 		sep2 = {
@@ -141,7 +152,7 @@ local options = {
 
 local defaults = {
 	profile = {
-		auto = "ask",
+		auto = true,
 		junk = true,
 		unusable = true,
 		light = false,
@@ -156,59 +167,90 @@ function Junkyard:CmdSell()
 		return
 	end
 
-	local _, class, enchanted, equip, gem1, gem2, gem3, gem4, gemmed, level, link, name, quality, req, sell, slot, slots, soulbound, subtype, type
+	local _, class, enchanted, equip, gem1, gem2, gem3, gem4, gemmed, level, link, name, quality, req, sales, sell, slot, slots, soulbound, subtype, type
+
+	sales = {}
 
 	for bag = 0, NUM_BAG_SLOTS do
 		slots = GetContainerNumSlots(bag)
 
 		for slot = 1, slots do
-			sell = false
-
 			link = GetContainerItemLink(bag, slot)
-			name, _, quality, _, req, type, subtype, _, equip, _ = GetItemInfo(link)
-			enchanted, gem1, gem2, gem3, gem4 = link.match("item:%d+:(%d+):(%d+):(%d+):(%d+):(%d+)")
-			enchanted = int(enchanted)
-			gemmed = int(gem1) or int(gem2) or int(gem3) or int(gem4)
 
-			if self.db.profile.unusable or self.db.profile.light then
-				_, class = UnitClass("player")
-				level = UnitLevel("player")
-				type = LBIR[type]
-				subtype = LBIR[subtype]
-
-				self.tooltip:ClearLines()
-				self.tooltip:SetBagItem(bag, slot)
-				soulbound = getglobal("JunkyardTooltipTextLeft2"):GetText() == ITEM_SOULBOUND
-			end
-
-			if self.db.profile.junk and not quality then
-				sell = true
-			end
-
-			if self.db.profile.light and type == "Armor" and soulbound and level >= self.armor[class][subtype] then
-				sell = true
-			end
-
-			if self.db.profile.unusable and type == "Armor" and soulbound and not self.armor[class][subtype] then
-				sell = true
-			end
-
-			if self.db.profile.unusable and type == "Weapon" and soulbound and not self.weapons[class][subtype] then
-				sell = true
-			end
-
-			if self.db.profile.no_enchanted and enchanted then
+			if link then
 				sell = false
-			end
+				name, _, quality, _, req, type, subtype, _, equip, _ = GetItemInfo(link)
+				enchanted, gem1, gem2, gem3, gem4 = link:match("item:%d+:(%d+):(%d+):(%d+):(%d+):(%d+)")
+				enchanted = tonumber(enchanted) > 0
+				gemmed = tonumber(gem1) > 0 or tonumber(gem2) > 0 or tonumber(gem3) > 0 or tonumber(gem4) > 0
 
-			if self.db.profile.no_gemmed and gemmed then
-				sell = false
-			end
+				if self.db.profile.unusable or self.db.profile.light then
+					_, class = UnitClass("player")
+					level = UnitLevel("player")
+					type = LBIR[type]
+					subtype = LBIR[subtype]
 
-			if sell then
-				self:Print("I would be selling " .. link .. " if I weren't alpha code.")
+					self.tooltip:ClearLines()
+					self.tooltip:SetBagItem(bag, slot)
+					soulbound = getglobal("JunkyardTooltipTextLeft2"):GetText() == ITEM_SOULBOUND
+				end
+
+				if self.db.profile.junk and quality == 0 then
+					sell = true
+				end
+
+				if self.db.profile.light and type == "Armor" and soulbound and level >= self.armor[class][subtype] then
+					sell = true
+				end
+
+				if self.db.profile.unusable and type == "Armor" and soulbound and not self.armor[class][subtype] then
+					sell = true
+				end
+
+				if self.db.profile.unusable and type == "Weapon" and soulbound and not self.weapons[class][subtype] then
+					sell = true
+				end
+
+				if self.db.profile.no_enchanted and enchanted then
+					sell = false
+				end
+
+				if self.db.profile.no_gemmed and gemmed then
+					sell = false
+				end
+
+				if sell then
+					if self.db.profile.prompt then
+						sales[#sales + 1] = {bag, slot, link}
+					else
+						ShowMerchantSellCursor(1)
+						UseContainerItem(bag, slot)
+					end
+				end
 			end
 		end
+	end
+
+	if #sales > 0 then
+		local frame = self.frame
+		local list = self.list
+
+		list:Clear()
+
+		for i, sell in ipairs(sales) do
+			list:AddMessage(sell[3], 1, 1, 1, 0, true)
+		end
+
+		frame:Show()
+
+		self.button:SetScript("OnClick", function()
+			for i, sell in ipairs(sales) do
+				ShowMerchantSellCursor(1)
+				UseContainerItem(sell[1], sell[2])
+			end
+
+			frame:Hide()
+		end)
 	end
 end
 
@@ -224,6 +266,79 @@ function Junkyard:OnInitialize()
 	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Junkyard", options)
 	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Junkyard", "Junkyard")
 
+	self:RegisterEvent("MERCHANT_CLOSED", "OnMerchantClosed")
+	self:RegisterEvent("MERCHANT_SHOW", "OnMerchantShow")
+
 	self.tooltip = CreateFrame("GameTooltip", "JunkyardTooltip")
 	self.tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	self.tooltip:AddFontStrings(self.tooltip:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"), self.tooltip:CreateFontString("$parentTextRight1", nil, "GameTooltipText"));
+
+	local button, cancel, frame, list
+
+	frame = CreateFrame("Frame", "JunkyardFrame", UIParent)
+	frame:SetWidth(400)
+	frame:SetHeight(300)
+	frame:SetPoint("CENTER",UIParent,"CENTER",0,0)
+	frame:EnableMouse()
+	frame:SetFrameStrata("FULLSCREEN_DIALOG")
+	frame:SetBackdrop({ bgFile="Interface\\DialogFrame\\UI-DialogBox-Background", edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border", tile = true, tileSize = 32, edgeSize = 32, insets = { left = 8, right = 8, top = 8, bottom = 8 } })
+	frame:SetBackdropColor(0,0,0,1)
+	frame:SetToplevel(true)
+	frame:Hide()
+
+	frame:SetScript("OnHide", function()
+		button:SetScript("OnClick", nil)
+	end)
+
+	button = CreateFrame("Button", "JunkyardSellButton", frame, "UIPanelButtonTemplate2")
+	button:SetPoint("BOTTOMLEFT", 17, 17)
+	button:SetHeight(24)
+	button:SetWidth(100)
+	button:SetText(L["CMD_SELL"])
+
+	cancel = CreateFrame("Button", "JunkyardCancelButton", frame, "UIPanelButtonTemplate2")
+	cancel:SetScript("OnClick", function() frame:Hide() end)
+	cancel:SetPoint("BOTTOMRIGHT", -17, 17)
+	cancel:SetHeight(24)
+	cancel:SetWidth(100)
+	cancel:SetText(CANCEL)
+
+	list = CreateFrame("ScrollingMessageFrame", "JunkyardItemList", frame)
+	list:SetFading(false)
+	list:SetFontObject(GameFontNormal)
+	list:SetInsertMode("TOP")
+	list:SetJustifyH("LEFT")
+	list:SetJustifyV("TOP")
+	list:SetMaxLines(104) -- 4x22 + 16
+	list:SetPoint("TOPLEFT", 18, -18)
+	list:SetPoint("TOPRIGHT", -18, -18)
+	list:SetPoint("BOTTOMLEFT", 18, 49)
+	list:SetPoint("BOTTOMRIGHT", -18, 49)
+
+	list:SetScript("OnHyperlinkEnter", function(self, data, link)
+		GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+		GameTooltip:SetHyperlink(link)
+	end)
+
+	list:SetScript("OnHyperlinkLeave", function(self, data, link)
+		GameTooltip:Hide()
+	end)
+
+	self.button = button
+	self.frame = frame
+	self.list = list
+end
+
+function Junkyard:OnMerchantClosed()
+	self.frame:Hide()
+end
+
+function Junkyard:OnMerchantShow()
+	if CanMerchantRepair() and self.db.profile.repair then
+		RepairAllItems()
+	end
+
+	if self.db.profile.auto then
+		self:CmdSell()
+	end
 end

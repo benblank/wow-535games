@@ -38,9 +38,9 @@ if not L then
 end
 
 L["CMD_SELL"] = "Sell"
-L["CMD_SELL_DESC"] = "Sell everything marked as \"junk\" to the active vendor."
+L["CMD_SELL_DESC"] = "Sell everything marked as \"junk\" to the active merchant."
 
-L["OPT_AUTO"] = "Automatically sell when talking to a vendor"
+L["OPT_AUTO"] = "Automatically sell when talking to a merchant"
 L["OPT_ENCHANTED"] = "Never sell enchanted items"
 L["OPT_ENCHANTED_DESC"] = "Prevents enchanted items from being sold even if they match one of the other conditions."
 L["OPT_GEMMED"] = "Never sell gemmed items"
@@ -50,5 +50,7 @@ L["OPT_JUNK_DESC"] = "Also called \"vendor trash\", \"grey\" items, etc."
 L["OPT_LIGHT"] = "Sell light-weight soulbound armor"
 L["OPT_LIGHT_DESC"] = "For example, leather armor is lighter-weight than Warriors typically wear."
 L["OPT_PROMPT"] = "Ask before selling items"
+L["OPT_PROMPT_DESC"] = "A window will appear showing the items to be sold and allowing you to cancel the sale."
+L["OPT_REPAIR"] = "Repair all items when talking to a merchant who has that ability."
 L["OPT_UNUSABLE"] = "Sell unequippable soulbound items"
 L["OPT_UNUSABLE_DESC"] = "For example, soulbound plate is unusable by a Mage."
