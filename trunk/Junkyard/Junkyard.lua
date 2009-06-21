@@ -191,24 +191,31 @@ function Junkyard:CmdSell(skipcheck)
 					type = LBIR[type]
 					subtype = LBIR[subtype]
 
-					self.tooltip:ClearLines()
-					self.tooltip:SetBagItem(bag, slot)
-					soulbound = getglobal("JunkyardTooltipTextLeft2"):GetText() == ITEM_SOULBOUND
+					if self[type] then
+						if self[type].known[subtype] then
+							self.tooltip:ClearLines()
+							self.tooltip:SetBagItem(bag, slot)
+							soulbound = getglobal("JunkyardTooltipTextLeft2"):GetText() == ITEM_SOULBOUND
+						else
+							soulbound = false -- prevent type-based sales from occurring
+							self:Print(L["WARN_UNKNOWN_TYPE"](link, type, subtype))
+						end
+					else
+						soulbound = false
+					end
+				else
+					soulbound = false
 				end
 
 				if self.db.profile.junk and quality == 0 then
 					sell = true
 				end
 
-				if self.db.profile.light and type == "Armor" and soulbound and level >= self.armor[class][subtype] then
+				if self.db.profile.light and type == "Armor" and soulbound and level >= self.Armor[class][subtype] then
 					sell = true
 				end
 
-				if self.db.profile.unusable and type == "Armor" and soulbound and not self.armor[class][subtype] then
-					sell = true
-				end
-
-				if self.db.profile.unusable and type == "Weapon" and soulbound and not self.weapons[class][subtype] then
+				if self.db.profile.unusable and soulbound and not self[type][class][subtype] then
 					sell = true
 				end
 
