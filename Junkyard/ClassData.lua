@@ -33,7 +33,20 @@
 
 local Junkyard = LibStub("AceAddon-3.0"):GetAddon("Junkyard")
 
-Junkyard.armor = {
+Junkyard.Armor = {
+	known = {
+		["Cloth"] = true,
+		["Idols"] = true,
+		["Leather"] = true,
+		["Librams"] = true,
+		["Mail"] = true,
+		["Miscellaneous"] = true,
+		["Plate"] = true,
+		["Shields"] = true,
+		["Sigils"] = true,
+		["Totems"] = true,
+	},
+
 	DEATHKNIGHT = {
 		["Cloth"] = -1,
 		["Leather"] = -1,
@@ -107,7 +120,27 @@ Junkyard.armor = {
 	},
 }
 
-Junkyard.weapons = {
+Junkyard.Weapon = {
+	known = {
+		["Bows"] = true,
+		["Crossbows"] = true,
+		["Daggers"] = true,
+		["Fishing Poles"] = true,
+		["Fist Weapons"] = true,
+		["Guns"] = true,
+		["Miscellaneous"] = true,
+		["One-Handed Axes"] = true,
+		["One-Handed Maces"] = true,
+		["One-Handed Swords"] = true,
+		["Polearms"] = true,
+		["Staves"] = true,
+		["Thrown"] = true,
+		["Two-Handed Axes"] = true,
+		["Two-Handed Maces"] = true,
+		["Two-Handed Swords"] = true,
+		["Wands"] = true,
+	},
+
 	DEATHKNIGHT = {
 		["Fishing Poles"] = true,
 		["Miscellaneous"] = true,
