@@ -1,0 +1,229 @@
+<!-- $Id$
+
+Copyright (c) 2009, Ben Blank
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+* Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+
+* Neither the name of 535 Design nor the names of its contributors
+  may be used to endorse or promote products derived from this
+  software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED.	IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script file="JunkyardSellFrame.lua"/>
+
+	<FontString name="JunkyardSellFrameItemTemplate" inherits="GameFontNormal" virtual="true" justifyH="LEFT" justifyV="CENTER">
+		<Size>
+			<AbsDimension x="329" y="16"/>
+		</Size>
+	</FontString>
+
+	<Frame name="JunkyardSellFrame" parent="UIParent" frameStrata="FULLSCREEN_DIALOG" toplevel="true" enableMouse="true" movable="true" hidden="true">
+		<Scripts>
+			<OnHide function="JunkyardSellFrame_OnHide"/>
+			<OnLoad function="JunkyardSellFrame_OnLoad"/>
+		</Scripts>
+
+		<Size>
+			<AbsDimension x="400" y="300"/>
+		</Size>
+
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset top="8" right="8" bottom="8" left="8"/>
+			</BackgroundInsets>
+
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="JunkyardSellFrameTitleTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<FontString name="JunkyardSellFrameTitleText" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="JunkyardSellFrameTitleTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<Button name="JunkyardSellFrameSellButton" inherits="UIPanelButtonTemplate2">
+				<Scripts>
+					<OnClick function="JunkyardSellFrameSellButton_OnClick"/>
+					<OnLoad function="JunkyardSellFrameSellButton_OnLoad"/>
+				</Scripts>
+
+				<Size>
+					<AbsDimension x="100" y="24"/>
+				</Size>
+
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="68" y="17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="JunkyardSellFrameCancelButton" inherits="UIPanelButtonTemplate2" text="CANCEL">
+				<Scripts>
+					<OnClick function="JunkyardSellFrameCancelButton_OnClick"/>
+				</Scripts>
+
+				<Size>
+					<AbsDimension x="100" y="24"/>
+				</Size>
+
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-68" y="17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Frame name="JunkyardSellFrameListFrame">
+				<Scripts>
+					<OnLoad function="JunkyardSellFrameListFrame_OnLoad"/>
+				</Scripts>
+
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="17" y="45"/>
+						</Offset>
+					</Anchor>
+
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-17" y="-28"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+
+				<Layers>
+					<Layer level="ARTWORK">
+					<FontString name="JunkyardSellFrameItem1" inherits="JunkyardSellFrameItemTemplate" text="Item1">
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+					</FontString>
+
+					<FontString name="JunkyardSellFrameItem2" inherits="JunkyardSellFrameItemTemplate" text="Item2">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem1" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</FontString>
+
+					<FontString name="JunkyardSellFrameItem3" inherits="JunkyardSellFrameItemTemplate" text="Item3">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem2" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</FontString>
+
+					<FontString name="JunkyardSellFrameItem4" inherits="JunkyardSellFrameItemTemplate" text="Item4">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem3" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</FontString>
+
+					<FontString name="JunkyardSellFrameItem5" inherits="JunkyardSellFrameItemTemplate" text="Item5">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem4" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</FontString>
+					</Layer>
+				</Layers>
+
+				<Frames>
+					<ScrollFrame name="JunkyardSellFrameScrollFrame" inherits="FauxScrollFrameTemplate">
+						<Scripts>
+							<OnVerticalScroll function="JunkyardSellFrameScrollFrame_OnVerticalScroll"/>
+						</Scripts>
+
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="8" y="7"/>
+								</Offset>
+							</Anchor>
+
+							<Anchor point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-29" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</ScrollFrame>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
+</Ui>

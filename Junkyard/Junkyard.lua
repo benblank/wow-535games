@@ -161,15 +161,16 @@ local defaults = {
 	},
 }
 
-function Junkyard:CmdSell()
-	if GetMerchantItemLink(1) == nil then
+function Junkyard:CmdSell(skipcheck)
+	-- GetMerchantItemLink(1) occasionally returns nil at the time MERCHANT_SHOW is fired, so the event handler passes "true" to skip the usual check
+	if not skipcheck and GetMerchantItemLink(1) == nil then
 		self:DisplayError(ERR_VENDOR_TOO_FAR)
 		return
 	end
 
-	local _, class, enchanted, equip, gem1, gem2, gem3, gem4, gemmed, level, link, name, quality, req, sales, sell, slot, slots, soulbound, subtype, type
+	local _, class, enchanted, equip, gem1, gem2, gem3, gem4, gemmed, level, link, name, quality, req, items, sell, slot, slots, soulbound, subtype, type
 
-	sales = {}
+	items = {}
 
 	for bag = 0, NUM_BAG_SLOTS do
 		slots = GetContainerNumSlots(bag)
@@ -221,7 +222,7 @@ function Junkyard:CmdSell()
 
 				if sell then
 					if self.db.profile.prompt then
-						sales[#sales + 1] = {bag, slot, link}
+						items[#items + 1] = {bag, slot, link}
 					else
 						ShowMerchantSellCursor(1)
 						UseContainerItem(bag, slot)
@@ -231,26 +232,9 @@ function Junkyard:CmdSell()
 		end
 	end
 
-	if #sales > 0 then
-		local frame = self.frame
-		local list = self.list
-
-		list:Clear()
-
-		for i, sell in ipairs(sales) do
-			list:AddMessage(sell[3], 1, 1, 1, 0, true)
-		end
-
-		frame:Show()
-
-		self.button:SetScript("OnClick", function()
-			for i, sell in ipairs(sales) do
-				ShowMerchantSellCursor(1)
-				UseContainerItem(sell[1], sell[2])
-			end
-
-			frame:Hide()
-		end)
+	if #items > 0 then
+		self.frame.items = items
+		self.frame:Show()
 	end
 end
 
@@ -273,60 +257,7 @@ function Junkyard:OnInitialize()
 	self.tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 	self.tooltip:AddFontStrings(self.tooltip:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"), self.tooltip:CreateFontString("$parentTextRight1", nil, "GameTooltipText"));
 
-	local button, cancel, frame, list
-
-	frame = CreateFrame("Frame", "JunkyardFrame", UIParent)
-	frame:SetWidth(400)
-	frame:SetHeight(300)
-	frame:SetPoint("CENTER",UIParent,"CENTER",0,0)
-	frame:EnableMouse()
-	frame:SetFrameStrata("FULLSCREEN_DIALOG")
-	frame:SetBackdrop({ bgFile="Interface\\DialogFrame\\UI-DialogBox-Background", edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border", tile = true, tileSize = 32, edgeSize = 32, insets = { left = 8, right = 8, top = 8, bottom = 8 } })
-	frame:SetBackdropColor(0,0,0,1)
-	frame:SetToplevel(true)
-	frame:Hide()
-
-	frame:SetScript("OnHide", function()
-		button:SetScript("OnClick", nil)
-	end)
-
-	button = CreateFrame("Button", "JunkyardSellButton", frame, "UIPanelButtonTemplate2")
-	button:SetPoint("BOTTOMLEFT", 17, 17)
-	button:SetHeight(24)
-	button:SetWidth(100)
-	button:SetText(L["CMD_SELL"])
-
-	cancel = CreateFrame("Button", "JunkyardCancelButton", frame, "UIPanelButtonTemplate2")
-	cancel:SetScript("OnClick", function() frame:Hide() end)
-	cancel:SetPoint("BOTTOMRIGHT", -17, 17)
-	cancel:SetHeight(24)
-	cancel:SetWidth(100)
-	cancel:SetText(CANCEL)
-
-	list = CreateFrame("ScrollingMessageFrame", "JunkyardItemList", frame)
-	list:SetFading(false)
-	list:SetFontObject(GameFontNormal)
-	list:SetInsertMode("TOP")
-	list:SetJustifyH("LEFT")
-	list:SetJustifyV("TOP")
-	list:SetMaxLines(104) -- 4x22 + 16
-	list:SetPoint("TOPLEFT", 18, -18)
-	list:SetPoint("TOPRIGHT", -18, -18)
-	list:SetPoint("BOTTOMLEFT", 18, 49)
-	list:SetPoint("BOTTOMRIGHT", -18, 49)
-
-	list:SetScript("OnHyperlinkEnter", function(self, data, link)
-		GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
-		GameTooltip:SetHyperlink(link)
-	end)
-
-	list:SetScript("OnHyperlinkLeave", function(self, data, link)
-		GameTooltip:Hide()
-	end)
-
-	self.button = button
-	self.frame = frame
-	self.list = list
+	self.frame = JunkyardSellFrame
 end
 
 function Junkyard:OnMerchantClosed()
@@ -339,6 +270,7 @@ function Junkyard:OnMerchantShow()
 	end
 
 	if self.db.profile.auto then
-		self:CmdSell()
+		-- GetMerchantItemLink(1) occasionally returns nil at the time MERCHANT_SHOW is fired, so skip the usual check
+		self:CmdSell(true)
 	end
 end

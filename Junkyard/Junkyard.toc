@@ -11,4 +11,5 @@ embeds.xml
 Locales\locales.xml
 
 Junkyard.lua
+JunkyardSellFrame.xml
 ClassData.lua
