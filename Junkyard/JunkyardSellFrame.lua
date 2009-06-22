@@ -31,6 +31,7 @@
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Junkyard")
 
+local lines = 10
 local lineheight = 16
 
 function JunkyardSellFrame_OnHide(self)
@@ -39,6 +40,11 @@ end
 
 function JunkyardSellFrame_OnLoad(self)
 	JunkyardSellFrameTitleText:SetText("Junkyard")
+
+	self.SetItems = function(self, items)
+		self.items = items
+		JunkyardSellFrameScrollFrame_OnVerticalScroll(self, 0)
+	end
 end
 
 function JunkyardSellFrameCancelButton_OnClick(self, button, down)
@@ -50,10 +56,29 @@ function JunkyardSellFrameListFrame_OnLoad(self)
 end
 
 function JunkyardSellFrameScrollFrame_OnVerticalScroll(self, offset)
-	FauxScrollFrame_OnVerticalScroll(self, offset, lineheight, JunkyardSellFrameScrollFrame_Update)
+	-- "self" here is JunkyardSellFrame!?
+	FauxScrollFrame_OnVerticalScroll(JunkyardSellFrameScrollFrame, offset, lineheight, JunkyardSellFrameScrollFrame_Update)
 end
 
 function JunkyardSellFrameScrollFrame_Update(self)
+	local fs, item, tiems, numitems, line, offset
+
+	items = JunkyardSellFrame.items
+	numitems = #items
+	FauxScrollFrame_Update(self, numitems, lines, lineheight)
+	offset = FauxScrollFrame_GetOffset(self)
+
+	for line = 1, lines do
+		item = line + offset
+		fs = getglobal("JunkyardSellFrameItem" .. line)
+
+		if item <= numitems then
+			fs:SetText(items[item][3])
+			fs:Show()
+		else
+			fs:Hide()
+		end
+	end
 end
 
 function JunkyardSellFrameSellButton_OnClick(self, button, down)

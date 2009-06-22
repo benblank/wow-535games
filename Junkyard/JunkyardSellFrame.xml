@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		</Scripts>
 
 		<Size>
-			<AbsDimension x="400" y="300"/>
+			<AbsDimension x="400" y="248"/>
 		</Size>
 
 		<Anchors>
@@ -170,35 +170,69 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 				<Layers>
 					<Layer level="ARTWORK">
-					<FontString name="JunkyardSellFrameItem1" inherits="JunkyardSellFrameItemTemplate" text="Item1">
-						<Anchors>
-							<Anchor point="TOPLEFT"/>
-						</Anchors>
-					</FontString>
+						<FontString name="JunkyardSellFrameItem1" inherits="JunkyardSellFrameItemTemplate">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimesion x="8" y="-6"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
 
-					<FontString name="JunkyardSellFrameItem2" inherits="JunkyardSellFrameItemTemplate" text="Item2">
-						<Anchors>
-							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem1" relativePoint="BOTTOMRIGHT"/>
-						</Anchors>
-					</FontString>
+						<FontString name="JunkyardSellFrameItem2" inherits="JunkyardSellFrameItemTemplate">
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem1" relativePoint="BOTTOMRIGHT"/>
+							</Anchors>
+						</FontString>
 
-					<FontString name="JunkyardSellFrameItem3" inherits="JunkyardSellFrameItemTemplate" text="Item3">
-						<Anchors>
-							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem2" relativePoint="BOTTOMRIGHT"/>
-						</Anchors>
-					</FontString>
+						<FontString name="JunkyardSellFrameItem3" inherits="JunkyardSellFrameItemTemplate">
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem2" relativePoint="BOTTOMRIGHT"/>
+							</Anchors>
+						</FontString>
 
-					<FontString name="JunkyardSellFrameItem4" inherits="JunkyardSellFrameItemTemplate" text="Item4">
-						<Anchors>
-							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem3" relativePoint="BOTTOMRIGHT"/>
-						</Anchors>
-					</FontString>
+						<FontString name="JunkyardSellFrameItem4" inherits="JunkyardSellFrameItemTemplate">
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem3" relativePoint="BOTTOMRIGHT"/>
+							</Anchors>
+						</FontString>
 
-					<FontString name="JunkyardSellFrameItem5" inherits="JunkyardSellFrameItemTemplate" text="Item5">
-						<Anchors>
-							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem4" relativePoint="BOTTOMRIGHT"/>
-						</Anchors>
-					</FontString>
+						<FontString name="JunkyardSellFrameItem5" inherits="JunkyardSellFrameItemTemplate">
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem4" relativePoint="BOTTOMRIGHT"/>
+							</Anchors>
+						</FontString>
+
+						<FontString name="JunkyardSellFrameItem6" inherits="JunkyardSellFrameItemTemplate">
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem5" relativePoint="BOTTOMRIGHT"/>
+							</Anchors>
+						</FontString>
+
+						<FontString name="JunkyardSellFrameItem7" inherits="JunkyardSellFrameItemTemplate">
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem6" relativePoint="BOTTOMRIGHT"/>
+							</Anchors>
+						</FontString>
+
+						<FontString name="JunkyardSellFrameItem8" inherits="JunkyardSellFrameItemTemplate">
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem7" relativePoint="BOTTOMRIGHT"/>
+							</Anchors>
+						</FontString>
+
+						<FontString name="JunkyardSellFrameItem9" inherits="JunkyardSellFrameItemTemplate">
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem8" relativePoint="BOTTOMRIGHT"/>
+							</Anchors>
+						</FontString>
+
+						<FontString name="JunkyardSellFrameItem10" inherits="JunkyardSellFrameItemTemplate">
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem9" relativePoint="BOTTOMRIGHT"/>
+							</Anchors>
+						</FontString>
 					</Layer>
 				</Layers>
 
