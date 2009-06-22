@@ -240,7 +240,7 @@ function Junkyard:CmdSell(skipcheck)
 	end
 
 	if #items > 0 then
-		self.frame.items = items
+		self.frame:SetItems(items)
 		self.frame:Show()
 	end
 end
