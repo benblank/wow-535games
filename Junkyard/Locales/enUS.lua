@@ -55,4 +55,4 @@ L["OPT_REPAIR"] = "Repair all items when talking to a merchant who has that abil
 L["OPT_UNUSABLE"] = "Sell unequippable soulbound items"
 L["OPT_UNUSABLE_DESC"] = "For example, soulbound plate is unusable by a Mage."
 
-L["WARN_UNKNOWN_TYPE"] = function(link, type, subtype) return "Warning: " .. link .. " has unknown type " .. type .. "/" .. subtype .. ".  Please check to see if a new version of this addon is available." end
+L["WARN_UNKNOWN_TYPE"] = function(link, type, subtype) return "Warning: " .. link .. " has unknown type \"" .. type .. ", " .. subtype .. "\".  Please check to see if a new version of this addon is available." end

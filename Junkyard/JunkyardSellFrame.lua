@@ -43,7 +43,8 @@ function JunkyardSellFrame_OnLoad(self)
 
 	self.SetItems = function(self, items)
 		self.items = items
-		JunkyardSellFrameScrollFrame_OnVerticalScroll(self, 0)
+		FauxScrollFrame_SetOffset(JunkyardSellFrameScrollFrame, 0)
+		JunkyardSellFrameScrollFrame_Update(JunkyardSellFrameScrollFrame)
 	end
 end
 

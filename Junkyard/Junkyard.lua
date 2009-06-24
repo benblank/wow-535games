@@ -168,7 +168,7 @@ function Junkyard:CmdSell(skipcheck)
 		return
 	end
 
-	local _, class, enchanted, equip, gem1, gem2, gem3, gem4, gemmed, level, link, name, quality, req, items, sell, slot, slots, soulbound, subtype, type
+	local _, class, enchanted, equip, gem1, gem2, gem3, gem4, gemmed, level, link, lsubtype, ltype, name, quality, req, items, sell, slot, slots, soulbound, subtype, type
 
 	items = {}
 
@@ -180,7 +180,7 @@ function Junkyard:CmdSell(skipcheck)
 
 			if link then
 				sell = false
-				name, _, quality, _, req, type, subtype, _, equip, _ = GetItemInfo(link)
+				name, _, quality, _, req, ltype, lsubtype, _, equip, _ = GetItemInfo(link)
 				enchanted, gem1, gem2, gem3, gem4 = link:match("item:%d+:(%d+):(%d+):(%d+):(%d+):(%d+)")
 				enchanted = tonumber(enchanted) > 0
 				gemmed = tonumber(gem1) > 0 or tonumber(gem2) > 0 or tonumber(gem3) > 0 or tonumber(gem4) > 0
@@ -188,8 +188,8 @@ function Junkyard:CmdSell(skipcheck)
 				if self.db.profile.unusable or self.db.profile.light then
 					_, class = UnitClass("player")
 					level = UnitLevel("player")
-					type = LBIR[type]
-					subtype = LBIR[subtype]
+					type = LBIR[ltype]
+					subtype = LBIR[lsubtype]
 
 					if self[type] then
 						if self[type].known[subtype] then
@@ -198,7 +198,7 @@ function Junkyard:CmdSell(skipcheck)
 							soulbound = getglobal("JunkyardTooltipTextLeft2"):GetText() == ITEM_SOULBOUND
 						else
 							soulbound = false -- prevent type-based sales from occurring
-							self:Print(L["WARN_UNKNOWN_TYPE"](link, type, subtype))
+							self:Print(L["WARN_UNKNOWN_TYPE"](link, ltype, lsubtype))
 						end
 					else
 						soulbound = false
