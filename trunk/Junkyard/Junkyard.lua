@@ -51,25 +51,33 @@ local options = {
 			func = "CmdSell",
 		},
 
-		sep1 = {
-			name = "",
-			type = "header",
-			order = 20,
+		repair = {
+			name = L["CMD_REPAIR"],
+			type = "execute",
+			order = 11,
 			dialogHidden = true,
+			func = "CmdRepair",
 		},
 
-		auto = {
-			name = L["OPT_AUTO"],
+		general = {
+			name = L["OPT_GENERAL"],
+			type = "header",
+			order = 20,
+		},
+
+		["opt-auto-sell"] = {
+			name = L["OPT_AUTO_SELL"],
+			desc = L["OPT_AUTO_SELL_DESC"],
 			type = "toggle",
 			order = 30,
 			width = "full",
-			get = function(info) return Junkyard.db.profile.auto end,
-			set = function(info, value) Junkyard.db.profile.auto = value end,
+			get = function(info) return Junkyard.db.profile.auto_sell end,
+			set = function(info, value) Junkyard.db.profile.auto_sell = value end,
 		},
 
-		prompt = {
-			name = L["OPT_PROMPT"],
-			desc = L["OPT_PROMPT_DESC"],
+		["opt-prompt-sell"] = {
+			name = L["OPT_PROMPT_SELL"],
+			desc = L["OPT_PROMPT_SELL_DESC"],
 			type = "toggle",
 			order = 31,
 			width = "full",
@@ -77,98 +85,109 @@ local options = {
 			set = function(info, value) Junkyard.db.profile.prompt = value end,
 		},
 
-		repair = {
-			name = L["OPT_REPAIR"],
+		["opt-auto-repair"] = {
+			name = L["OPT_AUTO_REPAIR"],
+			desc = L["OPT_AUTO_REPAIR_DESC"],
 			type = "toggle",
 			order = 32,
 			width = "full",
-			get = function(info) return Junkyard.db.profile.repair end,
-			set = function(info, value) Junkyard.db.profile.repair = value end,
-		},
-
-		sep2 = {
-			name = "",
-			type = "header",
-			order = 40,
+			get = function(info) return Junkyard.db.profile.auto_repair end,
+			set = function(info, value) Junkyard.db.profile.auto_repair = value end,
 		},
 
 		junk = {
 			name = L["OPT_JUNK"],
-			desc = L["OPT_JUNK_DESC"],
+			type = "header",
+			order = 40,
+		},
+
+		["junk-poor"] = {
+			name = L["OPT_JUNK_POOR"],
+			desc = L["OPT_JUNK_POOR_DESC"],
 			type = "toggle",
 			order = 50,
 			width = "full",
-			get = function(info) return Junkyard.db.profile.junk end,
-			set = function(info, value) Junkyard.db.profile.junk = value end,
+			get = function(info) return Junkyard.db.profile.junk_poor end,
+			set = function(info, value) Junkyard.db.profile.junk_poor = value end,
 		},
 
-		unusable = {
-			name = L["OPT_UNUSABLE"],
-			desc = L["OPT_UNUSABLE_DESC"],
+		["junk-unusable"] = {
+			name = L["OPT_JUNK_UNUSABLE"],
+			desc = L["OPT_JUNK_UNUSABLE_DESC"],
 			type = "toggle",
 			order = 60,
 			width = "full",
-			get = function(info) return Junkyard.db.profile.unusable end,
-			set = function(info, value) Junkyard.db.profile.unusable = value end,
+			get = function(info) return Junkyard.db.profile.junk_unusable end,
+			set = function(info, value) Junkyard.db.profile.junk_unusable = value end,
 		},
 
-		light = {
-			name = L["OPT_LIGHT"],
-			desc = L["OPT_LIGHT_DESC"],
+		["junk-light"] = {
+			name = L["OPT_JUNK_LIGHT"],
+			desc = L["OPT_JUNK_LIGHT_DESC"],
 			type = "toggle",
 			order = 70,
 			width = "full",
-			get = function(info) return Junkyard.db.profile.light end,
-			set = function(info, value) Junkyard.db.profile.light = value end,
+			get = function(info) return Junkyard.db.profile.junk_light end,
+			set = function(info, value) Junkyard.db.profile.junk_light = value end,
 		},
 
-		sep3 = {
-			name = "",
+		notjunk = {
+			name = L["OPT_NOTJUNK"],
 			type = "header",
 			order = 80,
 		},
 
-		["no-enchanted"] = {
-			name = L["OPT_ENCHANTED"],
-			desc = L["OPT_ENCHANTED_DESC"],
+		["notjunk-enchanted"] = {
+			name = L["OPT_NOTJUNK_ENCHANTED"],
+			desc = L["OPT_NOTJUNK_ENCHANTED_DESC"],
 			type = "toggle",
 			order = 90,
 			width = "full",
-			get = function(info) return Junkyard.db.profile.no_enchanted end,
-			set = function(info, value) Junkyard.db.profile.no_enchanted = value end,
+			get = function(info) return Junkyard.db.profile.notjunk_enchanted end,
+			set = function(info, value) Junkyard.db.profile.notjunk_enchanted = value end,
 		},
 
-		["no-gemmed"] = {
-			name = L["OPT_GEMMED"],
-			desc = L["OPT_GEMMED_DESC"],
+		["notjunk-gemmed"] = {
+			name = L["OPT_NOTJUNK_GEMMED"],
+			desc = L["OPT_NOTJUNK_GEMMED_DESC"],
 			type = "toggle",
 			order = 100,
 			width = "full",
-			get = function(info) return Junkyard.db.profile.no_gemmed end,
-			set = function(info, value) Junkyard.db.profile.no_gemmed = value end,
+			get = function(info) return Junkyard.db.profile.notjunk_gemmed end,
+			set = function(info, value) Junkyard.db.profile.notjunk_gemmed = value end,
 		},
 	},
 }
 
 local defaults = {
 	profile = {
-		auto = true,
-		junk = true,
-		unusable = true,
-		light = false,
-		no_enchanted = true,
-		no_gemmed = true,
+		auto_repair = true,
+		auto_sell = true,
+		junk_light = false,
+		junk_poor = true,
+		junk_unusable = false,
+		notjunk_enchanted = true,
+		notjunk_gemmed = true,
 	},
 }
 
-function Junkyard:CmdSell(skipcheck)
-	-- GetMerchantItemLink(1) occasionally returns nil at the time MERCHANT_SHOW is fired, so the event handler passes "true" to skip the usual check
-	if not skipcheck and GetMerchantItemLink(1) == nil then
-		self:DisplayError(ERR_VENDOR_TOO_FAR)
+function Junkyard:CmdRepair()
+	if not self.at_merchant then
+		self:PrintError(L["ERROR_NO_MERCHANT"])
+		return
+	elseif not CanMerchantRepair() then
+		self:PrintError(L["ERROR_CANNOT_REPAIR"])
+	end
+	RepairAllItems()
+end
+
+function Junkyard:CmdSell()
+	if not self.at_merchant then
+		self:PrintError(L["ERROR_NO_MERCHANT"])
 		return
 	end
 
-	local _, class, enchanted, equip, gem1, gem2, gem3, gem4, gemmed, level, link, lsubtype, ltype, name, quality, req, items, sell, slot, slots, soulbound, subtype, type
+	local _, class, enchanted, equip, gem1, gem2, gem3, gem4, gemmed, id, level, link, lsubtype, ltype, name, quality, req, items, sell, slot, slots, soulbound, subtype, type
 
 	items = {}
 
@@ -181,11 +200,11 @@ function Junkyard:CmdSell(skipcheck)
 			if link then
 				sell = false
 				name, _, quality, _, req, ltype, lsubtype, _, equip, _ = GetItemInfo(link)
-				enchanted, gem1, gem2, gem3, gem4 = link:match("item:%d+:(%d+):(%d+):(%d+):(%d+):(%d+)")
+				id, enchanted, gem1, gem2, gem3, gem4 = strsplit(":", link:sub(18))
 				enchanted = tonumber(enchanted) > 0
 				gemmed = tonumber(gem1) > 0 or tonumber(gem2) > 0 or tonumber(gem3) > 0 or tonumber(gem4) > 0
 
-				if self.db.profile.unusable or self.db.profile.light then
+				if self.db.profile.junk_unusable or self.db.profile.junk_light then
 					_, class = UnitClass("player")
 					level = UnitLevel("player")
 					type = LBIR[ltype]
@@ -198,7 +217,7 @@ function Junkyard:CmdSell(skipcheck)
 							soulbound = getglobal("JunkyardTooltipTextLeft2"):GetText() == ITEM_SOULBOUND
 						else
 							soulbound = false -- prevent type-based sales from occurring
-							self:Print(L["WARN_UNKNOWN_TYPE"](link, ltype, lsubtype))
+							self:PrintWarning(L["WARN_UNKNOWN_TYPE"](link, ltype, lsubtype))
 						end
 					else
 						soulbound = false
@@ -207,23 +226,23 @@ function Junkyard:CmdSell(skipcheck)
 					soulbound = false
 				end
 
-				if self.db.profile.junk and quality == 0 then
+				if self.db.profile.junk_poor and quality == 0 then
 					sell = true
 				end
 
-				if self.db.profile.light and type == "Armor" and soulbound and level >= self.Armor[class][subtype] then
+				if self.db.profile.junk_light and type == "Armor" and soulbound and level >= self.Armor[class][subtype] then
 					sell = true
 				end
 
-				if self.db.profile.unusable and soulbound and not self[type][class][subtype] then
+				if self.db.profile.junk_unusable and soulbound and not self[type][class][subtype] then
 					sell = true
 				end
 
-				if self.db.profile.no_enchanted and enchanted then
+				if self.db.profile.notjunk_enchanted and enchanted then
 					sell = false
 				end
 
-				if self.db.profile.no_gemmed and gemmed then
+				if self.db.profile.notjunk_gemmed and gemmed then
 					sell = false
 				end
 
@@ -245,17 +264,17 @@ function Junkyard:CmdSell(skipcheck)
 	end
 end
 
-function Junkyard:DisplayError(message)
-	UIErrorsFrame:AddMessage(message, 1.0, 0.1, 0.1, 1.0)
-end
-
 function Junkyard:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("JunkyardDB", defaults)
 	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+	options.args.profile.dialogHidden = true
 
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("Junkyard", options, {"junkyard"})
 	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Junkyard", options)
 	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Junkyard", "Junkyard")
+
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("JunkyardProfile", options.args.profile)
+	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("JunkyardProfile", "Profile", "Junkyard")
 
 	self:RegisterEvent("MERCHANT_CLOSED", "OnMerchantClosed")
 	self:RegisterEvent("MERCHANT_SHOW", "OnMerchantShow")
@@ -265,19 +284,34 @@ function Junkyard:OnInitialize()
 	self.tooltip:AddFontStrings(self.tooltip:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"), self.tooltip:CreateFontString("$parentTextRight1", nil, "GameTooltipText"));
 
 	self.frame = JunkyardSellFrame
+
+	self.at_merchant = false
 end
 
 function Junkyard:OnMerchantClosed()
+	self.at_merchant = false
+
 	self.frame:Hide()
 end
 
 function Junkyard:OnMerchantShow()
-	if CanMerchantRepair() and self.db.profile.repair then
-		RepairAllItems()
+	self.at_merchant = true
+
+	if CanMerchantRepair() and self.db.profile.auto_repair then
+		self:CmdRepair()
 	end
 
-	if self.db.profile.auto then
-		-- GetMerchantItemLink(1) occasionally returns nil at the time MERCHANT_SHOW is fired, so skip the usual check
-		self:CmdSell(true)
+	if self.db.profile.auto_sell then
+		self:CmdSell()
 	end
+end
+
+function Junkyard:PrintError(message)
+	self:Print("[|cffe61a1aERROR|r] " .. message)
+	PlaySoundFile([[Sound\interface\Error.wav]])
+end
+
+function Junkyard:PrintWarning(message)
+	self:Print("[|cffefea1aWarning|r] " .. message)
+	PlaySoundFile([[Sound\interface\Error.wav]])
 end
