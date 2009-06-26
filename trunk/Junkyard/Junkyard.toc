@@ -2,7 +2,7 @@
 ## Title: Junkyard
 ## Notes: Flexible junk seller and vendor helper.
 ## Author: Malefactor @ Draenor US
-## Version: 0.2
+## Version: 0.3
 ## SavedVariables: JunkyardDB
 ## OptionalDeps: Ace3
 ## X-Embeds: Ace3

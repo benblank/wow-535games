@@ -44,7 +44,7 @@ local options = {
 	args = {
 		sell = {
 			name = L["CMD_SELL"],
-			desc = L["CMD_SELL_DESC"],
+			desc = L["CMD_SELL"],
 			type = "execute",
 			order = 10,
 			dialogHidden = true,
@@ -52,11 +52,30 @@ local options = {
 		},
 
 		repair = {
-			name = L["CMD_REPAIR"],
+			name = L["CMD_SELL"],
+			desc = L["CMD_SELL"],
 			type = "execute",
 			order = 11,
 			dialogHidden = true,
 			func = "CmdRepair",
+		},
+
+		["open-bags"] = {
+			name = L["CMD_BAGS_OPEN"],
+			desc = L["CMD_BAGS_OPEN"],
+			type = "execute",
+			order = 12,
+			dialogHidden = true,
+			func = "CmdBagsOpen",
+		},
+
+		["close-bags"] = {
+			name = L["CMD_BAGS_CLOSE"],
+			desc = L["CMD_BAGS_CLOSE"],
+			type = "execute",
+			order = 13,
+			dialogHidden = true,
+			func = "CmdBagsClose",
 		},
 
 		general = {
@@ -156,6 +175,21 @@ local options = {
 			get = function(info) return Junkyard.db.profile.notjunk_gemmed end,
 			set = function(info, value) Junkyard.db.profile.notjunk_gemmed = value end,
 		},
+
+		["junklist"] = {
+			name = L["OPT_JUNKLIST"],
+			type = "header",
+			order = 110,
+		},
+
+		["junklist-add"] = {
+			name = L["OPT_JUNKLIST_ADD"],
+			desc = L["OPT_JUNKLIST_ADD_DESC"],
+			type = "input",
+			order = 120,
+			width = "full",
+			set = function(info, value) Junkyard:CmdJunkListAdd(value) end,
+		},
 	},
 }
 
@@ -170,6 +204,38 @@ local defaults = {
 		notjunk_gemmed = true,
 	},
 }
+
+function Junkyard:CmdBagsClose()
+	CloseAllBags() -- unlike OpenAllBags, this actually does what it says on the tin
+end
+
+function Junkyard:CmdBagsOpen()
+	OpenBackpack();
+	for i=1, NUM_CONTAINER_FRAMES, 1 do
+		OpenBag(i);
+	end
+end
+
+function Junkyard:CmdJunkListAdd(input)
+	local id, item
+
+	local pat_id = "^%d+$"
+	local pat_str = "^item:(%d+)"
+	local pat_link = "^|c%x%x%x%x%x%x%x%x|Hitem:(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+|h%[[^]]+%]|h|r$"
+
+	item = strtrim(input)
+	id = item:match(pat_id)
+	if not id then id = item:match(pat_str) end
+	if not id then id = item:match(pat_link) end
+
+	if not id then
+		self:Print(L["ERROR_INVALID_ITEM"])
+		self:Print("\"" .. item:gsub("|", "||") .. "\"")
+		return
+	end
+
+	self:Print(id .. ": " .. item)
+end
 
 function Junkyard:CmdRepair()
 	if not self.at_merchant then
