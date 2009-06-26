@@ -37,22 +37,34 @@ if not L then
 	return
 end
 
-L["CMD_SELL"] = "Sell"
+L["BUTTON_SELL"] = "Sell"
+
+L["CMD_SELL"] = "Sell \"junk\" items now"
 L["CMD_SELL_DESC"] = "Sell everything marked as \"junk\" to the active merchant."
+L["CMD_REPAIR"] = "Repair all items now."
 
-L["OPT_AUTO"] = "Automatically sell when talking to a merchant"
-L["OPT_ENCHANTED"] = "Never sell enchanted items"
-L["OPT_ENCHANTED_DESC"] = "Prevents enchanted items from being sold even if they match one of the other conditions."
-L["OPT_GEMMED"] = "Never sell gemmed items"
-L["OPT_GEMMED_DESC"] = "Prevents gemmed items from being sold even if they match one of the other conditions."
-L["OPT_JUNK"] = "Sell \"poor\"-quality items"
-L["OPT_JUNK_DESC"] = "Also called \"vendor trash\", \"grey\" items, etc."
-L["OPT_LIGHT"] = "Sell light-weight soulbound armor"
-L["OPT_LIGHT_DESC"] = "For example, leather armor is lighter-weight than Warriors typically wear."
-L["OPT_PROMPT"] = "Ask before selling items"
-L["OPT_PROMPT_DESC"] = "A window will appear showing the items to be sold and allowing you to cancel the sale."
-L["OPT_REPAIR"] = "Repair all items when talking to a merchant who has that ability."
-L["OPT_UNUSABLE"] = "Sell unequippable soulbound items"
-L["OPT_UNUSABLE_DESC"] = "For example, soulbound plate is unusable by a Mage."
+L["ERROR_CANNOT_REPAIR"] = "This merchant cannot repair your equipment."
+L["ERROR_INVALID_ITEM"] = "Not a valid item.  Please use a bare item ID (e.g. \"12345\"), an item reference (e.g. \"item:12345\" or \"item:12345:0:0:0:0:0:0:0\") or an item link (by shift-clicking on an item)."
+L["ERROR_NO_MERCHANT"] = "You are not speaking to a merchant."
 
-L["WARN_UNKNOWN_TYPE"] = function(link, type, subtype) return "Warning: " .. link .. " has unknown type \"" .. type .. ", " .. subtype .. "\".  Please check to see if a new version of this addon is available." end
+L["OPT_AUTO_REPAIR"] = "Repair equipment at merchants"
+L["OPT_AUTO_REPAIR_DESC"] = "When set, all equipment will automatically be repaired when talking to a merchant who has that ability."
+L["OPT_AUTO_SELL"] = "Sell \"junk\" items at merchant"
+L["OPT_AUTO_SELL_DESC"] = "When set, all items considered \"junk\" will automatically be sold when talking to any merchant."
+L["OPT_GENERAL"] = "General options"
+L["OPT_JUNK"] = "\"Junk\" options"
+L["OPT_JUNK_LIGHT"] = "Light-weight, soulbound armor is junk"
+L["OPT_JUNK_LIGHT_DESC"] = "When set, armor which is soulbound and lighter-weight than a class typically wears (taking level into account) is considered junk.  For example, leather is light-weight for Warriors.  Some specs (healadins wearing spellpower cloth, high-level hunters wearing agility leather) probably want to leave this off."
+L["OPT_JUNK_POOR"] = "\"Poor\"-quality items are junk"
+L["OPT_JUNK_POOR_DESC"] = "When set, \"poor\"-quality items (whose names appear in grey) are considered junk.  Also called \"vendor trash\"."
+L["OPT_JUNK_UNUSABLE"] = "Unusable, soulbound equipment is junk"
+L["OPT_JUNK_UNUSABLE_DESC"] = "When set, equipment which is soulbound but cannot be equipped by your character is considered junk.  For example, maces and plate are unusable by a Mage.  Enchanters probably want to leave this off."
+L["OPT_NOTJUNK"] = "\"Not junk\" options"
+L["OPT_NOTJUNK_ENCHANTED"] = "Enchanted items are not junk"
+L["OPT_NOTJUNK_ENCHANTED_DESC"] = "When set, enchanted items will never be considered \"junk\" unless they are specifically included in the \"junk\" list."
+L["OPT_NOTJUNK_GEMMED"] = "Gemmed items are not junk"
+L["OPT_NOTJUNK_GEMMED_DESC"] = "When set, gemmed items will never be considered \"junk\" unless they are specifically included in the \"junk\" list."
+L["OPT_PROMPT_SELL"] = "Ask before selling items"
+L["OPT_PROMPT_SELL_DESC"] = "When set, a window will appear showing the items to be sold and allowing you to cancel the sale."
+
+L["WARN_UNKNOWN_TYPE"] = function(link, type, subtype) return "Item " .. link .. " has unknown type \"" .. type .. ", " .. subtype .. "\" and will not be sold.  Please check to see if a new version of this addon is available." end

@@ -99,5 +99,5 @@ function JunkyardSellFrameSellButton_OnClick(self, button, down)
 end
 
 function JunkyardSellFrameSellButton_OnLoad(self)
-	self:SetText(L["CMD_SELL"])
+	self:SetText(L["BUTTON_SELL"])
 end
