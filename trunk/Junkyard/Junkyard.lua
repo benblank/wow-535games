@@ -42,9 +42,18 @@ local options = {
 	handler = Junkyard,
 	type = "group",
 	args = {
+		options = {
+			name = L["CMD_OPTIONS"],
+			desc = L["CMD_OPTIONS_DESC"],
+			type = "execute",
+			order = 9,
+			dialogHidden = true,
+			func = "CmdOptions",
+		},
+
 		sell = {
 			name = L["CMD_SELL"],
-			desc = L["CMD_SELL"],
+			desc = L["CMD_SELL_DESC"],
 			type = "execute",
 			order = 10,
 			dialogHidden = true,
@@ -53,7 +62,7 @@ local options = {
 
 		repair = {
 			name = L["CMD_SELL"],
-			desc = L["CMD_SELL"],
+			desc = L["CMD_SELL_DESC"],
 			type = "execute",
 			order = 11,
 			dialogHidden = true,
@@ -62,7 +71,7 @@ local options = {
 
 		["open-bags"] = {
 			name = L["CMD_BAGS_OPEN"],
-			desc = L["CMD_BAGS_OPEN"],
+			desc = L["CMD_BAGS_OPEN_DESC"],
 			type = "execute",
 			order = 12,
 			dialogHidden = true,
@@ -71,7 +80,7 @@ local options = {
 
 		["close-bags"] = {
 			name = L["CMD_BAGS_CLOSE"],
-			desc = L["CMD_BAGS_CLOSE"],
+			desc = L["CMD_BAGS_CLOSE_DESC"],
 			type = "execute",
 			order = 13,
 			dialogHidden = true,
@@ -237,6 +246,12 @@ function Junkyard:CmdJunkListAdd(input)
 	self:Print(id .. ": " .. item)
 end
 
+function Junkyard:CmdOptions()
+	-- opening the "Profile" sub-category first ensures the primary category is expanded
+	InterfaceOptionsFrame_OpenToCategory(self.opt_profile);
+	InterfaceOptionsFrame_OpenToCategory(self.opt_main);
+end
+
 function Junkyard:CmdRepair()
 	if not self.at_merchant then
 		self:PrintError(L["ERROR_NO_MERCHANT"])
@@ -337,10 +352,10 @@ function Junkyard:OnInitialize()
 
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("Junkyard", options, {"junkyard"})
 	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Junkyard", options)
-	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Junkyard", "Junkyard")
+	self.opt_main = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Junkyard", "Junkyard")
 
 	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("JunkyardProfile", options.args.profile)
-	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("JunkyardProfile", "Profile", "Junkyard")
+	self.opt_profile = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("JunkyardProfile", "Profile", "Junkyard")
 
 	self:RegisterEvent("MERCHANT_CLOSED", "OnMerchantClosed")
 	self:RegisterEvent("MERCHANT_SHOW", "OnMerchantShow")
