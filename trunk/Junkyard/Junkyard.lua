@@ -31,11 +31,19 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 -- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Junkyard = LibStub("AceAddon-3.0"):NewAddon("Junkyard", "AceConsole-3.0", "AceEvent-3.0")
+-- local references to commonly-used global variables for faster access
+local GetContainerItemLink = GetContainerItemLink
+local GetItemInfo = GetItemInfo
+local LibStub = LibStub
+local ShowMerchantSellCursor = ShowMerchantSellCursor
+local strsplit = strsplit
+local tonumber = tonumber
+local UseContainerItem = UseContainerItem
 
-local AceGUI = LibStub("AceGUI-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Junkyard")
 local LBIR = LibStub("LibBabble-Inventory-3.0"):GetReverseLookupTable()
+
+Junkyard = LibStub("AceAddon-3.0"):NewAddon("Junkyard", "AceConsole-3.0", "AceEvent-3.0")
 
 local options = {
 	name = "Junkyard",
@@ -199,6 +207,39 @@ local options = {
 			width = "full",
 			set = function(info, value) Junkyard:CmdJunkListAdd(value) end,
 		},
+
+		["junklist-remove"] = {
+			name = L["OPT_JUNKLIST_REMOVE"],
+			desc = L["OPT_JUNKLIST_REMOVE_DESC"],
+			type = "input",
+			order = 130,
+			width = "full",
+			set = function(info, value) Junkyard:CmdJunkListRemove(value) end,
+		},
+
+		["notjunklist"] = {
+			name = L["OPT_NOTJUNKLIST"],
+			type = "header",
+			order = 140,
+		},
+
+		["notjunklist-add"] = {
+			name = L["OPT_NOTJUNKLIST_ADD"],
+			desc = L["OPT_NOTJUNKLIST_ADD_DESC"],
+			type = "input",
+			order = 150,
+			width = "full",
+			set = function(info, value) Junkyard:CmdNotJunkListAdd(value) end,
+		},
+
+		["notjunklist-remove"] = {
+			name = L["OPT_NOTJUNKLIST_REMOVE"],
+			desc = L["OPT_NOTJUNKLIST_REMOVE_DESC"],
+			type = "input",
+			order = 160,
+			width = "full",
+			set = function(info, value) Junkyard:CmdNotJunkListRemove(value) end,
+		},
 	},
 }
 
@@ -206,44 +247,82 @@ local defaults = {
 	profile = {
 		auto_repair = true,
 		auto_sell = true,
+		debug = false,
 		junk_light = false,
+		junk_list = {},
 		junk_poor = true,
 		junk_unusable = false,
 		notjunk_enchanted = true,
 		notjunk_gemmed = true,
+		notjunk_list = {},
 	},
 }
 
+local ItemListTool = function(self, args, list, value, success, dupe)
+	local id, link
+
+	local found = false
+	local pat_id = "^%d+$"
+	local pat_str = "^item:(%d+)"
+	local pat_link = "|Hitem:(%d+)"
+
+	for arg in strtrim(args):gmatch("[^%s]+") do
+		id = arg:match(pat_id)
+		if not id then id = arg:match(pat_str) end
+		if not id then id = arg:match(pat_link) end
+
+		if id then
+			found = true
+
+			id = tonumber(id)
+			link = select(2, GetItemInfo(id))
+
+			if list[id] == value then
+				self:PrintWarning(L[dupe](link))
+			else
+				list[id] = value
+
+				self:Print(L[success](link))
+			end
+		end
+	end
+
+	if not found then
+		self:PrintError(L["MSG_INVALID_ITEM"])
+		if self.db.profile.debug then self:Print(args:gsub("|", "||")) end
+		return
+	end
+end
+
 function Junkyard:CmdBagsClose()
-	CloseAllBags() -- unlike OpenAllBags, this actually does what it says on the tin
+	 -- unlike OpenAllBags, this actually does what it says on the tin
+	CloseAllBags()
 end
 
 function Junkyard:CmdBagsOpen()
+	-- OpenAllBags doesn't (at least, there's no way to guarantee it will work
+	-- as expected without running CloseAllBags first) - this function is
+	-- patterened after CloseAllBags, which *always* works as expected
 	OpenBackpack();
 	for i=1, NUM_CONTAINER_FRAMES, 1 do
 		OpenBag(i);
 	end
 end
 
-function Junkyard:CmdJunkListAdd(input)
-	local id, item
+function Junkyard:CmdJunkListAdd(args)
+	ItemListTool(self, args, self.db.profile.junk_list, true, "MSG_JUNK_ADDED", "MSG_JUNK_ADDED_DUPE")
+end
 
-	local pat_id = "^%d+$"
-	local pat_str = "^item:(%d+)"
-	local pat_link = "^|c%x%x%x%x%x%x%x%x|Hitem:(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+:%d+|h%[[^]]+%]|h|r$"
+function Junkyard:CmdJunkListRemove(args)
+	ItemListTool(self, args, self.db.profile.junk_list, nil, "MSG_JUNK_REMOVED", "MSG_JUNK_REMOVED_DUPE")
+end
 
-	item = strtrim(input)
-	id = item:match(pat_id)
-	if not id then id = item:match(pat_str) end
-	if not id then id = item:match(pat_link) end
+function Junkyard:CmdNotJunkListAdd(args)
+	ItemListTool(self, args, self.db.profile.notjunk_list, true, "MSG_NOTJUNK_ADDED", "MSG_NOTJUNK_ADDED_DUPE")
+end
 
-	if not id then
-		self:Print(L["ERROR_INVALID_ITEM"])
-		self:Print("\"" .. item:gsub("|", "||") .. "\"")
-		return
-	end
-
-	self:Print(id .. ": " .. item)
+function Junkyard:CmdNotJunkListRemove(args)
+	ItemListTool(self, args, self.db.profile.notjunk_list, nil, "MSG_NOTJUNK_REMOVED", "MSG_NOTJUNK_REMOVED_DUPE")
 end
 
 function Junkyard:CmdOptions()
@@ -254,23 +333,26 @@ end
 
 function Junkyard:CmdRepair()
 	if not self.at_merchant then
-		self:PrintError(L["ERROR_NO_MERCHANT"])
+		self:PrintError(L["MSG_NO_MERCHANT"])
 		return
 	elseif not CanMerchantRepair() then
-		self:PrintError(L["ERROR_CANNOT_REPAIR"])
+		self:PrintError(L["MSG_CANNOT_REPAIR"])
 	end
 	RepairAllItems()
 end
 
 function Junkyard:CmdSell()
 	if not self.at_merchant then
-		self:PrintError(L["ERROR_NO_MERCHANT"])
+		self:PrintError(L["MSG_NO_MERCHANT"])
 		return
 	end
 
-	local _, class, enchanted, equip, gem1, gem2, gem3, gem4, gemmed, id, level, link, lsubtype, ltype, name, quality, req, items, sell, slot, slots, soulbound, subtype, type
+	local _, enchanted, gem1, gem2, gem3, gem4, gemmed, id, link, lsubtype, ltype, quality, sell, slot, slots, soulbound, subtype, type
 
-	items = {}
+	local class = select(2, UnitClass("player"))
+	local items = {}
+	local level = UnitLevel("player")
+	local profile = self.db.profile
 
 	for bag = 0, NUM_BAG_SLOTS do
 		slots = GetContainerNumSlots(bag)
@@ -280,14 +362,13 @@ function Junkyard:CmdSell()
 
 			if link then
 				sell = false
-				name, _, quality, _, req, ltype, lsubtype, _, equip, _ = GetItemInfo(link)
+				quality, _, _, ltype, lsubtype = select(3, GetItemInfo(link))
 				id, enchanted, gem1, gem2, gem3, gem4 = strsplit(":", link:sub(18))
+				id = tonumber(id)
 				enchanted = tonumber(enchanted) > 0
 				gemmed = tonumber(gem1) > 0 or tonumber(gem2) > 0 or tonumber(gem3) > 0 or tonumber(gem4) > 0
 
-				if self.db.profile.junk_unusable or self.db.profile.junk_light then
-					_, class = UnitClass("player")
-					level = UnitLevel("player")
+				if profile.junk_unusable or profile.junk_light then
 					type = LBIR[ltype]
 					subtype = LBIR[lsubtype]
 
@@ -298,7 +379,7 @@ function Junkyard:CmdSell()
 							soulbound = getglobal("JunkyardTooltipTextLeft2"):GetText() == ITEM_SOULBOUND
 						else
 							soulbound = false -- prevent type-based sales from occurring
-							self:PrintWarning(L["WARN_UNKNOWN_TYPE"](link, ltype, lsubtype))
+							self:PrintWarning(L["MSG_UNKNOWN_TYPE"](link, ltype, lsubtype))
 						end
 					else
 						soulbound = false
@@ -307,28 +388,36 @@ function Junkyard:CmdSell()
 					soulbound = false
 				end
 
-				if self.db.profile.junk_poor and quality == 0 then
+				if profile.junk_poor and quality == 0 then
 					sell = true
 				end
 
-				if self.db.profile.junk_light and type == "Armor" and soulbound and level >= self.Armor[class][subtype] then
+				if profile.junk_light and type == "Armor" and soulbound and level >= self.Armor[class][subtype] then
 					sell = true
 				end
 
-				if self.db.profile.junk_unusable and soulbound and not self[type][class][subtype] then
+				if profile.junk_unusable and soulbound and not self[type][class][subtype] then
 					sell = true
 				end
 
-				if self.db.profile.notjunk_enchanted and enchanted then
+				if profile.junk_list[id] then
+					sell = true
+				end
+
+				if profile.notjunk_enchanted and enchanted then
 					sell = false
 				end
 
-				if self.db.profile.notjunk_gemmed and gemmed then
+				if profile.notjunk_gemmed and gemmed then
+					sell = false
+				end
+
+				if profile.notjunk_list[id] then
 					sell = false
 				end
 
 				if sell then
-					if self.db.profile.prompt then
+					if profile.prompt then
 						items[#items + 1] = {bag, slot, link}
 					else
 						ShowMerchantSellCursor(1)
@@ -350,7 +439,7 @@ function Junkyard:OnInitialize()
 	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 	options.args.profile.dialogHidden = true
 
-	LibStub("AceConfig-3.0"):RegisterOptionsTable("Junkyard", options, {"junkyard"})
+	LibStub("AceConfig-3.0"):RegisterOptionsTable("Junkyard", options, "junkyard")
 	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Junkyard", options)
 	self.opt_main = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Junkyard", "Junkyard")
 
