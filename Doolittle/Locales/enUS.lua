@@ -55,7 +55,3 @@ L["OPT_ZERO"] = "A rating of 0 means \"unrated\".  Unrated mounts have normal od
 L["TYPE_FLYING"] = "Flying"
 L["TYPE_GROUND"] = "Ground"
 L["TYPE_SWIMMING"] = "Swimming"
-
-L["ZONE_DALARAN"] = "Dalaran"
-L["ZONE_KRASUS_LANDING"] = "Krasus' Landing"
-L["ZONE_WINTERGRASP"] = "Wintergrasp"

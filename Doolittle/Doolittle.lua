@@ -31,10 +31,14 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 -- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+local LibStub = LibStub
+local PetPaperDollFrameCompanionFrame = PetPaperDollFrameCompanionFrame
+
 Doolittle = LibStub("AceAddon-3.0"):NewAddon("Doolittle", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 
 local AceGUI = LibStub("AceGUI-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Doolittle")
+local LBZ = LibStub("LibBabble-Zone-3.0"):GetLookupTable()
 
 local options = {
 	name = "Doolittle",
@@ -61,7 +65,7 @@ local options = {
 					style = "dropdown",
 					get = function(info) return Doolittle.db.profile.mounts.dismountkey end,
 					set = function(info, value) Doolittle.db.profile.mounts.dismountkey = value end,
-					values = { --BUG: these display sorted in GUI; NONE_KEY should appear first
+					values = { --BUG: these display sorted in GUI; NONE_KEY should appear last
 						none = NONE_KEY,
 						alt = ALT_KEY,
 						ctrl = CTRL_KEY,
@@ -175,6 +179,13 @@ local orders = {
 	swimming = 3000,
 }
 
+local function GetSelectedCompanion()
+	local mode = PetPaperDollFrameCompanionFrame.mode:lower() .. "s"
+	local spell = ((mode == "mounts") and PetPaperDollFrameCompanionFrame.idMount or PetPaperDollFrameCompanionFrame.idCritter)
+
+	return mode, spell
+end
+
 function Doolittle:BuildOptionsAndDefaults()
 	local args = options.args.mounts.args
 	local mounts = defaults.profile.mounts
@@ -227,7 +238,7 @@ function Doolittle:CmdMount()
 		macro = "[mounted,flying,nomodifier:" .. dismountkey .. "]error-flying;" .. macro
 	end
 
-	local command, _ = SecureCmdOptionParse(macro)
+	local command = SecureCmdOptionParse(macro)
 
 	if command == "dismount" then
 		Dismount()
@@ -241,7 +252,7 @@ function Doolittle:CmdMount()
 	elseif command == "error-indoors" then
 		self:DisplayError(SPELL_FAILED_NO_MOUNTS_ALLOWED)
 		return
-	elseif command == "flying" and (zone == L["ZONE_WINTERGRASP"] or (zone == L["ZONE_DALARAN"] and subzone ~= L["ZONE_KRASUS_LANDING"])) then
+	elseif command == "flying" and (zone == LBZ["Wintergrasp"] or (zone == LBZ["Dalaran"] and subzone ~= LBZ["Krasus' Landing"])) then
 		command = "ground"
 	end
 
@@ -270,15 +281,8 @@ function Doolittle:DisplayError(message)
 	UIErrorsFrame:AddMessage(message, 1.0, 0.1, 0.1, 1.0)
 end
 
-function Doolittle:GetRating(which)
-	return self.db.profile[which[1]].ratings[which[2]]
-end
-
-function Doolittle:GetSelected()
-	local mode = PetPaperDollFrameCompanionFrame.mode:lower() .. "s"
-	local spell = ((mode == "mounts") and PetPaperDollFrameCompanionFrame.idMount or PetPaperDollFrameCompanionFrame.idCritter)
-
-	return {mode, spell}
+function Doolittle:GetRating(type, id)
+	return self.db.profile[type].ratings[id]
 end
 
 function Doolittle:OnCompanionUpdate(event, mode)
@@ -299,9 +303,7 @@ function Doolittle:OnEnable()
 	self.slider:SetSliderValues(0,5,1)
 	self.slider.frame:SetParent(CompanionModelFrame)
 	self.slider:SetPoint("TOPRIGHT")
-
-	local this = self
-	self.slider:SetCallback("OnValueChanged", function(info) this:SetRating(this:GetSelected(), info.value) end)
+	self.slider:SetCallback("OnValueChanged", function(info) self:SetRating(info.value, GetSelectedCompanion()) end)
 end
 
 function Doolittle:OnInitialize()
@@ -324,7 +326,7 @@ function Doolittle:OnInitialize()
 end
 
 function Doolittle:OnPreviewUpdate()
-	self.slider:SetValue(self:GetRating(self:GetSelected()))
+	self.slider:SetValue(self:GetRating(GetSelectedCompanion()))
 end
 
 function Doolittle:ScanCompanions(mode)
@@ -332,10 +334,10 @@ function Doolittle:ScanCompanions(mode)
 	local known = Pool{}
 
 	if count then
-		local _, name, spell, icon, speeds
+		local name, spell, icon, speeds
 
 		for id = 1, count do
-			_, name, spell, icon, _ = GetCompanionInfo(mode, id)
+			name, spell, icon = select(2, GetCompanionInfo(mode, id))
 
 			known[spell] = {id, name, icon}
 		end
@@ -343,18 +345,14 @@ function Doolittle:ScanCompanions(mode)
 
 	mode = mode:lower() .. "s"
 
-	-- these two if blocks can be removed once critters have been added to CompanionData.php
-	if not self[mode] then
-		self[mode] = {}
-	end
-
-	if not self[mode].pools then
-		self[mode].pools = {}
-	end
-
 	self[mode].pools.known = known
 end
 
-function Doolittle:SetRating(which, value)
-	self.db.profile[which[1]].ratings[which[2]] = value
+function Doolittle:SetRating(value, type, id)
+	local profile = self.db.profile[type].ratings
+	local pools = self[type].pools.ratings
+
+	pools[profile[id]] = pools[profile[id]] - id
+	profile[id] = value
+	pools[value] = pools[value] + id
 end
