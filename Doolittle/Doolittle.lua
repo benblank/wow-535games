@@ -323,6 +323,18 @@ function Doolittle:OnInitialize()
 	Doolittle:SecureHook("PetPaperDollFrame_UpdateCompanionPreview", "OnPreviewUpdate")
 
 	self:OnCompanionUpdate() -- COMPANION_UPDATE does not fire on UI reload
+
+	for type in pairs{critters=1, mounts=1} do
+		local ratings = self[type].pools.ratings = {}
+
+		for id, rating in pairs(self.db.profile[type].ratings) do
+			if not ratings[rating] then
+				ratings[rating] = Pool{}
+			end
+
+			ratings[rating][id] = true
+		end
+	end
 end
 
 function Doolittle:OnPreviewUpdate()
@@ -349,10 +361,10 @@ function Doolittle:ScanCompanions(mode)
 end
 
 function Doolittle:SetRating(value, type, id)
-	local profile = self.db.profile[type].ratings
+	local ratings = self.db.profile[type].ratings
 	local pools = self[type].pools.ratings
 
-	pools[profile[id]] = pools[profile[id]] - id
-	profile[id] = value
-	pools[value] = pools[value] + id
+	pools[ratings[id]][id] = nil
+	ratings[id] = value
+	pools[value][id] = true
 end
