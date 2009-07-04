@@ -180,21 +180,21 @@ local orders = {
 }
 
 local function GetSelectedCompanion()
-	local mode = PetPaperDollFrameCompanionFrame.mode:lower() .. "s"
-	local spell = ((mode == "mounts") and PetPaperDollFrameCompanionFrame.idMount or PetPaperDollFrameCompanionFrame.idCritter)
+	local mode = PetPaperDollFrameCompanionFrame.mode
+	local spell = select(3, GetCompanionInfo(mode, PetPaperDollFrame_FindCompanionIndex()))
 
-	return mode, spell
+	return mode:lower() .. "s", spell
 end
 
 function Doolittle:BuildOptionsAndDefaults()
 	local args = options.args.mounts.args
-	local mounts = defaults.profile.mounts
+	local profile = defaults.profile.mounts
 
-	for type, speeds in pairs(self.mounts.speeds) do
-		mounts[type] = {fastest = true}
+	for terrain, speeds in pairs(self.mounts.speeds) do
+		profile[terrain] = {fastest = true}
 
-		args[type] = {
-			name = L["TYPE_" .. type:upper()],
+		args[terrain] = {
+			name = L["TYPE_" .. terrain:upper()],
 			type = "group",
 			inline = true,
 			args = {
@@ -204,8 +204,8 @@ function Doolittle:BuildOptionsAndDefaults()
 					type = "toggle",
 					order = 50,
 					width = "full",
-					get = function(info) return self.db.profile.mounts[type].fastest end,
-					set = function(info, value) self.db.profile.mounts[type].fastest = value end,
+					get = function(info) return self.db.profile.mounts[terrain].fastest end,
+					set = function(info, value) self.db.profile.mounts[terrain].fastest = value end,
 				},
 			},
 		}
@@ -213,16 +213,16 @@ function Doolittle:BuildOptionsAndDefaults()
 		for speed, default in pairs(speeds) do
 			local sspeed = "speed" .. speed
 
-			mounts[type][sspeed] = default
+			profile[terrain][sspeed] = default
 
-			args[type].args[sspeed] = {
+			args[terrain].args[sspeed] = {
 				name = L["OPT_INCLUDE_SPEED"](speed),
 				type = "toggle",
 				order = 1000 + speed,
 				width = "full",
-				disabled = function(info) return self.db.profile.mounts[type].fastest end,
-				get = function(info) return self.db.profile.mounts[type][sspeed] end,
-				set = function(info, value) self.db.profile.mounts[type][sspeed] = value end,
+				disabled = function(info) return self.db.profile.mounts[terrain].fastest end,
+				get = function(info) return self.db.profile.mounts[terrain][sspeed] end,
+				set = function(info, value) self.db.profile.mounts[terrain][sspeed] = value end,
 			}
 		end
 	end
@@ -232,7 +232,8 @@ function Doolittle:CmdMount()
 	local zone = GetRealZoneText()
 	local subzone = GetSubZoneText()
 	local macro = "[mounted]dismount;[combat]error-combat;[indoors]error-indoors;[swimming]swimming;[flyable]flying;ground"
-	local dismountkey = self.db.profile.mounts.dismountkey
+	local profile = self.db.profile.mounts
+	local dismountkey = profile.dismountkey
 
 	if dismountkey ~= "none" then
 		macro = "[mounted,flying,nomodifier:" .. dismountkey .. "]error-flying;" .. macro
@@ -256,33 +257,76 @@ function Doolittle:CmdMount()
 		command = "ground"
 	end
 
-	local type = self.mounts[command]
+	local pool = self:GetMountPool(command)
 
-	if not type then
-		--TODO: no mounts of type
+	-- ground mounts can be used anywhere if no flying/swimming mounts are available
+	if not (pool:size() > 0) and command ~= "ground" then
+		pool = self:GetMountPool("ground")
+	end
+
+	-- swimming mounts can be used out-of-water if no ground mounts are available
+	if not (pool:size() > 0) and command ~= "swimming" then
+		pool = self:GetMountPool("swimming")
+	end
+
+	if not (pool:size() > 0) then
+		self:DisplayError(L["ERROR_NO_MOUNTS"])
 		return
 	end
 
-	local mounts = self.db.profile.mounts
+	local rating
+	local ratings = {}
+	local pools = self.mounts.pools.ratings
 	local tickets = {}
 
-	--TODO: restrict to selected speed brackets
-	--TODO: randomize to rating, then randomize within rating?
-	for spell, id in pairs(type) do
-		for i = 1, mounts.weights[mounts.ratings[spell]] do
-			table.insert(tickets, id)
+	for i = 0, 5 do
+		rating = pools[i] * pool
+
+		if rating:size() > 0 then
+			ratings[i] = rating
+
+			for j = 1, profile.weights[i] do
+				table.insert(tickets, i)
+			end
 		end
 	end
 
-	CallCompanion("MOUNT", tickets[math.random(#tickets) - 1])
+	rating = tickets[math.random(#tickets)]
+
+	CallCompanion("MOUNT", ratings[rating][ratings[rating]()][1])
 end
 
 function Doolittle:DisplayError(message)
 	UIErrorsFrame:AddMessage(message, 1.0, 0.1, 0.1, 1.0)
 end
 
-function Doolittle:GetRating(type, id)
-	return self.db.profile[type].ratings[id]
+function Doolittle:GetMountPool(terrain)
+	local pool
+	local pools = self.mounts.pools
+	local tpools = pools[terrain]
+	local profile = self.db.profile.mounts[terrain]
+
+	if profile.fastest then
+		if tpools.fastest < 0 then
+			return Pool{}
+		end
+
+		pool = tpools[tpools.fastest]
+	else
+		pool = Pool{}
+
+		for speed, default in pairs(profile) do
+			if speed:sub(1, 5) == "speed" then
+				pool = pool + tpools[tonumber(speed:sub(6))]
+			end
+		end
+	end
+
+	return pool * pools.known
+end
+
+function Doolittle:GetRating(mode, spell)
+	return self.db.profile[mode].ratings[spell]
 end
 
 function Doolittle:OnCompanionUpdate(event, mode)
@@ -291,6 +335,23 @@ function Doolittle:OnCompanionUpdate(event, mode)
 		self:ScanCompanions("MOUNT")
 	else
 		self:ScanCompanions(mode)
+	end
+
+	-- ideally, this would be in OnInitialize and only run once,
+	-- but companion data isn't always available at that point
+	for mode in pairs{critters=1, mounts=1} do
+		local ratings = {}
+
+		for rating = 0, 5 do
+			ratings[rating] = Pool{}
+		end
+
+		for spell, info in pairs(self[mode].pools.known) do
+			local rating = self.db.profile[mode].ratings[spell]
+			ratings[rating][spell] = true
+		end
+
+		self[mode].pools.ratings = ratings
 	end
 end
 
@@ -323,18 +384,6 @@ function Doolittle:OnInitialize()
 	Doolittle:SecureHook("PetPaperDollFrame_UpdateCompanionPreview", "OnPreviewUpdate")
 
 	self:OnCompanionUpdate() -- COMPANION_UPDATE does not fire on UI reload
-
-	for type in pairs{critters=1, mounts=1} do
-		local ratings = self[type].pools.ratings = {}
-
-		for id, rating in pairs(self.db.profile[type].ratings) do
-			if not ratings[rating] then
-				ratings[rating] = Pool{}
-			end
-
-			ratings[rating][id] = true
-		end
-	end
 end
 
 function Doolittle:OnPreviewUpdate()
@@ -344,9 +393,10 @@ end
 function Doolittle:ScanCompanions(mode)
 	local count = GetNumCompanions(mode)
 	local known = Pool{}
+	local pools = self[mode:lower() .. "s"].pools
 
 	if count then
-		local name, spell, icon, speeds
+		local name, spell, icon
 
 		for id = 1, count do
 			name, spell, icon = select(2, GetCompanionInfo(mode, id))
@@ -355,16 +405,30 @@ function Doolittle:ScanCompanions(mode)
 		end
 	end
 
-	mode = mode:lower() .. "s"
+	pools.known = known
 
-	self[mode].pools.known = known
+	if mode == "MOUNT" then
+		local fastest
+
+		for terrain, speeds in pairs(self.mounts.speeds) do
+			pools[terrain].fastest = -1
+
+			for speed in pairs(speeds) do
+				fastest = known * pools[terrain][speed]
+
+				if fastest:size() > 0 and speed > pools[terrain].fastest then
+					pools[terrain].fastest = speed
+				end
+			end
+		end
+	end
 end
 
-function Doolittle:SetRating(value, type, id)
-	local ratings = self.db.profile[type].ratings
-	local pools = self[type].pools.ratings
+function Doolittle:SetRating(value, mode, spell)
+	local ratings = self.db.profile[mode].ratings
+	local pools = self[mode].pools.ratings
 
-	pools[ratings[id]][id] = nil
-	ratings[id] = value
-	pools[value][id] = true
+	pools[ratings[spell]][spell] = nil
+	ratings[spell] = value
+	pools[value][spell] = true
 end

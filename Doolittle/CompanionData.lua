@@ -45,6 +45,7 @@ Doolittle.mounts = {
 				61294, -- Green Proto-Drake
 				39798, -- Green Riding Nether Ray
 				48025, -- Headless Horseman's Mount
+				61309, -- Magnificent Flying Carpet
 				41513, -- Onyx Netherwing Drake
 				41516, -- Purple Netherwing Drake
 				39801, -- Purple Riding Nether Ray
@@ -92,6 +93,7 @@ Doolittle.mounts = {
 			[60] = Pool{
 				32244, -- Blue Wind Rider
 				32239, -- Ebon Gryphon
+				61451, -- Flying Carpet
 				44153, -- Flying Machine
 				32235, -- Golden Gryphon
 				32245, -- Green Wind Rider
@@ -173,7 +175,6 @@ Doolittle.mounts = {
 				66122, -- Magic Rooster
 				66123, -- Magic Rooster
 				66124, -- Magic Rooster
-				61309, -- Magnificent Flying Carpet
 				55531, -- Mechano-hog
 				60424, -- Mekgineer's Chopper
 				16084, -- Mottled Red Raptor
@@ -280,7 +281,6 @@ Doolittle.mounts = {
 				6653, -- Dire Wolf
 				8395, -- Emerald Raptor
 				17458, -- Fluorescent Green Mechanostrider
-				61451, -- Flying Carpet
 				16060, -- Golden Sabercat
 				35710, -- Gray Elekk
 				18989, -- Gray Kodo
@@ -348,4 +348,4 @@ Doolittle.mounts = {
 	},
 }
 
--- Generated on Mon, 29 Jun 2009 16:06:37 -0700 in 72.751327991486 seconds
+-- Generated on Sat, 04 Jul 2009 12:25:22 -0700 in 74.294680118561 seconds
