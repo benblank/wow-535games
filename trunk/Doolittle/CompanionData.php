@@ -102,22 +102,12 @@ foreach (array("http://www.wowhead.com/?spells=-5", "http://www.wowhead.com/?spe
 						if ($value > 0 && substr($content, 0, 21) === "Apply Aura: Mod Speed") {
 							if (substr($content, 22) === "Mounted Flight") {
 								// flying mounts can only be used in flyable areas and so aren't considered any other kind of mount
-								if (!$type || $type == 'flying') {
-									$speeds[] = array('flying', $value);
-									$type = 'flying';
-								}
-
+								$speeds = array(array('flying', $value));
 								break;
 							} else if(substr($content, 22, 4) === "Swim") {
-								if (!$type || $type != 'flying') {
-									$speeds[] = array('swimming', $value);
-									$type = 'swimming';
-								}
+								$speeds[] = array('swimming', $value);
 							} else if(substr($content, 22, 7) === "Mounted") {
-								if (!$type || $type != 'flying') {
-									$speeds[] = array('ground', $value);
-									$type = 'ground';
-								}
+								$speeds[] = array('ground', $value);
 							}
 						}
 					}

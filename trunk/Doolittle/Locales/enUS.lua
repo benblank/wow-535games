@@ -41,6 +41,7 @@ L["CMD_MOUNT"] = "Mount" -- not using MOUNT from GlobalStrings because that appe
 L["CMD_MOUNT_DESC"] = "Hop into the saddle of a random mount."
 
 L["ERROR_FLYING"] = function(key) return "Hold the " .. key .. " to dismount while flying." end
+L["ERROR_NO_MOUNTS"] = "You do not have any mounts which can be used here."
 
 L["OPT_DISMOUNT"] = "Dismount-in-flight key"
 L["OPT_DISMOUNT_DESC"] = "Hold this key to dismount even when flying."

@@ -34,6 +34,14 @@
 local gmt = getmetatable
 local mt = {}
 
+local function get_keys(a)
+	local keys = {}
+
+	for k in pairs(a) do table.insert(keys, k) end
+
+	return keys
+end
+
 function mt.__add(a, b)
 	local c = Pool{}
 
@@ -57,9 +65,7 @@ function mt.__add(a, b)
 end
 
 function mt.__call(a)
-	local keys = {}
-
-	for k in pairs(a) do table.insert(keys, k) end
+	local keys = get_keys(a)
 
 	return keys[math.random(#keys)]
 end
@@ -99,11 +105,14 @@ function mt.__sub(a, b)
 end
 
 function mt.__tostring(a)
-	local keys = {}
+	return "{ " .. table.concat(get_keys(a), " ") .. " }"
+end
 
-	for k, _ in pairs(a) do table.insert(keys, k) end
+mt.__index = mt
 
-	return "{ " .. table.concat(keys, " ") .. " }"
+-- Lua doesn't seem to allow metatables to override __len for tables
+function mt.size(a)
+	return #get_keys(a)
 end
 
 function Pool(a)
