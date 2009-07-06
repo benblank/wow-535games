@@ -302,6 +302,7 @@ Doolittle.mounts = {
 				10873, -- Red Mechanostrider
 				17462, -- Red Skeletal Horse
 				18363, -- Riding Kodo
+				64731, -- Sea Turtle
 				8980, -- Skeletal Horse
 				42776, -- Spectral Tiger
 				10789, -- Spotted Frostsaber

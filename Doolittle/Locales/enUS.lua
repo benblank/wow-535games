@@ -37,7 +37,6 @@ if not L then
 	return
 end
 
-L["CMD_MOUNT"] = "Mount" -- not using MOUNT from GlobalStrings because that appears to be intended as a noun whereas this is a verb
 L["CMD_MOUNT_DESC"] = "Hop into the saddle of a random mount."
 
 L["ERROR_FLYING"] = function(key) return "Hold the " .. key .. " to dismount while flying." end
