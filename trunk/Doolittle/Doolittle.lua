@@ -46,7 +46,7 @@ local options = {
 	type = "group",
 	args = {
 		mount = {
-			name = L["CMD_MOUNT"],
+			name = MOUNT,
 			desc = L["CMD_MOUNT_DESC"],
 			type = "execute",
 			dialogHidden = true,
@@ -129,6 +129,16 @@ local options = {
 							step = 1,
 							get = function(info) return Doolittle.db.profile.mounts.weights[4] end,
 							set = function(info, value) Doolittle.db.profile.mounts.weights[4] = value end,
+						},
+						rating5 = {
+							name = L["OPT_WEIGHT_FOR"](5),
+							type = "range",
+							width = "full",
+							min = 0,
+							max = 10,
+							step = 1,
+							get = function(info) return Doolittle.db.profile.mounts.weights[5] end,
+							set = function(info, value) Doolittle.db.profile.mounts.weights[5] = value end,
 						},
 					},
 				},
@@ -248,7 +258,7 @@ function Doolittle:CmdMount()
 		self:DisplayError(ERR_NOT_IN_COMBAT)
 		return
 	elseif command == "error-flying" then
-		self:DisplayError(L["ERROR_FLYING"](L["KEY_" .. dismountkey:upper()]))
+		self:DisplayError(L["ERROR_FLYING"](getglobal(dismountkey:upper() .. "_KEY")))
 		return
 	elseif command == "error-indoors" then
 		self:DisplayError(SPELL_FAILED_NO_MOUNTS_ALLOWED)
@@ -262,11 +272,6 @@ function Doolittle:CmdMount()
 	-- ground mounts can be used anywhere if no flying/swimming mounts are available
 	if not (pool:size() > 0) and command ~= "ground" then
 		pool = self:GetMountPool("ground")
-	end
-
-	-- swimming mounts can be used out-of-water if no ground mounts are available
-	if not (pool:size() > 0) and command ~= "swimming" then
-		pool = self:GetMountPool("swimming")
 	end
 
 	if not (pool:size() > 0) then
@@ -289,6 +294,12 @@ function Doolittle:CmdMount()
 				table.insert(tickets, i)
 			end
 		end
+	end
+
+	-- somehow, there are occasionally zero tickets at this point; I need to add code to analyze the problem
+	if not (#tickets > 0) then
+		self:Print("[|cffe61a1aERROR|r] Can't happen: zero tickets")
+		return
 	end
 
 	rating = tickets[math.random(#tickets)]

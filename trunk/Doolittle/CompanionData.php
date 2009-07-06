@@ -105,6 +105,8 @@ foreach (array("http://www.wowhead.com/?spells=-5", "http://www.wowhead.com/?spe
 								$speeds = array(array('flying', $value));
 								break;
 							} else if(substr($content, 22, 4) === "Swim") {
+								// the swimming mount aura appears to apply the same speed bonus when out of water
+								$speeds[] = array('ground', $value);
 								$speeds[] = array('swimming', $value);
 							} else if(substr($content, 22, 7) === "Mounted") {
 								$speeds[] = array('ground', $value);
