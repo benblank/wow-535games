@@ -53,6 +53,14 @@ local options = {
 			func = "CmdMount",
 		},
 
+		options = {
+			name = L["CMD_OPTIONS"],
+			desc = L["CMD_OPTIONS_DESC"],
+			type = "execute",
+			dialogHidden = true,
+			func = "CmdOptions",
+		},
+
 		mounts = {
 			name = MOUNTS,
 			type = "group",
@@ -183,12 +191,6 @@ local defaults = {
 	},
 }
 
-local orders = {
-	flying   = 1000,
-	ground   = 2000,
-	swimming = 3000,
-}
-
 local function GetSelectedCompanion()
 	local mode = PetPaperDollFrameCompanionFrame.mode
 	local spell = select(3, GetCompanionInfo(mode, PetPaperDollFrame_FindCompanionIndex()))
@@ -307,6 +309,12 @@ function Doolittle:CmdMount()
 	CallCompanion("MOUNT", ratings[rating][ratings[rating]()][1])
 end
 
+function Doolittle:CmdOptions()
+	-- opening the "Profile" sub-category first ensures the primary category is expanded
+	InterfaceOptionsFrame_OpenToCategory(self.opt_profile);
+	InterfaceOptionsFrame_OpenToCategory(self.opt_main);
+end
+
 function Doolittle:DisplayError(message)
 	UIErrorsFrame:AddMessage(message, 1.0, 0.1, 0.1, 1.0)
 end
@@ -348,21 +356,25 @@ function Doolittle:OnCompanionUpdate(event, mode)
 		self:ScanCompanions(mode)
 	end
 
-	-- ideally, this would be in OnInitialize and only run once,
-	-- but companion data isn't always available at that point
-	for mode in pairs{critters=1, mounts=1} do
-		local ratings = {}
+	-- companion data isn't always available during
+	-- OnInitialize, but this only needs to occur once
+	if not self.built_rating_pools then
+		for mode in pairs{critters=1, mounts=1} do
+			local ratings = {}
 
-		for rating = 0, 5 do
-			ratings[rating] = Pool{}
+			for rating = 0, 5 do
+				ratings[rating] = Pool{}
+			end
+
+			for spell, info in pairs(self[mode].pools.known) do
+				local rating = self.db.profile[mode].ratings[spell]
+				ratings[rating][spell] = true
+			end
+
+			self[mode].pools.ratings = ratings
 		end
 
-		for spell, info in pairs(self[mode].pools.known) do
-			local rating = self.db.profile[mode].ratings[spell]
-			ratings[rating][spell] = true
-		end
-
-		self[mode].pools.ratings = ratings
+		self.built_rating_pools = true
 	end
 end
 
@@ -376,17 +388,6 @@ function Doolittle:OnEnable()
 	self.slider.frame:SetParent(CompanionModelFrame)
 	self.slider:SetPoint("TOPRIGHT")
 	self.slider:SetCallback("OnValueChanged", function(info) self:SetRating(info.value, GetSelectedCompanion()) end)
-end
-
-function Doolittle:OnInitialize()
-	self:BuildOptionsAndDefaults() -- sets defaults; MUST be before AceDB call
-
-	self.db = LibStub("AceDB-3.0"):New("DoolittleDB", defaults)
-	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-
-	LibStub("AceConfig-3.0"):RegisterOptionsTable("Doolittle", options, {"doolittle"})
-	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Doolittle", options)
-	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Doolittle", "Doolittle")
 
 	Doolittle:RegisterEvent("COMPANION_LEARNED", "OnCompanionUpdate")
 	Doolittle:RegisterEvent("COMPANION_UPDATE", "OnCompanionUpdate")
@@ -394,7 +395,24 @@ function Doolittle:OnInitialize()
 	-- there's no real need for this to be a secure hook, but it has no side effects
 	Doolittle:SecureHook("PetPaperDollFrame_UpdateCompanionPreview", "OnPreviewUpdate")
 
-	self:OnCompanionUpdate() -- COMPANION_UPDATE does not fire on UI reload
+	self:OnCompanionUpdate()
+end
+
+function Doolittle:OnInitialize()
+	self:BuildOptionsAndDefaults() -- sets defaults; MUST be before AceDB call
+
+	self.db = LibStub("AceDB-3.0"):New("DoolittleDB", defaults)
+	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+	options.args.profile.dialogHidden = true
+
+	LibStub("AceConfig-3.0"):RegisterOptionsTable("Doolittle", options, {"doolittle"})
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Doolittle", options)
+	self.opt_main = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Doolittle", "Doolittle")
+
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("DoolittleProfile", options.args.profile)
+	self.opt_profile = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("DoolittleProfile", "Profile", "Doolittle")
+
+	self.built_rating_pools = false
 end
 
 function Doolittle:OnPreviewUpdate()

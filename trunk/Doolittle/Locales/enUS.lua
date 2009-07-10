@@ -38,6 +38,8 @@ if not L then
 end
 
 L["CMD_MOUNT_DESC"] = "Hop into the saddle of a random mount."
+L["CMD_OPTIONS"] = "Options"
+L["CMD_OPTIONS_DESC"] = "Open the Doolittle options in the Interface Options window."
 
 L["ERROR_FLYING"] = function(key) return "Hold the " .. key .. " to dismount while flying." end
 L["ERROR_NO_MOUNTS"] = "You do not have any mounts which can be used here."
