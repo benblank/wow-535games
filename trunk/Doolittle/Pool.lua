@@ -46,7 +46,7 @@ function mt.__add(a, b)
 	local c = Pool{}
 
 	if gmt(a) == mt then
-		for k in pairs(a) do c[k] = true end
+		for k, v in pairs(a) do c[k] = v end
 	elseif type(a) == "table" then
 		for _, v in ipairs(a) do c[v] = true end
 	else
@@ -86,7 +86,7 @@ function mt.__sub(a, b)
 	local c = Pool{}
 
 	if gmt(a) == mt then
-		for k in pairs(a) do c[k] = true end
+		for k, v in pairs(a) do c[k] = v end
 	elseif type(a) == "table" then
 		for _, v in ipairs(a) do c[v] = true end
 	else

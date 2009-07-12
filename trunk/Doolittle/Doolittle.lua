@@ -246,6 +246,7 @@ function Doolittle:CmdMount()
 	local macro = "[mounted]dismount;[combat]error-combat;[indoors]error-indoors;[swimming]swimming;[flyable]flying;ground"
 	local profile = self.db.profile.mounts
 	local dismountkey = profile.dismountkey
+	local pools = self.mounts.pools
 
 	if dismountkey ~= "none" then
 		macro = "[mounted,flying,nomodifier:" .. dismountkey .. "]error-flying;" .. macro
@@ -267,9 +268,15 @@ function Doolittle:CmdMount()
 		return
 	elseif command == "flying" and (zone == LBZ["Wintergrasp"] or (zone == LBZ["Dalaran"] and subzone ~= LBZ["Krasus' Landing"])) then
 		command = "ground"
+	elseif GetCurrentMapContinent() == 4 and not IsUsableSpell(GetSpellLink(54197):sub(27, -6)) then
+		command = "ground"
 	end
 
 	local pool = self:GetMountPool(command)
+
+	if GetRealZoneText() ~= LBZ["Temple of Ahn'Qiraj"] then
+		pool = pool - pools.aq40
+	end
 
 	-- ground mounts can be used anywhere if no flying/swimming mounts are available
 	if not (pool:size() > 0) and command ~= "ground" then
@@ -281,9 +288,9 @@ function Doolittle:CmdMount()
 		return
 	end
 
+	pools = pools.ratings
 	local rating
 	local ratings = {}
-	local pools = self.mounts.pools.ratings
 	local tickets = {}
 
 	for i = 0, 5 do
