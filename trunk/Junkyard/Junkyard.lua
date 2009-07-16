@@ -392,7 +392,7 @@ function Junkyard:CmdSell()
 					sell = true
 				end
 
-				if profile.junk_light and type == "Armor" and soulbound and level >= self.Armor[class][subtype] then
+				if profile.junk_light and type == "Armor" and soulbound and level >= (self.Armor[class][subtype] or 1000) then
 					sell = true
 				end
 
@@ -434,6 +434,11 @@ function Junkyard:CmdSell()
 	end
 end
 
+function Junkyard:OnEnable()
+	self:RegisterEvent("MERCHANT_CLOSED", "OnMerchantClosed")
+	self:RegisterEvent("MERCHANT_SHOW", "OnMerchantShow")
+end
+
 function Junkyard:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("JunkyardDB", defaults)
 	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
@@ -445,9 +450,6 @@ function Junkyard:OnInitialize()
 
 	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("JunkyardProfile", options.args.profile)
 	self.opt_profile = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("JunkyardProfile", "Profile", "Junkyard")
-
-	self:RegisterEvent("MERCHANT_CLOSED", "OnMerchantClosed")
-	self:RegisterEvent("MERCHANT_SHOW", "OnMerchantShow")
 
 	self.tooltip = CreateFrame("GameTooltip", "JunkyardTooltip")
 	self.tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
