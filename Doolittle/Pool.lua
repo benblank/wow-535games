@@ -54,7 +54,7 @@ function mt.__add(a, b)
 	end
 
 	if gmt(b) == mt then
-		for k in pairs(b) do c[k] = true end
+		for k, v in pairs(b) do c[k] = v end
 	elseif type(b) == "table" then
 		for _, v in ipairs(b) do c[v] = true end
 	else

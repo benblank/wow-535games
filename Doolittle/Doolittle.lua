@@ -88,22 +88,12 @@ local options = {
 					order = 50,
 					inline = true,
 					args = {
-						rating0 = {
-							name = L["OPT_WEIGHT_FOR"](0),
-							type = "range",
-							width = "full",
-							min = 0,
-							max = 10,
-							step = 1,
-							get = function(info) return Doolittle.db.profile.mounts.weights[0] end,
-							set = function(info, value) Doolittle.db.profile.mounts.weights[0] = value end,
-						},
 						rating1 = {
 							name = L["OPT_WEIGHT_FOR"](1),
 							type = "range",
 							width = "full",
-							min = 0,
-							max = 10,
+							min = 1,
+							max = 100,
 							step = 1,
 							get = function(info) return Doolittle.db.profile.mounts.weights[1] end,
 							set = function(info, value) Doolittle.db.profile.mounts.weights[1] = value end,
@@ -112,8 +102,8 @@ local options = {
 							name = L["OPT_WEIGHT_FOR"](2),
 							type = "range",
 							width = "full",
-							min = 0,
-							max = 10,
+							min = 1,
+							max = 100,
 							step = 1,
 							get = function(info) return Doolittle.db.profile.mounts.weights[2] end,
 							set = function(info, value) Doolittle.db.profile.mounts.weights[2] = value end,
@@ -122,8 +112,8 @@ local options = {
 							name = L["OPT_WEIGHT_FOR"](3),
 							type = "range",
 							width = "full",
-							min = 0,
-							max = 10,
+							min = 1,
+							max = 100,
 							step = 1,
 							get = function(info) return Doolittle.db.profile.mounts.weights[3] end,
 							set = function(info, value) Doolittle.db.profile.mounts.weights[3] = value end,
@@ -132,8 +122,8 @@ local options = {
 							name = L["OPT_WEIGHT_FOR"](4),
 							type = "range",
 							width = "full",
-							min = 0,
-							max = 10,
+							min = 1,
+							max = 100,
 							step = 1,
 							get = function(info) return Doolittle.db.profile.mounts.weights[4] end,
 							set = function(info, value) Doolittle.db.profile.mounts.weights[4] = value end,
@@ -142,8 +132,8 @@ local options = {
 							name = L["OPT_WEIGHT_FOR"](5),
 							type = "range",
 							width = "full",
-							min = 0,
-							max = 10,
+							min = 1,
+							max = 100,
 							step = 1,
 							get = function(info) return Doolittle.db.profile.mounts.weights[5] end,
 							set = function(info, value) Doolittle.db.profile.mounts.weights[5] = value end,
@@ -159,16 +149,15 @@ local defaults = {
 	profile = {
 		critters = {
 			ratings = {
-				["*"] = 0,
+				["*"] = 3,
 			},
 
 			weights = {
-				[0] = 5,
-				[1] = 0,
-				[2] = 2,
-				[3] = 5,
-				[4] = 8,
-				[5] = 10,
+				[1] = 10,
+				[2] = 16,
+				[3] = 25,
+				[4] = 40,
+				[5] = 63,
 			},
 		},
 
@@ -176,16 +165,15 @@ local defaults = {
 			dismountkey = "shift",
 
 			ratings = {
-				["*"] = 0,
+				["*"] = 3,
 			},
 
 			weights = {
-				[0] = 5,
-				[1] = 0,
-				[2] = 2,
-				[3] = 5,
-				[4] = 8,
-				[5] = 10,
+				[1] = 10,
+				[2] = 16,
+				[3] = 25,
+				[4] = 40,
+				[5] = 63,
 			},
 		},
 	},
@@ -293,7 +281,7 @@ function Doolittle:CmdMount()
 	local ratings = {}
 	local tickets = {}
 
-	for i = 0, 5 do
+	for i = 1, 5 do
 		rating = pools[i] * pool
 
 		if rating:size() > 0 then
@@ -303,12 +291,6 @@ function Doolittle:CmdMount()
 				table.insert(tickets, i)
 			end
 		end
-	end
-
-	-- somehow, there are occasionally zero tickets at this point; I need to add code to analyze the problem
-	if not (#tickets > 0) then
-		self:Print("[|cffe61a1aERROR|r] Can't happen: zero tickets")
-		return
 	end
 
 	rating = tickets[math.random(#tickets)]
@@ -348,7 +330,7 @@ function Doolittle:GetMountPool(terrain)
 		end
 	end
 
-	return pool * pools.known
+	return pool * (pools.ratings[1] + pools.ratings[2] + pools.ratings[3] + pools.ratings[4] + pools.ratings[5])
 end
 
 function Doolittle:GetRating(mode, spell)
@@ -361,27 +343,6 @@ function Doolittle:OnCompanionUpdate(event, mode)
 		self:ScanCompanions("MOUNT")
 	else
 		self:ScanCompanions(mode)
-	end
-
-	-- companion data isn't always available during
-	-- OnInitialize, but this only needs to occur once
-	if not self.built_rating_pools then
-		for mode in pairs{critters=1, mounts=1} do
-			local ratings = {}
-
-			for rating = 0, 5 do
-				ratings[rating] = Pool{}
-			end
-
-			for spell, info in pairs(self[mode].pools.known) do
-				local rating = self.db.profile[mode].ratings[spell]
-				ratings[rating][spell] = true
-			end
-
-			self[mode].pools.ratings = ratings
-		end
-
-		self.built_rating_pools = true
 	end
 end
 
@@ -418,8 +379,6 @@ function Doolittle:OnInitialize()
 
 	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("DoolittleProfile", options.args.profile)
 	self.opt_profile = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("DoolittleProfile", "Profile", "Doolittle")
-
-	self.built_rating_pools = false
 end
 
 function Doolittle:OnPreviewUpdate()
@@ -428,8 +387,9 @@ end
 
 function Doolittle:ScanCompanions(mode)
 	local count = GetNumCompanions(mode)
-	local known = Pool{}
+	local ratings = {Pool{}, Pool{}, Pool{}, Pool{}, Pool{}}
 	local pools = self[mode:lower() .. "s"].pools
+	local profile = self.db.profile[mode:lower() .. "s"].ratings
 
 	if count then
 		local name, spell, icon
@@ -437,14 +397,15 @@ function Doolittle:ScanCompanions(mode)
 		for id = 1, count do
 			name, spell, icon = select(2, GetCompanionInfo(mode, id))
 
-			known[spell] = {id, name, icon}
+			ratings[profile[spell]][spell] = {id, name, icon}
 		end
 	end
 
-	pools.known = known
+	pools.ratings = ratings
 
 	if mode == "MOUNT" then
 		local fastest
+		local known = ratings[1] + ratings[2] + ratings[3] + ratings[4] + ratings[5]
 
 		for terrain, speeds in pairs(self.mounts.speeds) do
 			pools[terrain].fastest = -1
@@ -462,9 +423,10 @@ end
 
 function Doolittle:SetRating(value, mode, spell)
 	local ratings = self.db.profile[mode].ratings
+	local rating = ratings[spell]
 	local pools = self[mode].pools.ratings
 
-	pools[ratings[spell]][spell] = nil
+	pools[rating][spell] = nil
+	pools[value][spell] = pools[rating][spell]
 	ratings[spell] = value
-	pools[value][spell] = true
 end

@@ -52,7 +52,6 @@ L["OPT_INCLUDE_SPEED"] = function(speed) return "Include " .. speed .. "% mounts
 L["OPT_WEIGHT_FOR"] = function(rating) return "Weight for rating " .. rating end
 L["OPT_WEIGHTS"] = "Weights"
 L["OPT_WEIGHTS_DESC"] = "Mounts whose ratings have a higher weight are more likely to be selected."
-L["OPT_ZERO"] = "A rating of 0 means \"unrated\".  Unrated mounts have normal odds of being selected."
 
 L["TYPE_FLYING"] = "Flying"
 L["TYPE_GROUND"] = "Ground"
