@@ -2,7 +2,7 @@
 ## Title: Doolittle
 ## Notes: Comprehensive mount and minipet manager and randomizer.
 ## Author: Malefactor @ Draenor US
-## Version: 0.2
+## Version: 0.3
 ## SavedVariables: DoolittleDB
 ## OptionalDeps: Ace3
 ## X-Embeds: Ace3
