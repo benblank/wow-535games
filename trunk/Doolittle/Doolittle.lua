@@ -53,6 +53,14 @@ local options = {
 			func = "CmdMount",
 		},
 
+		summon = {
+			name = SUMMON,
+			desc = L["CMD_SUMMON_DESC"],
+			type = "execute",
+			dialogHidden = true,
+			func = "CmdSummon",
+		},
+
 		options = {
 			name = L["CMD_OPTIONS"],
 			desc = L["CMD_OPTIONS_DESC"],
@@ -61,15 +69,24 @@ local options = {
 			func = "CmdOptions",
 		},
 
+		critters = {
+			name = COMPANIONS,
+			type = "group",
+			inline = true,
+			args = {
+			},
+		},
+
 		mounts = {
 			name = MOUNTS,
 			type = "group",
+			inline = true,
 			args = {
 				dismountkey = {
 					name = L["OPT_DISMOUNT"],
 					desc = L["OPT_DISMOUNT_DESC"],
 					type = "select",
-					order = 50,
+					order = 0,
 					style = "dropdown",
 					get = function(info) return Doolittle.db.profile.mounts.dismountkey end,
 					set = function(info, value) Doolittle.db.profile.mounts.dismountkey = value end,
@@ -80,66 +97,6 @@ local options = {
 						shift = SHIFT_KEY,
 					},
 				},
-
-				weights = {
-					name = L["OPT_WEIGHTS"],
-					desc = L["OPT_WEIGHTS_DESC"],
-					type = "group",
-					order = 50,
-					inline = true,
-					args = {
-						rating1 = {
-							name = L["OPT_WEIGHT_FOR"](1),
-							type = "range",
-							width = "full",
-							min = 1,
-							max = 100,
-							step = 1,
-							get = function(info) return Doolittle.db.profile.mounts.weights[1] end,
-							set = function(info, value) Doolittle.db.profile.mounts.weights[1] = value end,
-						},
-						rating2 = {
-							name = L["OPT_WEIGHT_FOR"](2),
-							type = "range",
-							width = "full",
-							min = 1,
-							max = 100,
-							step = 1,
-							get = function(info) return Doolittle.db.profile.mounts.weights[2] end,
-							set = function(info, value) Doolittle.db.profile.mounts.weights[2] = value end,
-						},
-						rating3 = {
-							name = L["OPT_WEIGHT_FOR"](3),
-							type = "range",
-							width = "full",
-							min = 1,
-							max = 100,
-							step = 1,
-							get = function(info) return Doolittle.db.profile.mounts.weights[3] end,
-							set = function(info, value) Doolittle.db.profile.mounts.weights[3] = value end,
-						},
-						rating4 = {
-							name = L["OPT_WEIGHT_FOR"](4),
-							type = "range",
-							width = "full",
-							min = 1,
-							max = 100,
-							step = 1,
-							get = function(info) return Doolittle.db.profile.mounts.weights[4] end,
-							set = function(info, value) Doolittle.db.profile.mounts.weights[4] = value end,
-						},
-						rating5 = {
-							name = L["OPT_WEIGHT_FOR"](5),
-							type = "range",
-							width = "full",
-							min = 1,
-							max = 100,
-							step = 1,
-							get = function(info) return Doolittle.db.profile.mounts.weights[5] end,
-							set = function(info, value) Doolittle.db.profile.mounts.weights[5] = value end,
-						},
-					},
-				},
 			},
 		},
 	},
@@ -148,6 +105,8 @@ local options = {
 local defaults = {
 	profile = {
 		critters = {
+			random = "always",
+
 			ratings = {
 				["*"] = 3,
 			},
@@ -163,6 +122,7 @@ local defaults = {
 
 		mounts = {
 			dismountkey = "shift",
+			random = "always",
 
 			ratings = {
 				["*"] = 3,
@@ -186,44 +146,101 @@ local function GetSelectedCompanion()
 	return mode:lower() .. "s", spell
 end
 
+local function GetSummonedCompanion(mode)
+	local _, spell, summoned
+	local id = nil
+
+	for i = 1, GetNumCompanions(mode) do
+		spell, _, summoned = select(3, GetCompanionInfo(mode, i))
+
+		if summoned then
+			id = spell
+		end
+	end
+
+	return id
+end
+
 function Doolittle:BuildOptionsAndDefaults()
-	local args = options.args.mounts.args
-	local profile = defaults.profile.mounts
+	for mode in pairs{critters=1, mounts=1} do
+		local args = options.args[mode].args
+		local defaults = defaults.profile[mode]
 
-	for terrain, speeds in pairs(self.mounts.speeds) do
-		profile[terrain] = {fastest = true}
-
-		args[terrain] = {
-			name = L["TYPE_" .. terrain:upper()],
+		args.weights = {
+			name = L["OPT_WEIGHTS"],
+			desc = L["OPT_WEIGHTS_DESC"],
 			type = "group",
+			order = 50,
 			inline = true,
 			args = {
-				fastest = {
-					name = L["OPT_FASTEST_ONLY"],
-					desc = L["OPT_FASTEST_ONLY_DESC"],
-					type = "toggle",
-					order = 50,
-					width = "full",
-					get = function(info) return self.db.profile.mounts[terrain].fastest end,
-					set = function(info, value) self.db.profile.mounts[terrain].fastest = value end,
-				},
 			},
 		}
 
-		for speed, default in pairs(speeds) do
-			local sspeed = "speed" .. speed
+		args.random = {
+			name = L["OPT_RANDOM"](mode),
+			desc = L["OPT_RANDOM_DESC"](mode),
+			type = "select",
+			order = 0,
+			style = "dropdown",
+			get = function(info) return self.db.profile[mode].random end,
+			set = function(info, value) self.db.profile[mode].random = value end,
+			values = {
+				daily = L["OPT_RANDOM_DAILY"],
+				session = L["OPT_RANDOM_SESSION"],
+				always = L["OPT_RANDOM_ALWAYS"],
+			},
+		}
 
-			profile[terrain][sspeed] = default
-
-			args[terrain].args[sspeed] = {
-				name = L["OPT_INCLUDE_SPEED"](speed),
-				type = "toggle",
-				order = 1000 + speed,
+		for i = 1, 5 do
+			args.weights.args["rating" .. i] = {
+				name = L["OPT_WEIGHT_FOR"](i),
+				type = "range",
 				width = "full",
-				disabled = function(info) return self.db.profile.mounts[terrain].fastest end,
-				get = function(info) return self.db.profile.mounts[terrain][sspeed] end,
-				set = function(info, value) self.db.profile.mounts[terrain][sspeed] = value end,
+				min = 1,
+				max = 100,
+				step = 1,
+				get = function(info) return self.db.profile[mode].weights[i] end,
+				set = function(info, value) self.db.profile[mode].weights[i] = value end,
 			}
+		end
+
+		if mode == "mounts" then
+			for terrain, speeds in pairs(self.mounts.speeds) do
+				defaults[terrain] = {fastest = true}
+
+				args[terrain] = {
+					name = L["TYPE_" .. terrain:upper()],
+					type = "group",
+					inline = true,
+					args = {
+						fastest = {
+							name = L["OPT_FASTEST_ONLY"],
+							desc = L["OPT_FASTEST_ONLY_DESC"],
+							type = "toggle",
+							order = 50,
+							width = "full",
+							get = function(info) return self.db.profile[mode][terrain].fastest end,
+							set = function(info, value) self.db.profile[mode][terrain].fastest = value end,
+						},
+					},
+				}
+
+				for speed, default in pairs(speeds) do
+					local sspeed = "speed" .. speed
+
+					defaults[terrain][sspeed] = default
+
+					args[terrain].args[sspeed] = {
+						name = L["OPT_INCLUDE_SPEED"](speed),
+						type = "toggle",
+						order = 1000 + speed,
+						width = "full",
+						disabled = function(info) return self.db.profile[mode][terrain].fastest end,
+						get = function(info) return self.db.profile[mode][terrain][sspeed] end,
+						set = function(info, value) self.db.profile[mode][terrain][sspeed] = value end,
+					}
+				end
+			end
 		end
 	end
 end
@@ -302,6 +319,47 @@ function Doolittle:CmdOptions()
 	-- opening the "Profile" sub-category first ensures the primary category is expanded
 	InterfaceOptionsFrame_OpenToCategory(self.opt_profile);
 	InterfaceOptionsFrame_OpenToCategory(self.opt_main);
+end
+
+function Doolittle:CmdSummon()
+	local profile = self.db.profile.critters
+	local pools = self.critters.pools
+	local pool = pools.ratings[1] + pools.ratings[2] + pools.ratings[3] + pools.ratings[4] + pools.ratings[5]
+	local summoned = GetSummonedCompanion("CRITTER")
+
+	if summoned then
+		pool = pool - summoned
+	end
+
+	-- TODO: generalize this?
+	-- TODO: check for reagent/option?
+	pool = pool - pools.i17202
+
+	if not (pool:size() > 0) then
+		self:DisplayError(L["ERROR_NO_COMPANIONS"])
+		return
+	end
+
+	pools = pools.ratings
+	local rating
+	local ratings = {}
+	local tickets = {}
+
+	for i = 1, 5 do
+		rating = pools[i] * pool
+
+		if rating:size() > 0 then
+			ratings[i] = rating
+
+			for j = 1, profile.weights[i] do
+				table.insert(tickets, i)
+			end
+		end
+	end
+
+	rating = tickets[math.random(#tickets)]
+
+	CallCompanion("CRITTER", ratings[rating][ratings[rating]()][1])
 end
 
 function Doolittle:DisplayError(message)
@@ -387,7 +445,7 @@ end
 
 function Doolittle:ScanCompanions(mode)
 	local count = GetNumCompanions(mode)
-	local ratings = {Pool{}, Pool{}, Pool{}, Pool{}, Pool{}}
+	local ratings = {[0] = Pool{}, Pool{}, Pool{}, Pool{}, Pool{}, Pool{}}
 	local pools = self[mode:lower() .. "s"].pools
 	local profile = self.db.profile[mode:lower() .. "s"].ratings
 
@@ -421,12 +479,12 @@ function Doolittle:ScanCompanions(mode)
 	end
 end
 
-function Doolittle:SetRating(value, mode, spell)
+function Doolittle:SetRating(newval, mode, spell)
 	local ratings = self.db.profile[mode].ratings
-	local rating = ratings[spell]
 	local pools = self[mode].pools.ratings
+	local oldval = ratings[spell]
 
-	pools[rating][spell] = nil
-	pools[value][spell] = pools[rating][spell]
-	ratings[spell] = value
+	pools[oldval][spell] = nil
+	pools[newval][spell] = pools[oldval][spell]
+	ratings[spell] = newval
 end
