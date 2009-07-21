@@ -278,7 +278,7 @@ local ItemListTool = function(self, args, list, value, success, dupe)
 			link = select(2, GetItemInfo(id))
 
 			if list[id] == value then
-				self:PrintWarning(L[dupe](link))
+				self:Print(L[dupe](link))
 			else
 				list[id] = value
 
@@ -347,9 +347,10 @@ function Junkyard:CmdSell()
 		return
 	end
 
-	local _, enchanted, gem1, gem2, gem3, gem4, gemmed, id, link, lsubtype, ltype, quality, sell, slot, slots, soulbound, subtype, type
+	local _, count, enchanted, gem1, gem2, gem3, gem4, gemmed, id, link, lsubtype, ltype, quality, sell, slot, slots, soulbound, subtype, type
 
 	local class = select(2, UnitClass("player"))
+	local indices = {}
 	local items = {}
 	local level = UnitLevel("player")
 	local profile = self.db.profile
@@ -418,7 +419,14 @@ function Junkyard:CmdSell()
 
 				if sell then
 					if profile.prompt then
-						items[#items + 1] = {bag, slot, link}
+						count = select(2, GetContainerItemInfo(bag, slot))
+
+						if indices[id] then
+							table.insert(items[indices[id]], {bag, slot, count, link})
+						else
+							table.insert(items, { {bag, slot, count, link} })
+							indices[id] = #items
+						end
 					else
 						ShowMerchantSellCursor(1)
 						UseContainerItem(bag, slot)

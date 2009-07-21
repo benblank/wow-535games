@@ -1,3 +1,5 @@
+-- $Id$
+
 -- Copyright (c) 2009, Ben Blank
 --
 -- All rights reserved.
@@ -74,7 +76,15 @@ function JunkyardSellFrameScrollFrame_Update(self)
 		fs = getglobal("JunkyardSellFrameItem" .. line)
 
 		if item <= numitems then
-			fs:SetText(items[item][3])
+			local count = 0
+
+			for i, info in ipairs(items[item]) do
+				count = count + info[3]
+			end
+
+			count = (count > 1) and (count .. "x ") or ""
+
+			fs:SetText(count .. items[item][1][4])
 			fs:Show()
 		else
 			fs:Hide()
@@ -88,11 +98,13 @@ function JunkyardSellFrameSellButton_OnClick(self, button, down)
 	parent = self:GetParent()
 	items = parent.items
 
-	for i, item in pairs(items) do
-		bag, slot = unpack(item)
+	for i, item in ipairs(items) do
+		for j, info in ipairs(items) do
+			bag, slot = unpack(info)
 
-		ShowMerchantSellCursor(1)
-		UseContainerItem(bag, slot)
+			ShowMerchantSellCursor(1)
+			UseContainerItem(bag, slot)
+		end
 	end
 
 	parent:Hide()
