@@ -32,10 +32,14 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ file:///C:/Development/WoW/Interface/FrameXML/UI.xsd">
 	<Script file="JunkyardSellFrame.lua"/>
 
 	<Button name="JunkyardSellFrameItemTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="329" y="16"/>
+		</Size>
+
 		<Scripts>
 			<OnClick function="JunkyardSellFrameItem_OnClick"/>
 			<OnEnter function="JunkyardSellFrameItem_OnEnter"/>
@@ -45,18 +49,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 		<ButtonText name="$parentText"/>
 		<NormalFont style="GameFontHighlight"/>
-
-		<Size>
-			<AbsDimension x="329" y="16"/>
-		</Size>
 	</Button>
 
 	<Frame name="JunkyardSellFrame" parent="UIParent" frameStrata="FULLSCREEN_DIALOG" toplevel="true" enableMouse="true" movable="true" hidden="true">
-		<Scripts>
-			<OnHide function="JunkyardSellFrame_OnHide"/>
-			<OnLoad function="JunkyardSellFrame_OnLoad"/>
-		</Scripts>
-
 		<Size>
 			<AbsDimension x="400" y="248"/>
 		</Size>
@@ -64,6 +59,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		<Anchors>
 			<Anchor point="CENTER"/>
 		</Anchors>
+
+		<Scripts>
+			<OnHide function="JunkyardSellFrame_OnHide"/>
+			<OnLoad function="JunkyardSellFrame_OnLoad"/>
+		</Scripts>
 
 		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
 			<BackgroundInsets>
@@ -109,11 +109,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 		<Frames>
 			<Button name="JunkyardSellFrameSellButton" inherits="UIPanelButtonTemplate2">
-				<Scripts>
-					<OnClick function="JunkyardSellFrameSellButton_OnClick"/>
-					<OnLoad function="JunkyardSellFrameSellButton_OnLoad"/>
-				</Scripts>
-
 				<Size>
 					<AbsDimension x="100" y="24"/>
 				</Size>
@@ -125,13 +120,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						</Offset>
 					</Anchor>
 				</Anchors>
+
+				<Scripts>
+					<OnClick function="JunkyardSellFrameSellButton_OnClick"/>
+					<OnLoad function="JunkyardSellFrameSellButton_OnLoad"/>
+				</Scripts>
 			</Button>
 
 			<Button name="JunkyardSellFrameCancelButton" inherits="UIPanelButtonTemplate2" text="CANCEL">
-				<Scripts>
-					<OnClick function="JunkyardSellFrameCancelButton_OnClick"/>
-				</Scripts>
-
 				<Size>
 					<AbsDimension x="100" y="24"/>
 				</Size>
@@ -143,13 +139,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						</Offset>
 					</Anchor>
 				</Anchors>
+
+				<Scripts>
+					<OnClick function="JunkyardSellFrameCancelButton_OnClick"/>
+				</Scripts>
 			</Button>
 
 			<Frame name="JunkyardSellFrameListFrame">
-				<Scripts>
-					<OnLoad function="JunkyardSellFrameListFrame_OnLoad"/>
-				</Scripts>
-
 				<Anchors>
 					<Anchor point="BOTTOMLEFT">
 						<Offset>
@@ -163,6 +159,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						</Offset>
 					</Anchor>
 				</Anchors>
+
+				<Scripts>
+					<OnLoad function="JunkyardSellFrameListFrame_OnLoad"/>
+				</Scripts>
 
 				<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
 					<EdgeSize>
@@ -256,23 +256,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					</Button>
 
 					<ScrollFrame name="JunkyardSellFrameScrollFrame" inherits="FauxScrollFrameTemplate">
-						<Scripts>
+            <Anchors>
+              <Anchor point="BOTTOMLEFT">
+                <Offset>
+                  <AbsDimension x="8" y="7"/>
+                </Offset>
+              </Anchor>
+
+              <Anchor point="TOPRIGHT">
+                <Offset>
+                  <AbsDimension x="-29" y="-8"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+
+            <Scripts>
 							<OnVerticalScroll function="JunkyardSellFrameScrollFrame_OnVerticalScroll"/>
 						</Scripts>
-
-						<Anchors>
-							<Anchor point="BOTTOMLEFT">
-								<Offset>
-									<AbsDimension x="8" y="7"/>
-								</Offset>
-							</Anchor>
-
-							<Anchor point="TOPRIGHT">
-								<Offset>
-									<AbsDimension x="-29" y="-8"/>
-								</Offset>
-							</Anchor>
-						</Anchors>
 					</ScrollFrame>
 				</Frames>
 			</Frame>
