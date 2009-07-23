@@ -35,11 +35,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
 	<Script file="JunkyardSellFrame.lua"/>
 
-	<FontString name="JunkyardSellFrameItemTemplate" inherits="GameFontNormal" virtual="true" justifyH="LEFT" justifyV="CENTER">
+	<Button name="JunkyardSellFrameItemTemplate" virtual="true">
+		<Scripts>
+			<OnClick function="JunkyardSellFrameItem_OnClick"/>
+			<OnEnter function="JunkyardSellFrameItem_OnEnter"/>
+			<OnLoad function="JunkyardSellFrameItem_OnLoad"/>
+			<OnLeave function="JunkyardSellFrameItem_OnLeave"/>
+		</Scripts>
+
+		<ButtonText name="$parentText"/>
+		<NormalFont style="GameFontHighlight"/>
+
 		<Size>
 			<AbsDimension x="329" y="16"/>
 		</Size>
-	</FontString>
+	</Button>
 
 	<Frame name="JunkyardSellFrame" parent="UIParent" frameStrata="FULLSCREEN_DIALOG" toplevel="true" enableMouse="true" movable="true" hidden="true">
 		<Scripts>
@@ -168,75 +178,83 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					</BackgroundInsets>
 				</Backdrop>
 
-				<Layers>
-					<Layer level="ARTWORK">
-						<FontString name="JunkyardSellFrameItem1" inherits="JunkyardSellFrameItemTemplate">
-							<Anchors>
-								<Anchor point="TOPLEFT">
-									<Offset>
-										<AbsDimension x="8" y="-6"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</FontString>
-
-						<FontString name="JunkyardSellFrameItem2" inherits="JunkyardSellFrameItemTemplate">
-							<Anchors>
-								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem1" relativePoint="BOTTOMRIGHT"/>
-							</Anchors>
-						</FontString>
-
-						<FontString name="JunkyardSellFrameItem3" inherits="JunkyardSellFrameItemTemplate">
-							<Anchors>
-								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem2" relativePoint="BOTTOMRIGHT"/>
-							</Anchors>
-						</FontString>
-
-						<FontString name="JunkyardSellFrameItem4" inherits="JunkyardSellFrameItemTemplate">
-							<Anchors>
-								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem3" relativePoint="BOTTOMRIGHT"/>
-							</Anchors>
-						</FontString>
-
-						<FontString name="JunkyardSellFrameItem5" inherits="JunkyardSellFrameItemTemplate">
-							<Anchors>
-								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem4" relativePoint="BOTTOMRIGHT"/>
-							</Anchors>
-						</FontString>
-
-						<FontString name="JunkyardSellFrameItem6" inherits="JunkyardSellFrameItemTemplate">
-							<Anchors>
-								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem5" relativePoint="BOTTOMRIGHT"/>
-							</Anchors>
-						</FontString>
-
-						<FontString name="JunkyardSellFrameItem7" inherits="JunkyardSellFrameItemTemplate">
-							<Anchors>
-								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem6" relativePoint="BOTTOMRIGHT"/>
-							</Anchors>
-						</FontString>
-
-						<FontString name="JunkyardSellFrameItem8" inherits="JunkyardSellFrameItemTemplate">
-							<Anchors>
-								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem7" relativePoint="BOTTOMRIGHT"/>
-							</Anchors>
-						</FontString>
-
-						<FontString name="JunkyardSellFrameItem9" inherits="JunkyardSellFrameItemTemplate">
-							<Anchors>
-								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem8" relativePoint="BOTTOMRIGHT"/>
-							</Anchors>
-						</FontString>
-
-						<FontString name="JunkyardSellFrameItem10" inherits="JunkyardSellFrameItemTemplate">
-							<Anchors>
-								<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem9" relativePoint="BOTTOMRIGHT"/>
-							</Anchors>
-						</FontString>
-					</Layer>
-				</Layers>
-
 				<Frames>
+					<Frame name="JunkyardSellFrameItemHighlightFrame" hidden="true">
+						<Size>
+							<AbsDimension x="329" y="16"/>
+						</Size>
+
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="JunkyardSellFrameItemHighlight" file="Interface\Buttons\UI-Listbox-Highlight2"/>
+							</Layer>
+						</Layers>
+					</Frame>
+
+					<Button name="JunkyardSellFrameItem1" inherits="JunkyardSellFrameItemTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="8" y="-6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardSellFrameItem2" inherits="JunkyardSellFrameItemTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem1" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardSellFrameItem3" inherits="JunkyardSellFrameItemTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem2" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardSellFrameItem4" inherits="JunkyardSellFrameItemTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem3" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardSellFrameItem5" inherits="JunkyardSellFrameItemTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem4" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardSellFrameItem6" inherits="JunkyardSellFrameItemTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem5" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardSellFrameItem7" inherits="JunkyardSellFrameItemTemplate" id="7">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem6" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardSellFrameItem8" inherits="JunkyardSellFrameItemTemplate" id="8">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem7" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardSellFrameItem9" inherits="JunkyardSellFrameItemTemplate" id="9">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem8" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardSellFrameItem10" inherits="JunkyardSellFrameItemTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem9" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
 					<ScrollFrame name="JunkyardSellFrameScrollFrame" inherits="FauxScrollFrameTemplate">
 						<Scripts>
 							<OnVerticalScroll function="JunkyardSellFrameScrollFrame_OnVerticalScroll"/>
