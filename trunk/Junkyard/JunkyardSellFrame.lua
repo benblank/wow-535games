@@ -144,10 +144,10 @@ function JunkyardSellFrameScrollFrame_Update(self)
 end
 
 function JunkyardSellFrameSellButton_OnClick(self, button, down)
-	local bag, i, item, slot
+	local bag, i, info, item, slot
 
 	for i, item in ipairs(items) do
-		for j, info in ipairs(items) do
+		for j, info in ipairs(item) do
 			bag, slot = unpack(info)
 
 			ShowMerchantSellCursor(1)
@@ -155,7 +155,7 @@ function JunkyardSellFrameSellButton_OnClick(self, button, down)
 		end
 	end
 
-	parent:Hide()
+	JunkyardSellFrame:Hide()
 end
 
 function JunkyardSellFrameSellButton_OnLoad(self)
