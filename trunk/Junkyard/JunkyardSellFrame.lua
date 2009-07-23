@@ -36,15 +36,21 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Junkyard")
 local lines = 10
 local lineheight = 16
 
+local items, over
+
+local function GetItemFromID(id)
+	return FauxScrollFrame_GetOffset(JunkyardSellFrameScrollFrame) + tonumber(id)
+end
+
 function JunkyardSellFrame_OnHide(self)
-	self.items = {}
+	items = {}
 end
 
 function JunkyardSellFrame_OnLoad(self)
 	JunkyardSellFrameTitleText:SetText("Junkyard")
 
-	self.SetItems = function(self, items)
-		self.items = items
+	self.SetItems = function(self, newItems)
+		items = newItems
 		FauxScrollFrame_SetOffset(JunkyardSellFrameScrollFrame, 0)
 		JunkyardSellFrameScrollFrame_Update(JunkyardSellFrameScrollFrame)
 	end
@@ -54,26 +60,67 @@ function JunkyardSellFrameCancelButton_OnClick(self, button, down)
 	self:GetParent():Hide()
 end
 
+function JunkyardSellFrameItem_OnClick(self, motion)
+	for i, info in ipairs(table.remove(items, GetItemFromID(self:GetID()))) do
+		bag, slot = unpack(info)
+
+		ShowMerchantSellCursor(1)
+		UseContainerItem(bag, slot)
+	end
+
+	if #items > 0 then
+		JunkyardSellFrameScrollFrame_Update(JunkyardSellFrameScrollFrame)
+	else
+		JunkyardSellFrame:Hide()
+	end
+end
+
+function JunkyardSellFrameItem_OnEnter(self, motion)
+	local item = items[GetItemFromID(self:GetID())]
+
+	over = self
+
+	GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+	GameTooltip:SetBagItem(item[1][1], item[1][2])
+
+	JunkyardSellFrameItemHighlight:SetVertexColor(GetItemQualityColor(item[1][4]))
+	JunkyardSellFrameItemHighlightFrame:SetPoint("TOPRIGHT", self, 0, -1)
+	JunkyardSellFrameItemHighlightFrame:Show()
+end
+
+function JunkyardSellFrameItem_OnLoad(self)
+	local text = self:GetFontString()
+
+	text:SetAllPoints()
+	text:SetJustifyH("LEFT")
+end
+
+function JunkyardSellFrameItem_OnLeave(self, motion)
+	over = nil
+
+	GameTooltip:Hide()
+
+	JunkyardSellFrameItemHighlightFrame:Hide()
+end
+
 function JunkyardSellFrameListFrame_OnLoad(self)
 	self:SetBackdropBorderColor(0.6, 0.6, 0.6);
 end
 
 function JunkyardSellFrameScrollFrame_OnVerticalScroll(self, offset)
-	-- "self" here is JunkyardSellFrame!?
-	FauxScrollFrame_OnVerticalScroll(JunkyardSellFrameScrollFrame, offset, lineheight, JunkyardSellFrameScrollFrame_Update)
+	FauxScrollFrame_OnVerticalScroll(self, offset, lineheight, JunkyardSellFrameScrollFrame_Update)
 end
 
 function JunkyardSellFrameScrollFrame_Update(self)
-	local fs, item, tiems, numitems, line, offset
+	local button, item, numitems, line, offset
 
-	items = JunkyardSellFrame.items
 	numitems = #items
 	FauxScrollFrame_Update(self, numitems, lines, lineheight)
 	offset = FauxScrollFrame_GetOffset(self)
 
 	for line = 1, lines do
 		item = line + offset
-		fs = getglobal("JunkyardSellFrameItem" .. line)
+		button = _G["JunkyardSellFrameItem" .. line]
 
 		if item <= numitems then
 			local count = 0
@@ -84,19 +131,20 @@ function JunkyardSellFrameScrollFrame_Update(self)
 
 			count = (count > 1) and (count .. "x ") or ""
 
-			fs:SetText(count .. items[item][1][4])
-			fs:Show()
+			button:SetText(count .. items[item][1][5])
+			button:Show()
 		else
-			fs:Hide()
+			button:Hide()
 		end
+	end
+
+	if over then
+		JunkyardSellFrameItem_OnEnter(over)
 	end
 end
 
 function JunkyardSellFrameSellButton_OnClick(self, button, down)
-	local bag, i, item, items, parent, slot
-
-	parent = self:GetParent()
-	items = parent.items
+	local bag, i, item, slot
 
 	for i, item in ipairs(items) do
 		for j, info in ipairs(items) do

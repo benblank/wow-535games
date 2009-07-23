@@ -377,7 +377,7 @@ function Junkyard:CmdSell()
 						if self[type].known[subtype] then
 							self.tooltip:ClearLines()
 							self.tooltip:SetBagItem(bag, slot)
-							soulbound = getglobal("JunkyardTooltipTextLeft2"):GetText() == ITEM_SOULBOUND
+							soulbound = JunkyardTooltipTextLeft2:GetText() == ITEM_SOULBOUND
 						else
 							soulbound = false -- prevent type-based sales from occurring
 							self:PrintWarning(L["MSG_UNKNOWN_TYPE"](link, ltype, lsubtype))
@@ -424,7 +424,7 @@ function Junkyard:CmdSell()
 						if indices[id] then
 							table.insert(items[indices[id]], {bag, slot, count, link})
 						else
-							table.insert(items, { {bag, slot, count, link} })
+							table.insert(items, { {bag, slot, count, quality, link} })
 							indices[id] = #items
 						end
 					else

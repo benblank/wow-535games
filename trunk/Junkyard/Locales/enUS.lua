@@ -37,7 +37,7 @@ if not L then
 	return
 end
 
-L["BUTTON_SELL"] = "Sell"
+L["BUTTON_SELL"] = "Sell All"
 
 L["CMD_BAGS_CLOSE"] = "Close bags"
 L["CMD_BAGS_CLOSE_DESC"] = "Close all open bags."
