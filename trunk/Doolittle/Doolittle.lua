@@ -266,14 +266,14 @@ function Doolittle:CmdMount()
 		self:DisplayError(ERR_NOT_IN_COMBAT)
 		return
 	elseif command == "error-flying" then
-		self:DisplayError(L["ERROR_FLYING"](getglobal(dismountkey:upper() .. "_KEY")))
+		self:DisplayError(L["ERROR_FLYING"](_G[dismountkey:upper() .. "_KEY"]))
 		return
 	elseif command == "error-indoors" then
 		self:DisplayError(SPELL_FAILED_NO_MOUNTS_ALLOWED)
 		return
 	elseif command == "flying" and (zone == LBZ["Wintergrasp"] or (zone == LBZ["Dalaran"] and subzone ~= LBZ["Krasus' Landing"])) then
 		command = "ground"
-	elseif GetCurrentMapContinent() == 4 and not IsUsableSpell(GetSpellLink(54197):sub(27, -6)) then
+	elseif command == "flying" and GetCurrentMapContinent() == 4 and not IsUsableSpell(GetSpellLink(54197):sub(27, -6)) then
 		command = "ground"
 	end
 
