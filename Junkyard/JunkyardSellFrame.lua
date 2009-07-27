@@ -88,23 +88,12 @@ function JunkyardSellFrameItem_OnEnter(self, motion)
 	JunkyardSellFrameItemHighlightFrame:Show()
 end
 
-function JunkyardSellFrameItem_OnLoad(self)
-	local text = self:GetFontString()
-
-	text:SetAllPoints()
-	text:SetJustifyH("LEFT")
-end
-
 function JunkyardSellFrameItem_OnLeave(self, motion)
 	over = nil
 
 	GameTooltip:Hide()
 
 	JunkyardSellFrameItemHighlightFrame:Hide()
-end
-
-function JunkyardSellFrameListFrame_OnLoad(self)
-	self:SetBackdropBorderColor(0.6, 0.6, 0.6);
 end
 
 function JunkyardSellFrameScrollFrame_OnVerticalScroll(self, offset)
