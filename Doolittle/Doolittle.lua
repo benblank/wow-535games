@@ -366,6 +366,10 @@ function Doolittle:DisplayError(message)
 	UIErrorsFrame:AddMessage(message, 1.0, 0.1, 0.1, 1.0)
 end
 
+function Doolittle:GetCurrentRating()
+	return self:GetRating(GetSelectedCompanion())
+end
+
 function Doolittle:GetMountPool(terrain)
 	local pool
 	local pools = self.mounts.pools
@@ -404,17 +408,7 @@ function Doolittle:OnCompanionUpdate(event, mode)
 	end
 end
 
-function Doolittle:OnDisable()
-	AceGUI:Release(self.slider)
-end
-
 function Doolittle:OnEnable()
-	self.slider = AceGUI:Create("Slider")
-	self.slider:SetSliderValues(0,5,1)
-	self.slider.frame:SetParent(CompanionModelFrame)
-	self.slider:SetPoint("TOPRIGHT")
-	self.slider:SetCallback("OnValueChanged", function(info) self:SetRating(info.value, GetSelectedCompanion()) end)
-
 	Doolittle:RegisterEvent("COMPANION_LEARNED", "OnCompanionUpdate")
 	Doolittle:RegisterEvent("COMPANION_UPDATE", "OnCompanionUpdate")
 
@@ -440,7 +434,7 @@ function Doolittle:OnInitialize()
 end
 
 function Doolittle:OnPreviewUpdate()
-	self.slider:SetValue(self:GetRating(GetSelectedCompanion()))
+	DoolittleRatingFrameRating_OnLeave(DoolittleRatingFrameRating0)
 end
 
 function Doolittle:ScanCompanions(mode)
@@ -477,6 +471,10 @@ function Doolittle:ScanCompanions(mode)
 			end
 		end
 	end
+end
+
+function Doolittle:SetCurrentRating(newval)
+	self:SetRating(newval, GetSelectedCompanion())
 end
 
 function Doolittle:SetRating(newval, mode, spell)
