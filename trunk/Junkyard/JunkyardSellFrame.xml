@@ -43,11 +43,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		<Scripts>
 			<OnClick function="JunkyardSellFrameItem_OnClick"/>
 			<OnEnter function="JunkyardSellFrameItem_OnEnter"/>
-			<OnLoad function="JunkyardSellFrameItem_OnLoad"/>
 			<OnLeave function="JunkyardSellFrameItem_OnLeave"/>
 		</Scripts>
 
-		<ButtonText name="$parentText"/>
+		<ButtonText name="$parentText" setAllPoints="true" justifyH="LEFT"/>
 		<NormalFont style="GameFontHighlight"/>
 	</Button>
 
@@ -160,10 +159,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					</Anchor>
 				</Anchors>
 
-				<Scripts>
-					<OnLoad function="JunkyardSellFrameListFrame_OnLoad"/>
-				</Scripts>
-
 				<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
 					<EdgeSize>
 						<AbsValue val="16"/>
@@ -176,6 +171,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					<BackgroundInsets>
 						<AbsInset left="5" right="5" top="5" bottom="5"/>
 					</BackgroundInsets>
+
+					<BorderColor r="0.6" g="0.6" b="0.6"/>
 				</Backdrop>
 
 				<Frames>
@@ -256,21 +253,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					</Button>
 
 					<ScrollFrame name="JunkyardSellFrameScrollFrame" inherits="FauxScrollFrameTemplate">
-            <Anchors>
-              <Anchor point="BOTTOMLEFT">
-                <Offset>
-                  <AbsDimension x="8" y="7"/>
-                </Offset>
-              </Anchor>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="8" y="7"/>
+								</Offset>
+							</Anchor>
 
-              <Anchor point="TOPRIGHT">
-                <Offset>
-                  <AbsDimension x="-29" y="-8"/>
-                </Offset>
-              </Anchor>
-            </Anchors>
+							<Anchor point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-29" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
 
-            <Scripts>
+						<Scripts>
 							<OnVerticalScroll function="JunkyardSellFrameScrollFrame_OnVerticalScroll"/>
 						</Scripts>
 					</ScrollFrame>
