@@ -45,33 +45,42 @@ local options = {
 	handler = Doolittle,
 	type = "group",
 	args = {
-		mount = {
-			name = MOUNT,
-			desc = L["CMD_MOUNT_DESC"],
-			type = "execute",
-			dialogHidden = true,
-			func = "CmdMount",
-		},
+		keys = {
+			name = KEY_BINDINGS,
+			type = "group",
+			order = 10,
+			inline = true,
+			args = {
+				options = {
+					name = L["KEY_OPTIONS"],
+					type = "keybinding",
+					order = 10,
+					get = function(info) return GetBindingKey("DOOLITTLE_OPTIONS") end,
+					set = function(info, value) SetBinding(value, "DOOLITTLE_OPTIONS") SaveBindings(GetCurrentBindingSet()) end,
+				},
 
-		summon = {
-			name = SUMMON,
-			desc = L["CMD_SUMMON_DESC"],
-			type = "execute",
-			dialogHidden = true,
-			func = "CmdSummon",
-		},
+				summon = {
+					name = L["KEY_SUMMON"],
+					type = "keybinding",
+					order = 20,
+					get = function(info) return GetBindingKey("DOOLITTLE_SUMMON") end,
+					set = function(info, value) SetBinding(value, "DOOLITTLE_SUMMON") SaveBindings(GetCurrentBindingSet()) end,
+				},
 
-		options = {
-			name = L["CMD_OPTIONS"],
-			desc = L["CMD_OPTIONS_DESC"],
-			type = "execute",
-			dialogHidden = true,
-			func = "CmdOptions",
+				mount = {
+					name = L["KEY_MOUNT"],
+					type = "keybinding",
+					order = 30,
+					get = function(info) return GetBindingKey("DOOLITTLE_MOUNT") end,
+					set = function(info, value) SetBinding(value, "DOOLITTLE_MOUNT") SaveBindings(GetCurrentBindingSet()) end,
+				},
+			},
 		},
 
 		critters = {
 			name = COMPANIONS,
 			type = "group",
+			order = 20,
 			inline = true,
 			args = {
 			},
@@ -80,23 +89,9 @@ local options = {
 		mounts = {
 			name = MOUNTS,
 			type = "group",
+			order = 30,
 			inline = true,
 			args = {
-				dismountkey = {
-					name = L["OPT_DISMOUNT"],
-					desc = L["OPT_DISMOUNT_DESC"],
-					type = "select",
-					order = 0,
-					style = "dropdown",
-					get = function(info) return Doolittle.db.profile.mounts.dismountkey end,
-					set = function(info, value) Doolittle.db.profile.mounts.dismountkey = value end,
-					values = { --BUG: these display sorted in GUI; NONE_KEY should appear last
-						none = NONE_KEY,
-						alt = ALT_KEY,
-						ctrl = CTRL_KEY,
-						shift = SHIFT_KEY,
-					},
-				},
 			},
 		},
 	},
@@ -121,7 +116,6 @@ local defaults = {
 		},
 
 		mounts = {
-			dismountkey = "shift",
 			random = "always",
 
 			ratings = {
@@ -193,7 +187,7 @@ function Doolittle:BuildOptionsAndDefaults()
 
 		for i = 1, 5 do
 			args.weights.args["rating" .. i] = {
-				name = L["OPT_WEIGHT_FOR"](i),
+				name = L["OPT_WEIGHT_FOR"](mode, i),
 				type = "range",
 				width = "full",
 				min = 1,
@@ -209,7 +203,7 @@ function Doolittle:BuildOptionsAndDefaults()
 				defaults[terrain] = {fastest = true}
 
 				args[terrain] = {
-					name = L["TYPE_" .. terrain:upper()],
+					name = L["TERRAIN_HEADING_" .. terrain:upper()],
 					type = "group",
 					inline = true,
 					args = {
@@ -245,31 +239,26 @@ function Doolittle:BuildOptionsAndDefaults()
 	end
 end
 
-function Doolittle:CmdMount()
+function Doolittle:CmdMount(macro)
 	local zone = GetRealZoneText()
 	local subzone = GetSubZoneText()
-	local macro = "[mounted]dismount;[combat]error-combat;[indoors]error-indoors;[swimming]swimming;[flyable]flying;ground"
+	local default = "[swimming]swimming;[flyable]flying;ground"
 	local profile = self.db.profile.mounts
-	local dismountkey = profile.dismountkey
 	local pools = self.mounts.pools
+	local command
 
-	if dismountkey ~= "none" then
-		macro = "[mounted,flying,nomodifier:" .. dismountkey .. "]error-flying;" .. macro
+	if macro == nil then
+		command = SecureCmdOptionParse(macro)
+
+		if command == "default" then
+			command = SecureCmdOptionParse(default)
+		end
+	else
+		command = SecureCmdOptionParse(default)
 	end
-
-	local command = SecureCmdOptionParse(macro)
 
 	if command == "dismount" then
 		Dismount()
-		return
-	elseif command == "error-combat" then
-		self:DisplayError(ERR_NOT_IN_COMBAT)
-		return
-	elseif command == "error-flying" then
-		self:DisplayError(L["ERROR_FLYING"](_G[dismountkey:upper() .. "_KEY"]))
-		return
-	elseif command == "error-indoors" then
-		self:DisplayError(SPELL_FAILED_NO_MOUNTS_ALLOWED)
 		return
 	elseif command == "flying" and (zone == LBZ["Wintergrasp"] or (zone == LBZ["Dalaran"] and subzone ~= LBZ["Krasus' Landing"])) then
 		command = "ground"
@@ -277,7 +266,16 @@ function Doolittle:CmdMount()
 		command = "ground"
 	end
 
+	if command ~= "ground" and command ~= "flying" and command ~= "swimming" then
+		self:PrintError(L["ERROR_INAVLID_COMMAND"](command))
+	end
+
 	local pool = self:GetMountPool(command)
+	local summoned = GetSummonedCompanion("MOUNT")
+
+	if summoned then
+		pool = pool - summoned
+	end
 
 	if GetRealZoneText() ~= LBZ["Temple of Ahn'Qiraj"] then
 		pool = pool - pools.aq40
@@ -422,15 +420,16 @@ function Doolittle:OnInitialize()
 	self:BuildOptionsAndDefaults() -- sets defaults; MUST be before AceDB call
 
 	self.db = LibStub("AceDB-3.0"):New("DoolittleDB", defaults)
-	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-	options.args.profile.dialogHidden = true
 
-	LibStub("AceConfig-3.0"):RegisterOptionsTable("Doolittle", options, {"doolittle"})
 	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Doolittle", options)
 	self.opt_main = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Doolittle", "Doolittle")
 
-	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("DoolittleProfile", options.args.profile)
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("DoolittleProfile", LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db))
 	self.opt_profile = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("DoolittleProfile", "Profile", "Doolittle")
+
+	self:RegisterChatCommand("doolittle", "CmdOptions")
+	self:RegisterChatCommand("companion", "CmdSummon")
+	self:RegisterChatCommand("mount", "CmdMount")
 end
 
 function Doolittle:OnPreviewUpdate()
