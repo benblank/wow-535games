@@ -37,13 +37,11 @@ if not L then
 	return
 end
 
-L["CMD_MOUNT_DESC"] = "Hop into the saddle of a random mount."
-L["CMD_OPTIONS"] = "Options"
-L["CMD_OPTIONS_DESC"] = "Open the Doolittle options in the Interface Options window."
-L["CMD_SUMMON_DESC"] = "Call a random companion to your side."
-
-L["ERROR_FLYING"] = function(key) return "Hold the " .. key .. " to dismount while flying." end
 L["ERROR_NO_MOUNTS"] = "You do not have any mounts which can be used here."
+
+L["KEY_OPTIONS"] = "Options"
+L["KEY_SUMMON"] = "Summon companion"
+L["KEY_MOUNT"] = "Summon mount"
 
 L["LABEL_RATING"] = {
 	[0] = "I never want to see it",
@@ -54,8 +52,6 @@ L["LABEL_RATING"] = {
 	[5] = "One of my favorites",
 }
 
-L["OPT_DISMOUNT"] = "Dismount-in-flight key"
-L["OPT_DISMOUNT_DESC"] = "Hold this key to dismount even when flying."
 L["OPT_FASTEST_ONLY"] = "Include fastest only"
 L["OPT_FASTEST_ONLY_DESC"] = "If checked, all speed category settings for this mount type will be ignored."
 L["OPT_INCLUDE_SPEED"] = function(speed) return "Include " .. speed .. "% mounts" end
@@ -64,10 +60,10 @@ L["OPT_RANDOM_DESC"] = function(mode) return "Determines how often a new " .. (m
 L["OPT_RANDOM_ALWAYS"] = "every time"
 L["OPT_RANDOM_DAILY"] = "once a day"
 L["OPT_RANDOM_SESSION"] = "each session"
-L["OPT_WEIGHT_FOR"] = function(rating) return "Weight for rating " .. rating end
+L["OPT_WEIGHT_FOR"] = function(mode, rating) return "Weight for " .. rating .. "-star " .. (mode == "critters" and "companions" or "mounts") end
 L["OPT_WEIGHTS"] = "Weights"
 L["OPT_WEIGHTS_DESC"] = "Mounts whose ratings have a higher weight are more likely to be selected."
 
-L["TYPE_FLYING"] = "Flying"
-L["TYPE_GROUND"] = "Ground"
-L["TYPE_SWIMMING"] = "Swimming"
+L["TERRAIN_HEADING_FLYING"] = "When summoning flying mounts"
+L["TERRAIN_HEADING_GROUND"] = "When summoning ground mounts"
+L["TERRAIN_HEADING_SWIMMING"] = "When summoning swimming mounts"
