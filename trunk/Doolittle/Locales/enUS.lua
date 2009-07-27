@@ -45,6 +45,15 @@ L["CMD_SUMMON_DESC"] = "Call a random companion to your side."
 L["ERROR_FLYING"] = function(key) return "Hold the " .. key .. " to dismount while flying." end
 L["ERROR_NO_MOUNTS"] = "You do not have any mounts which can be used here."
 
+L["LABEL_RATING"] = {
+	[0] = "I never want to see it",
+	[1] = "I don't really like it",
+	[2] = "It's okay sometimes",
+	[3] = "I like it",
+	[4] = "I really like it",
+	[5] = "One of my favorites",
+}
+
 L["OPT_DISMOUNT"] = "Dismount-in-flight key"
 L["OPT_DISMOUNT_DESC"] = "Hold this key to dismount even when flying."
 L["OPT_FASTEST_ONLY"] = "Include fastest only"
