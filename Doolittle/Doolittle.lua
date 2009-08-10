@@ -36,62 +36,89 @@ local PetPaperDollFrameCompanionFrame = PetPaperDollFrameCompanionFrame
 
 Doolittle = LibStub("AceAddon-3.0"):NewAddon("Doolittle", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 
-local AceGUI = LibStub("AceGUI-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Doolittle")
 local LBZ = LibStub("LibBabble-Zone-3.0"):GetLookupTable()
 
 local options = {
-	name = "Doolittle",
-	handler = Doolittle,
-	type = "group",
-	args = {
-		keys = {
-			name = KEY_BINDINGS,
-			type = "group",
-			order = 10,
-			inline = true,
-			args = {
-				options = {
-					name = L["KEY_OPTIONS"],
-					type = "keybinding",
-					order = 10,
-					get = function(info) return GetBindingKey("DOOLITTLE_OPTIONS") end,
-					set = function(info, value) SetBinding(value, "DOOLITTLE_OPTIONS") SaveBindings(GetCurrentBindingSet()) end,
-				},
+	main = {
+		name = "Doolittle",
+		handler = Doolittle,
+		type = "group",
+		args = {
+			keys = {
+				name = KEY_BINDINGS,
+				type = "group",
+				order = 0,
+				inline = true,
+				args = {
+					options = {
+						name = L["KEY_OPTIONS"],
+						type = "keybinding",
+						order = 10,
+						get = function(info) return GetBindingKey("DOOLITTLE_OPTIONS") end,
+						set = function(info, value) SetBinding(value, "DOOLITTLE_OPTIONS") SaveBindings(GetCurrentBindingSet()) end,
+					},
 
-				summon = {
-					name = L["KEY_SUMMON"],
-					type = "keybinding",
-					order = 20,
-					get = function(info) return GetBindingKey("DOOLITTLE_SUMMON") end,
-					set = function(info, value) SetBinding(value, "DOOLITTLE_SUMMON") SaveBindings(GetCurrentBindingSet()) end,
-				},
+					summon = {
+						name = L["KEY_SUMMON"],
+						type = "keybinding",
+						order = 20,
+						get = function(info) return GetBindingKey("DOOLITTLE_SUMMON") end,
+						set = function(info, value) SetBinding(value, "DOOLITTLE_SUMMON") SaveBindings(GetCurrentBindingSet()) end,
+					},
 
-				mount = {
-					name = L["KEY_MOUNT"],
-					type = "keybinding",
-					order = 30,
-					get = function(info) return GetBindingKey("DOOLITTLE_MOUNT") end,
-					set = function(info, value) SetBinding(value, "DOOLITTLE_MOUNT") SaveBindings(GetCurrentBindingSet()) end,
+					mount = {
+						name = L["KEY_MOUNT"],
+						type = "keybinding",
+						order = 30,
+						get = function(info) return GetBindingKey("DOOLITTLE_MOUNT") end,
+						set = function(info, value) SetBinding(value, "DOOLITTLE_MOUNT") SaveBindings(GetCurrentBindingSet()) end,
+					},
 				},
 			},
 		},
+	},
 
-		critters = {
-			name = COMPANIONS,
-			type = "group",
-			order = 20,
-			inline = true,
-			args = {
+	advanced = {
+		name = L["OPT_ADVANCED"],
+		handler = Doolittle,
+		type = "group",
+		childGroups = "tab",
+		args = {
+			about = {
+				name = L["OPT_ABOUT"],
+				type = "group",
+				order = 10,
+				args = {
+					weights = {
+						name = L["OPT_ABOUT_WEIGHTS"],
+						type = "description",
+						order = 0,
+					},
+
+					reset = {
+						name = L["OPT_RESET_WEIGHTS"],
+						type = "execute",
+						order = 10,
+						func = "ResetWeights",
+					},
+				},
 			},
-		},
 
-		mounts = {
-			name = MOUNTS,
-			type = "group",
-			order = 30,
-			inline = true,
-			args = {
+			CRITTER = {
+				name = COMPANIONS,
+				type = "group",
+				order = 20,
+				args = {
+				},
+			},
+
+			MOUNT = {
+				name = MOUNTS,
+				type = "group",
+				order = 30,
+				args = {
+				},
 			},
 		},
 	},
@@ -99,7 +126,7 @@ local options = {
 
 local defaults = {
 	profile = {
-		critters = {
+		CRITTER = {
 			random = "always",
 
 			ratings = {
@@ -115,7 +142,7 @@ local defaults = {
 			},
 		},
 
-		mounts = {
+		MOUNT = {
 			random = "always",
 
 			ratings = {
@@ -137,7 +164,7 @@ local function GetSelectedCompanion()
 	local mode = PetPaperDollFrameCompanionFrame.mode
 	local spell = select(3, GetCompanionInfo(mode, PetPaperDollFrame_FindCompanionIndex()))
 
-	return mode:lower() .. "s", spell
+	return mode, spell
 end
 
 local function GetSummonedCompanion(mode)
@@ -156,25 +183,16 @@ local function GetSummonedCompanion(mode)
 end
 
 function Doolittle:BuildOptionsAndDefaults()
-	for mode in pairs{critters=1, mounts=1} do
-		local args = options.args[mode].args
+	for mode in pairs{CRITTER=1, MOUNT=1} do
+		local main = options.main.args
+		local advanced = options.advanced.args[mode].args
 		local defaults = defaults.profile[mode]
 
-		args.weights = {
-			name = L["OPT_WEIGHTS"],
-			desc = L["OPT_WEIGHTS_DESC"],
-			type = "group",
-			order = 50,
-			inline = true,
-			args = {
-			},
-		}
-
-		args.random = {
+		main["random" .. mode] = {
 			name = L["OPT_RANDOM"](mode),
 			desc = L["OPT_RANDOM_DESC"](mode),
 			type = "select",
-			order = 0,
+			order = 10,
 			style = "dropdown",
 			get = function(info) return self.db.profile[mode].random end,
 			set = function(info, value) self.db.profile[mode].random = value end,
@@ -185,8 +203,17 @@ function Doolittle:BuildOptionsAndDefaults()
 			},
 		}
 
+		advanced.weights = {
+			name = L["OPT_WEIGHTS"],
+			desc = L["OPT_WEIGHTS_DESC"],
+			type = "group",
+			inline = true,
+			args = {
+			},
+		}
+
 		for i = 1, 5 do
-			args.weights.args["rating" .. i] = {
+			advanced.weights.args["rating" .. i] = {
 				name = L["OPT_WEIGHT_FOR"](mode, i),
 				type = "range",
 				width = "full",
@@ -198,20 +225,20 @@ function Doolittle:BuildOptionsAndDefaults()
 			}
 		end
 
-		if mode == "mounts" then
-			for terrain, speeds in pairs(self.mounts.speeds) do
+		if mode == "MOUNT" then
+			for terrain, speeds in pairs(self.MOUNT.speeds) do
 				defaults[terrain] = {fastest = true}
 
-				args[terrain] = {
+				main[terrain] = {
 					name = L["TERRAIN_HEADING_" .. terrain:upper()],
 					type = "group",
 					inline = true,
+					order = 100,
 					args = {
 						fastest = {
 							name = L["OPT_FASTEST_ONLY"],
 							desc = L["OPT_FASTEST_ONLY_DESC"],
 							type = "toggle",
-							order = 50,
 							width = "full",
 							get = function(info) return self.db.profile[mode][terrain].fastest end,
 							set = function(info, value) self.db.profile[mode][terrain].fastest = value end,
@@ -224,7 +251,7 @@ function Doolittle:BuildOptionsAndDefaults()
 
 					defaults[terrain][sspeed] = default
 
-					args[terrain].args[sspeed] = {
+					main[terrain].args[sspeed] = {
 						name = L["OPT_INCLUDE_SPEED"](speed),
 						type = "toggle",
 						order = 1000 + speed,
@@ -243,8 +270,8 @@ function Doolittle:CmdMount(macro)
 	local zone = GetRealZoneText()
 	local subzone = GetSubZoneText()
 	local default = "[swimming]swimming;[flyable]flying;ground"
-	local profile = self.db.profile.mounts
-	local pools = self.mounts.pools
+	local profile = self.db.profile.MOUNT
+	local pools = self.MOUNT.pools
 	local command
 
 	if macro == nil then
@@ -287,7 +314,7 @@ function Doolittle:CmdMount(macro)
 	end
 
 	if not (pool:size() > 0) then
-		self:DisplayError(L["ERROR_NO_MOUNTS"])
+		self:DisplayError(L["ERROR_NO_MOUNTS"](summoned))
 		return
 	end
 
@@ -313,15 +340,21 @@ function Doolittle:CmdMount(macro)
 	CallCompanion("MOUNT", ratings[rating][ratings[rating]()][1])
 end
 
-function Doolittle:CmdOptions()
-	-- opening the "Profile" sub-category first ensures the primary category is expanded
-	InterfaceOptionsFrame_OpenToCategory(self.opt_profile);
-	InterfaceOptionsFrame_OpenToCategory(self.opt_main);
+function Doolittle:CmdOptions(which)
+	which = self.panels[strtrim(which)]
+
+	if which then
+		InterfaceOptionsFrame_OpenToCategory(which)
+	else
+		-- opening a sub-category first ensures the primary category is expanded
+		InterfaceOptionsFrame_OpenToCategory(self.panels.profile);
+		InterfaceOptionsFrame_OpenToCategory(self.panels.main);
+	end
 end
 
 function Doolittle:CmdSummon()
-	local profile = self.db.profile.critters
-	local pools = self.critters.pools
+	local profile = self.db.profile.CRITTER
+	local pools = self.CRITTER.pools
 	local pool = pools.ratings[1] + pools.ratings[2] + pools.ratings[3] + pools.ratings[4] + pools.ratings[5]
 	local summoned = GetSummonedCompanion("CRITTER")
 
@@ -370,9 +403,9 @@ end
 
 function Doolittle:GetMountPool(terrain)
 	local pool
-	local pools = self.mounts.pools
+	local pools = self.MOUNT.pools
 	local tpools = pools[terrain]
-	local profile = self.db.profile.mounts[terrain]
+	local profile = self.db.profile.MOUNT[terrain]
 
 	if profile.fastest then
 		if tpools.fastest < 0 then
@@ -420,12 +453,22 @@ function Doolittle:OnInitialize()
 	self:BuildOptionsAndDefaults() -- sets defaults; MUST be before AceDB call
 
 	self.db = LibStub("AceDB-3.0"):New("DoolittleDB", defaults)
+	self.db.RegisterCallback(self, "OnProfileReset", "OnPreviewUpdate")
 
-	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Doolittle", options)
-	self.opt_main = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Doolittle", "Doolittle")
+	options.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 
-	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("DoolittleProfile", LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db))
-	self.opt_profile = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("DoolittleProfile", "Profile", "Doolittle")
+	self.panels = {}
+
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Doolittle", options.main)
+	self.panels.main = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Doolittle", "Doolittle")
+
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("DoolittleAdvanced", options.advanced)
+	self.panels.advanced = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("DoolittleAdvanced", options.advanced.name, "Doolittle")
+
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("DoolittleProfile", options.profile)
+	self.panels.profile = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("DoolittleProfile", options.profile.name, "Doolittle")
+
+	self.panels.about = LibStub("LibAboutPanel").new("Doolittle", "Doolittle")
 
 	self:RegisterChatCommand("doolittle", "CmdOptions")
 	self:RegisterChatCommand("companion", "CmdSummon")
@@ -436,11 +479,17 @@ function Doolittle:OnPreviewUpdate()
 	DoolittleRatingFrameRating_OnLeave(DoolittleRatingFrameRating0)
 end
 
+function Doolittle:ResetWeights()
+	self.db.profile.CRITTER.weights = nil
+	self.db.profile.MOUNT.weights = nil
+	self.db:RegisterDefaults(defaults) -- rebuild metatable(s)
+end
+
 function Doolittle:ScanCompanions(mode)
 	local count = GetNumCompanions(mode)
 	local ratings = {[0] = Pool{}, Pool{}, Pool{}, Pool{}, Pool{}, Pool{}}
-	local pools = self[mode:lower() .. "s"].pools
-	local profile = self.db.profile[mode:lower() .. "s"].ratings
+	local pools = self[mode].pools
+	local profile = self.db.profile[mode].ratings
 
 	if count then
 		local name, spell, icon
@@ -458,7 +507,7 @@ function Doolittle:ScanCompanions(mode)
 		local fastest
 		local known = ratings[1] + ratings[2] + ratings[3] + ratings[4] + ratings[5]
 
-		for terrain, speeds in pairs(self.mounts.speeds) do
+		for terrain, speeds in pairs(self.MOUNT.speeds) do
 			pools[terrain].fastest = -1
 
 			for speed in pairs(speeds) do

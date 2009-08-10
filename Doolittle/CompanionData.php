@@ -68,12 +68,12 @@ foreach (array("http://www.wowhead.com/?spells=-5", "http://www.wowhead.com/?spe
 				break;
 
 				case 54729: // Winged Steed of the Ebon Blade
-					$speeds[] = array('flying', 60);
+					$speeds[] = array('flying', 150);
 					$speeds[] = array('flying', 280);
 				break;
 
 				case 48025: // Headless Horseman's Mount
-					$speeds[] = array('flying', 60);
+					$speeds[] = array('flying', 150);
 					$speeds[] = array('flying', 280);
 				// fall through
 
@@ -140,7 +140,7 @@ echo <<<DONE
 
 local Doolittle = LibStub("AceAddon-3.0"):GetAddon("Doolittle")
 
-Doolittle.critters = {
+Doolittle.CRITTER = {
 	pools = {
 		-- if other pet reagents are ever added, this will be replaced
 		-- with a proper generator like the one used for mounts
@@ -153,7 +153,7 @@ Doolittle.critters = {
 	},
 }
 
-Doolittle.mounts = {
+Doolittle.MOUNT = {
 	pools = {
 		aq40 = {
 			25953, -- Blue Qiraji Battle Tank

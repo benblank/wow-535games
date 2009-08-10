@@ -2,7 +2,7 @@
 
 local Doolittle = LibStub("AceAddon-3.0"):GetAddon("Doolittle")
 
-Doolittle.critters = {
+Doolittle.CRITTER = {
 	pools = {
 		-- if other pet reagents are ever added, this will be replaced
 		-- with a proper generator like the one used for mounts
@@ -15,7 +15,7 @@ Doolittle.critters = {
 	},
 }
 
-Doolittle.mounts = {
+Doolittle.MOUNT = {
 	pools = {
 		aq40 = {
 			25953, -- Blue Qiraji Battle Tank
@@ -41,7 +41,7 @@ Doolittle.mounts = {
 				43927, -- Cenarion War Hippogryph
 				41515, -- Cobalt Netherwing Drake
 				43810, -- Frost Wyrm
-				51960, -- Frostwyrm Mount
+				51960, -- Frost Wyrm Mount
 				61294, -- Green Proto-Drake
 				39798, -- Green Riding Nether Ray
 				48025, -- Headless Horseman's Mount
@@ -53,7 +53,9 @@ Doolittle.mounts = {
 				59570, -- Red Drake
 				59961, -- Red Proto-Drake
 				39800, -- Red Riding Nether Ray
+				66087, -- Silver Covenant Hippogryph
 				39802, -- Silver Riding Nether Ray
+				66088, -- Sunreaver Dragonhawk
 				32242, -- Swift Blue Gryphon
 				32290, -- Swift Green Gryphon
 				32295, -- Swift Green Wind Rider
@@ -77,7 +79,8 @@ Doolittle.mounts = {
 				40192, -- Ashes of Al'ar
 				59976, -- Black Proto-Drake
 				58615, -- Brutal Nether Drake
-				64927, -- Deadly Gladiator's Frostwyrm
+				64927, -- Deadly Gladiator's Frost Wyrm
+				65439, -- Furious Gladiator's Frost Wyrm
 				63956, -- Ironbound Proto-Drake
 				44317, -- Merciless Nether Drake
 				44744, -- Merciless Nether Drake
@@ -85,12 +88,13 @@ Doolittle.mounts = {
 				3363, -- Nether Drake
 				32345, -- Peep the Phoenix Mount
 				60021, -- Plagued Proto-Drake
+				67336, -- Relentless Gladiator's Frost Wyrm
 				63963, -- Rusted Proto-Drake
 				37015, -- Swift Nether Drake
 				49193, -- Vengeful Nether Drake
 				60024, -- Violet Proto-Drake
 			},
-			[60] = Pool{
+			[150] = Pool{
 				32244, -- Blue Wind Rider
 				32239, -- Ebon Gryphon
 				61451, -- Flying Carpet
@@ -108,6 +112,8 @@ Doolittle.mounts = {
 			[100] = Pool{
 				43688, -- Amani War Bear
 				16056, -- Ancient Frostsaber
+				66906, -- Argent Charger
+				67466, -- Argent Warhorse
 				60114, -- Armored Brown Bear
 				60116, -- Armored Brown Bear
 				51412, -- Big Battle Bear
@@ -133,6 +139,8 @@ Doolittle.mounts = {
 				59573, -- Brown Polar Bear
 				39315, -- Cobalt Riding Talbuk
 				34896, -- Cobalt War Talbuk
+				68188, -- Crusader's Black Warhorse
+				68187, -- Crusader's White Warhorse
 				39316, -- Dark Riding Talbuk
 				34790, -- Dark War Talbuk
 				63635, -- Darkspear Raptor
@@ -153,7 +161,6 @@ Doolittle.mounts = {
 				59804, -- Grand Ice Mammoth
 				61469, -- Grand Ice Mammoth
 				61470, -- Grand Ice Mammoth
-				65637, -- Grea Red Elekk
 				35713, -- Great Blue Elekk
 				49379, -- Great Brewfest Kodo
 				23249, -- Great Brown Kodo
@@ -162,6 +169,7 @@ Doolittle.mounts = {
 				23248, -- Great Gray Kodo
 				35712, -- Great Green Elekk
 				35714, -- Great Purple Elekk
+				65637, -- Great Red Elekk
 				23247, -- Great White Kodo
 				18991, -- Green Kodo
 				26056, -- Green Qiraji Battle Tank
@@ -179,9 +187,11 @@ Doolittle.mounts = {
 				60424, -- Mekgineer's Chopper
 				16084, -- Mottled Red Raptor
 				29059, -- Naxxramas Deathcharger
+				66846, -- Ochre Skeletal Warhorse
 				63640, -- Orgrimmar Wolf
 				16082, -- Palomino
 				23246, -- Purple Skeletal Warhorse
+				66090, -- Quel'dorei Steed
 				41252, -- Raven Lord
 				26054, -- Red Qiraji Battle Tank
 				22722, -- Red Skeletal Warhorse
@@ -193,6 +203,8 @@ Doolittle.mounts = {
 				63642, -- Silvermoon Hawkstrider
 				23510, -- Stormpike Battle Charger
 				63232, -- Stormwind Steed
+				66091, -- Sunreaver Hawkstrider
+				68057, -- Swift Alliance Steed
 				23241, -- Swift Blue Raptor
 				43900, -- Swift Brewfest Ram
 				23238, -- Swift Brown Ram
@@ -206,6 +218,7 @@ Doolittle.mounts = {
 				23252, -- Swift Gray Wolf
 				35025, -- Swift Green Hawkstrider
 				23225, -- Swift Green Mechanostrider
+				68056, -- Swift Horde Wolf
 				23219, -- Swift Mistsaber
 				65638, -- Swift Moonsaber
 				23242, -- Swift Olive Raptor
@@ -255,6 +268,7 @@ Doolittle.mounts = {
 				34767, -- Summon Charger
 			},
 			[60] = Pool{
+				66907, -- Argent Warhorse
 				58983, -- Big Blizzard Bear
 				35022, -- Black Hawkstrider
 				6896, -- Black Ram
@@ -307,6 +321,7 @@ Doolittle.mounts = {
 				42776, -- Spectral Tiger
 				10789, -- Spotted Frostsaber
 				15781, -- Steel Mechanostrider
+				66847, -- Striped Dawnsaber
 				8394, -- Striped Frostsaber
 				10793, -- Striped Nightsaber
 				16059, -- Tawny Sabercat
@@ -334,7 +349,7 @@ Doolittle.mounts = {
 	},
 	speeds = {
 		flying = {
-			[60] = false,
+			[150] = false,
 			[280] = true,
 			[310] = true,
 		},
@@ -349,4 +364,4 @@ Doolittle.mounts = {
 	},
 }
 
--- Generated on Sat, 04 Jul 2009 12:25:22 -0700 in 74.294680118561 seconds
+-- Generated on Sat, 08 Aug 2009 22:07:57 -0700 in 67.49551320076 seconds

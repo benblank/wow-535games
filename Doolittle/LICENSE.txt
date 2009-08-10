@@ -41,8 +41,8 @@ license.
 * home page: http://www.oxygen-icons.org/
 * license: http://creativecommons.org/licenses/by-sa/3.0/
 
-This software contains portions of the "LibBabble" embeddable library,
-which is in the public domain.
+This software contains portions of the "LibAboutPanel" and "LibBabble"
+embeddable libraries, which are in the public domain.
 
 This software contains portions of the "Ace3" embeddable library, which
 is copyright (c) 2007, Ace3 Development Team and is used under the
