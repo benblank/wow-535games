@@ -37,6 +37,7 @@ if not L then
 	return
 end
 
+L["ERROR_INAVLID_MOUNT_TYPE"] = function(command) return "Not a recognized mount type: \"" .. command .. "\"" end
 L["ERROR_NO_MOUNTS"] = function(mounted) return "You do not have any" .. (mounted and " other" or "") .. " mounts which can be used here." end
 
 L["KEY_OPTIONS"] = "Options"
@@ -58,11 +59,14 @@ L["OPT_ADVANCED"] = "Advanced"
 L["OPT_FASTEST_ONLY"] = "Include fastest only"
 L["OPT_FASTEST_ONLY_DESC"] = "If checked, all other speed category settings for this mount type will be ignored."
 L["OPT_INCLUDE_SPEED"] = function(speed) return "Include " .. speed .. "% mounts" end
+L["OPT_MACRO"] = "Default mount macro"
+L["OPT_MACRO_DESC"] = "The /mount command can be used with macro-style optons; this is the macro which will be run when you don't supply one."
 L["OPT_RANDOM"] = function(mode) return "Select a new " .. (mode == "CRITTER" and "companion" or "mount") .. " [NYI]" end
 L["OPT_RANDOM_DESC"] = function(mode) return "Determines how often a new " .. (mode == "CRITTER" and "companion" or "mount") .. " will be randomly selected." end
 L["OPT_RANDOM_ALWAYS"] = "every time"
 L["OPT_RANDOM_DAILY"] = "once a day"
 L["OPT_RANDOM_SESSION"] = "each session"
+L["OPT_RESET_MACRO"] = "Reset mount macro"
 L["OPT_RESET_WEIGHTS"] = "Reset weights"
 L["OPT_WEIGHT_FOR"] = function(mode, rating) return "Weight for " .. rating .. "-star " .. (mode == "CRITTER" and "companions" or "mounts") end
 L["OPT_WEIGHTS"] = "Weights"
