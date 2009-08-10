@@ -76,6 +76,22 @@ local options = {
 					},
 				},
 			},
+
+			macro = {
+				name = L["OPT_MACRO"],
+				desc = L["OPT_MACRO_DESC"],
+				type = "input",
+				width = "full",
+				get = function(info) return Doolittle.db.profile.MOUNT.macro end,
+				set = function(info, value) Doolittle.db.profile.MOUNT.macro = value end,
+			},
+
+			resetmacro = {
+				name = L["OPT_RESET_MACRO"],
+				type = "execute",
+				order = 10,
+				func = "ResetMacro",
+			},
 		},
 	},
 
@@ -144,6 +160,7 @@ local defaults = {
 
 		MOUNT = {
 			random = "always",
+			macro = "[mounted]dismount;[swimming]swimming;[flyable]flying;ground",
 
 			ratings = {
 				["*"] = 3,
@@ -269,19 +286,21 @@ end
 function Doolittle:CmdMount(macro)
 	local zone = GetRealZoneText()
 	local subzone = GetSubZoneText()
-	local default = "[swimming]swimming;[flyable]flying;ground"
 	local profile = self.db.profile.MOUNT
+	local defmacro = profile.macro
 	local pools = self.MOUNT.pools
-	local command
+	local command = nil
 
-	if macro == nil then
-		command = SecureCmdOptionParse(macro)
+	if macro ~= nil then
+		macro = strtrim(macro)
 
-		if command == "default" then
-			command = SecureCmdOptionParse(default)
+		if macro ~= "" then
+			command = SecureCmdOptionParse(macro)
 		end
-	else
-		command = SecureCmdOptionParse(default)
+	end
+
+	if command == nil or command == "default" then
+		command = SecureCmdOptionParse(defmacro)
 	end
 
 	if command == "dismount" then
@@ -294,7 +313,8 @@ function Doolittle:CmdMount(macro)
 	end
 
 	if command ~= "ground" and command ~= "flying" and command ~= "swimming" then
-		self:PrintError(L["ERROR_INAVLID_COMMAND"](command))
+		self:DisplayError(L["ERROR_INAVLID_MOUNT_TYPE"](command))
+		return
 	end
 
 	local pool = self:GetMountPool(command)
@@ -477,6 +497,11 @@ end
 
 function Doolittle:OnPreviewUpdate()
 	DoolittleRatingFrameRating_OnLeave(DoolittleRatingFrameRating0)
+end
+
+function Doolittle:ResetMacro()
+	self.db.profile.MOUNT.macro = nil
+	self.db:RegisterDefaults(defaults) -- rebuild metatable(s)
 end
 
 function Doolittle:ResetWeights()
