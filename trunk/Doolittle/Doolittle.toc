@@ -1,11 +1,16 @@
-## Interface: 30100
+## Interface: 30200
 ## Title: Doolittle
-## Notes: Comprehensive mount and minipet manager and randomizer.
-## Author: Malefactor @ Draenor US
+## Notes: A manager and randomizer for your mounts and companions.  Give your favorites a higher rating to see them more often and never worry about
+## Author: Malefactor
+## X-Author-Server: Draenor US
 ## Version: 0.4
+## X-Website: http://code.google.com/p/wow-535games/
+## X-License: New BSD License
+## X-Category: Miscellaneous
+## X-Localizations: enUS
 ## SavedVariables: DoolittleDB
-## OptionalDeps: Ace3
-## X-Embeds: Ace3
+## OptionalDeps: Ace3, LibAboutPanel, LibBabble-Zone
+## X-Embeds: Ace3, LibAboutPanel, LibBabble-Zone
 
 embeds.xml
 Locales\locales.xml
