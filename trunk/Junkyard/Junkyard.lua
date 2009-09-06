@@ -46,199 +46,279 @@ local LBIR = LibStub("LibBabble-Inventory-3.0"):GetReverseLookupTable()
 Junkyard = LibStub("AceAddon-3.0"):NewAddon("Junkyard", "AceConsole-3.0", "AceEvent-3.0")
 
 local options = {
-	name = "Junkyard",
-	handler = Junkyard,
-	type = "group",
-	args = {
-		options = {
-			name = L["CMD_OPTIONS"],
-			desc = L["CMD_OPTIONS_DESC"],
-			type = "execute",
-			order = 9,
-			dialogHidden = true,
-			func = "CmdOptions",
-		},
+	main = {
+		name = "Junkyard",
+		handler = Junkyard,
+		type = "group",
+		args = {
+			auto_sell = {
+				name = L["OPT_AUTO_SELL"],
+				desc = L["OPT_AUTO_SELL_DESC"],
+				type = "toggle",
+				order = 30,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 
-		sell = {
-			name = L["CMD_SELL"],
-			desc = L["CMD_SELL_DESC"],
-			type = "execute",
-			order = 10,
-			dialogHidden = true,
-			func = "CmdSell",
-		},
+			prompt_sell = {
+				name = L["OPT_PROMPT_SELL"],
+				desc = L["OPT_PROMPT_SELL_DESC"],
+				type = "toggle",
+				order = 31,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 
-		repair = {
-			name = L["CMD_SELL"],
-			desc = L["CMD_SELL_DESC"],
-			type = "execute",
-			order = 11,
-			dialogHidden = true,
-			func = "CmdRepair",
+			auto_repair = {
+				name = L["OPT_AUTO_REPAIR"],
+				desc = L["OPT_AUTO_REPAIR_DESC"],
+				type = "toggle",
+				order = 32,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 		},
+	},
 
-		["open-bags"] = {
-			name = L["CMD_BAGS_OPEN"],
-			desc = L["CMD_BAGS_OPEN_DESC"],
-			type = "execute",
-			order = 12,
-			dialogHidden = true,
-			func = "CmdBagsOpen",
+	junk = {
+		name = L["OPT_JUNK"],
+		handler = Junkyard,
+		type = "group",
+		args = {
+			junk_poor = {
+				name = L["OPT_JUNK_POOR"],
+				desc = L["OPT_JUNK_POOR_DESC"],
+				type = "toggle",
+				order = 10,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
+
+			junk_unusable = {
+				name = L["OPT_JUNK_UNUSABLE"],
+				desc = L["OPT_JUNK_UNUSABLE_DESC"],
+				type = "toggle",
+				order = 20,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
+
+			junk_light = {
+				name = L["OPT_JUNK_LIGHT"],
+				desc = L["OPT_JUNK_LIGHT_DESC"],
+				type = "toggle",
+				order = 30,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
+
+			["junklist"] = {
+				name = L["OPT_JUNKLIST"],
+				type = "header",
+				order = 40,
+			},
+
+			["junklist-add"] = {
+				name = L["OPT_JUNKLIST_ADD"],
+				desc = L["OPT_JUNKLIST_ADD_DESC"],
+				type = "input",
+				order = 50,
+				width = "full",
+				set = function(info, value) Junkyard:CmdJunkListAdd(value) end,
+			},
+
+			["junklist-remove"] = {
+				name = L["OPT_JUNKLIST_REMOVE"],
+				desc = L["OPT_JUNKLIST_REMOVE_DESC"],
+				type = "input",
+				order = 60,
+				width = "full",
+				set = function(info, value) Junkyard:CmdJunkListRemove(value) end,
+			},
 		},
+	},
 
-		["close-bags"] = {
-			name = L["CMD_BAGS_CLOSE"],
-			desc = L["CMD_BAGS_CLOSE_DESC"],
-			type = "execute",
-			order = 13,
-			dialogHidden = true,
-			func = "CmdBagsClose",
+	notjunk = {
+		name = L["OPT_NOTJUNK"],
+		handler = Junkyard,
+		type = "group",
+		args = {
+			notjunk_enchanted = {
+				name = L["OPT_NOTJUNK_ENCHANTED"],
+				desc = L["OPT_NOTJUNK_ENCHANTED_DESC"],
+				type = "toggle",
+				order = 10,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
+
+			notjunk_gemmed = {
+				name = L["OPT_NOTJUNK_GEMMED"],
+				desc = L["OPT_NOTJUNK_GEMMED_DESC"],
+				type = "toggle",
+				order = 20,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
+
+			["notjunklist"] = {
+				name = L["OPT_NOTJUNKLIST"],
+				type = "header",
+				order = 30,
+			},
+
+			["notjunklist-add"] = {
+				name = L["OPT_NOTJUNKLIST_ADD"],
+				desc = L["OPT_NOTJUNKLIST_ADD_DESC"],
+				type = "input",
+				order = 40,
+				width = "full",
+				set = function(info, value) Junkyard:CmdNotJunkListAdd(value) end,
+			},
+
+			["notjunklist-remove"] = {
+				name = L["OPT_NOTJUNKLIST_REMOVE"],
+				desc = L["OPT_NOTJUNKLIST_REMOVE_DESC"],
+				type = "input",
+				order = 50,
+				width = "full",
+				set = function(info, value) Junkyard:CmdNotJunkListRemove(value) end,
+			},
 		},
+	},
 
-		general = {
-			name = L["OPT_GENERAL"],
-			type = "header",
-			order = 20,
-		},
+	bags = {
+		name = L["OPT_BAGS"],
+		handler = Junkyard,
+		type = "group",
+		args = {
+			open = {
+				name = L["OPT_BAGS_OPEN"],
+				type = "header",
+				order = 10,
+			},
 
-		["opt-auto-sell"] = {
-			name = L["OPT_AUTO_SELL"],
-			desc = L["OPT_AUTO_SELL_DESC"],
-			type = "toggle",
-			order = 30,
-			width = "full",
-			get = function(info) return Junkyard.db.profile.auto_sell end,
-			set = function(info, value) Junkyard.db.profile.auto_sell = value end,
-		},
+			open_auction = {
+				name = L["OPT_BAGS_OPEN_AUCTION"],
+				type = "toggle",
+				order = 20,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 
-		["opt-prompt-sell"] = {
-			name = L["OPT_PROMPT_SELL"],
-			desc = L["OPT_PROMPT_SELL_DESC"],
-			type = "toggle",
-			order = 31,
-			width = "full",
-			get = function(info) return Junkyard.db.profile.prompt end,
-			set = function(info, value) Junkyard.db.profile.prompt = value end,
-		},
+			open_bank = {
+				name = L["OPT_BAGS_OPEN_BANK"],
+				type = "toggle",
+				order = 30,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 
-		["opt-auto-repair"] = {
-			name = L["OPT_AUTO_REPAIR"],
-			desc = L["OPT_AUTO_REPAIR_DESC"],
-			type = "toggle",
-			order = 32,
-			width = "full",
-			get = function(info) return Junkyard.db.profile.auto_repair end,
-			set = function(info, value) Junkyard.db.profile.auto_repair = value end,
-		},
+			open_guild = {
+				name = L["OPT_BAGS_OPEN_GUILD"],
+				type = "toggle",
+				order = 40,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 
-		junk = {
-			name = L["OPT_JUNK"],
-			type = "header",
-			order = 40,
-		},
+			open_mail = {
+				name = L["OPT_BAGS_OPEN_MAIL"],
+				type = "toggle",
+				order = 50,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 
-		["junk-poor"] = {
-			name = L["OPT_JUNK_POOR"],
-			desc = L["OPT_JUNK_POOR_DESC"],
-			type = "toggle",
-			order = 50,
-			width = "full",
-			get = function(info) return Junkyard.db.profile.junk_poor end,
-			set = function(info, value) Junkyard.db.profile.junk_poor = value end,
-		},
+			open_merchant = {
+				name = L["OPT_BAGS_OPEN_MERCHANT"],
+				type = "toggle",
+				order = 60,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 
-		["junk-unusable"] = {
-			name = L["OPT_JUNK_UNUSABLE"],
-			desc = L["OPT_JUNK_UNUSABLE_DESC"],
-			type = "toggle",
-			order = 60,
-			width = "full",
-			get = function(info) return Junkyard.db.profile.junk_unusable end,
-			set = function(info, value) Junkyard.db.profile.junk_unusable = value end,
-		},
+			open_trade = {
+				name = L["OPT_BAGS_OPEN_TRADE"],
+				type = "toggle",
+				order = 70,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 
-		["junk-light"] = {
-			name = L["OPT_JUNK_LIGHT"],
-			desc = L["OPT_JUNK_LIGHT_DESC"],
-			type = "toggle",
-			order = 70,
-			width = "full",
-			get = function(info) return Junkyard.db.profile.junk_light end,
-			set = function(info, value) Junkyard.db.profile.junk_light = value end,
-		},
+			close = {
+				name = L["OPT_BAGS_CLOSE"],
+				type = "header",
+				order = 80,
+			},
 
-		notjunk = {
-			name = L["OPT_NOTJUNK"],
-			type = "header",
-			order = 80,
-		},
+			close_auction = {
+				name = L["OPT_BAGS_CLOSE_AUCTION"],
+				type = "toggle",
+				order = 90,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 
-		["notjunk-enchanted"] = {
-			name = L["OPT_NOTJUNK_ENCHANTED"],
-			desc = L["OPT_NOTJUNK_ENCHANTED_DESC"],
-			type = "toggle",
-			order = 90,
-			width = "full",
-			get = function(info) return Junkyard.db.profile.notjunk_enchanted end,
-			set = function(info, value) Junkyard.db.profile.notjunk_enchanted = value end,
-		},
+			close_bank = {
+				name = L["OPT_BAGS_CLOSE_BANK"],
+				type = "toggle",
+				order = 100,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 
-		["notjunk-gemmed"] = {
-			name = L["OPT_NOTJUNK_GEMMED"],
-			desc = L["OPT_NOTJUNK_GEMMED_DESC"],
-			type = "toggle",
-			order = 100,
-			width = "full",
-			get = function(info) return Junkyard.db.profile.notjunk_gemmed end,
-			set = function(info, value) Junkyard.db.profile.notjunk_gemmed = value end,
-		},
+			close_guild = {
+				name = L["OPT_BAGS_CLOSE_GUILD"],
+				type = "toggle",
+				order = 110,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 
-		["junklist"] = {
-			name = L["OPT_JUNKLIST"],
-			type = "header",
-			order = 110,
-		},
+			close_mail = {
+				name = L["OPT_BAGS_CLOSE_MAIL"],
+				type = "toggle",
+				order = 120,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 
-		["junklist-add"] = {
-			name = L["OPT_JUNKLIST_ADD"],
-			desc = L["OPT_JUNKLIST_ADD_DESC"],
-			type = "input",
-			order = 120,
-			width = "full",
-			set = function(info, value) Junkyard:CmdJunkListAdd(value) end,
-		},
+			close_merchant = {
+				name = L["OPT_BAGS_CLOSE_MERCHANT"],
+				type = "toggle",
+				order = 130,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 
-		["junklist-remove"] = {
-			name = L["OPT_JUNKLIST_REMOVE"],
-			desc = L["OPT_JUNKLIST_REMOVE_DESC"],
-			type = "input",
-			order = 130,
-			width = "full",
-			set = function(info, value) Junkyard:CmdJunkListRemove(value) end,
-		},
-
-		["notjunklist"] = {
-			name = L["OPT_NOTJUNKLIST"],
-			type = "header",
-			order = 140,
-		},
-
-		["notjunklist-add"] = {
-			name = L["OPT_NOTJUNKLIST_ADD"],
-			desc = L["OPT_NOTJUNKLIST_ADD_DESC"],
-			type = "input",
-			order = 150,
-			width = "full",
-			set = function(info, value) Junkyard:CmdNotJunkListAdd(value) end,
-		},
-
-		["notjunklist-remove"] = {
-			name = L["OPT_NOTJUNKLIST_REMOVE"],
-			desc = L["OPT_NOTJUNKLIST_REMOVE_DESC"],
-			type = "input",
-			order = 160,
-			width = "full",
-			set = function(info, value) Junkyard:CmdNotJunkListRemove(value) end,
+			close_trade = {
+				name = L["OPT_BAGS_CLOSE_TRADE"],
+				type = "toggle",
+				order = 140,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
 		},
 	},
 }
@@ -247,18 +327,61 @@ local defaults = {
 	profile = {
 		auto_repair = true,
 		auto_sell = true,
+		close_auction = true,
+		close_bank = true,
+		close_guild = true,
+		close_mail = true,
+		close_merchant = true,
+		close_trade = true,
 		debug = false,
 		junk_light = false,
-		junk_list = {},
 		junk_poor = true,
 		junk_unusable = false,
 		notjunk_enchanted = true,
 		notjunk_gemmed = true,
-		notjunk_list = {},
+		open_auction = true,
+		open_bank = true,
+		open_guild = true,
+		open_mail = true,
+		open_merchant = true,
+		open_trade = true,
+		prompt_sell = true,
+
+		junk_list = {
+		},
+
+		notjunk_list = {
+			7189, -- Goblin Rocket Boots
+			10506, -- Deepdive Helmet
+			10542, -- Goblin Mining Helmet
+			10543, -- Goblin Construction Helmet
+			10588, -- Goblin Rocket Helmet
+			10721, -- Gnomish Harm Prevention Belt
+			10724, -- Gnomish Rocket Boots
+			10726, -- Gnomish Mind Control Cap
+			19969, -- Nat Pagle's Extreme Anglin' Boots
+			19972, -- Lucky Fishing Hat
+			33820, -- Weather-Beaten Fishing Hat
+		},
 	},
 }
 
-local ItemListTool = function(self, args, list, value, success, dupe)
+local bag_events = {
+	AUCTION_HOUSE_CLOSED  = "close_auction",
+	AUCTION_HOUSE_SHOW    = "open_auction",
+	BANKFRAME_CLOSED      = "close_bank",
+	BANKFRAME_OPENED      = "open_bank",
+	GUILDBANKFRAME_CLOSED = "close_guild",
+	GUILDBANKFRAME_OPENED = "open_guild",
+	MAIL_CLOSED           = "close_mail",
+	MAIL_SHOW             = "open_mail",
+	MERCHANT_CLOSED       = "close_merchant",
+	MERCHANT_SHOW         = "open_merchant",
+	TRADE_CLOSED          = "close_trade",
+	TRADE_SHOW            = "open_trade",
+}
+
+local function ItemListTool(self, args, list, value, success, dupe)
 	local id, link
 
 	local found = false
@@ -294,12 +417,12 @@ local ItemListTool = function(self, args, list, value, success, dupe)
 	end
 end
 
-function Junkyard:CmdBagsClose()
+function Junkyard:CloseBags()
 	 -- unlike OpenAllBags, this actually does what it says on the tin
 	CloseAllBags()
 end
 
-function Junkyard:CmdBagsOpen()
+function Junkyard:OpenBags()
 	-- OpenAllBags doesn't (at least, there's no way to guarantee it will work
 	-- as expected without running CloseAllBags first) - this function is
 	-- patterened after CloseAllBags, which *always* works as expected
@@ -307,6 +430,14 @@ function Junkyard:CmdBagsOpen()
 	for i=1, NUM_CONTAINER_FRAMES, 1 do
 		OpenBag(i);
 	end
+end
+
+function Junkyard:GetOption(info)
+	return self.db.profile[info[#info]]
+end
+
+function Junkyard:SetOption(info, value)
+	self.db.profile[info[#info]] = value
 end
 
 function Junkyard:CmdJunkListAdd(args)
@@ -325,10 +456,16 @@ function Junkyard:CmdNotJunkListRemove(args)
 	ItemListTool(self, args, self.db.profile.notjunk_list, nil, "MSG_NOTJUNK_REMOVED", "MSG_NOTJUNK_REMOVED_DUPE")
 end
 
-function Junkyard:CmdOptions()
-	-- opening the "Profile" sub-category first ensures the primary category is expanded
-	InterfaceOptionsFrame_OpenToCategory(self.opt_profile);
-	InterfaceOptionsFrame_OpenToCategory(self.opt_main);
+function Junkyard:CmdOptions(which)
+	which = self.panels[strtrim(which)]
+
+	if which then
+		InterfaceOptionsFrame_OpenToCategory(which)
+	else
+		-- opening a sub-category first ensures the primary category is expanded
+		InterfaceOptionsFrame_OpenToCategory(self.panels.profile);
+		InterfaceOptionsFrame_OpenToCategory(self.panels.main);
+	end
 end
 
 function Junkyard:CmdRepair()
@@ -442,22 +579,58 @@ function Junkyard:CmdSell()
 	end
 end
 
+function Junkyard:OnBagEvent(event)
+	local action = bag_events[event]
+
+	if self.db.profile[action] then
+		if strsplit("_", action) == "open" then
+			self:OpenBags()
+		else
+			self:CloseBags()
+		end
+	end
+end
+
 function Junkyard:OnEnable()
 	self:RegisterEvent("MERCHANT_CLOSED", "OnMerchantClosed")
 	self:RegisterEvent("MERCHANT_SHOW", "OnMerchantShow")
+	self:RegisterEvent("AUCTION_HOUSE_CLOSED", "OnBagEvent")
+	self:RegisterEvent("AUCTION_HOUSE_SHOW", "OnBagEvent")
+	self:RegisterEvent("BANKFRAME_CLOSED", "OnBagEvent")
+	self:RegisterEvent("BANKFRAME_OPENED", "OnBagEvent")
+	self:RegisterEvent("GUILDBANKFRAME_CLOSED", "OnBagEvent")
+	self:RegisterEvent("GUILDBANKFRAME_OPENED", "OnBagEvent")
+	self:RegisterEvent("MAIL_CLOSED", "OnBagEvent")
+	self:RegisterEvent("MAIL_SHOW", "OnBagEvent")
+	self:RegisterEvent("TRADE_CLOSED", "OnBagEvent")
+	self:RegisterEvent("TRADE_SHOW", "OnBagEvent")
 end
 
 function Junkyard:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("JunkyardDB", defaults)
-	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-	options.args.profile.dialogHidden = true
 
-	LibStub("AceConfig-3.0"):RegisterOptionsTable("Junkyard", options, "junkyard")
-	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Junkyard", options)
-	self.opt_main = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Junkyard", "Junkyard")
+	options.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 
-	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("JunkyardProfile", options.args.profile)
-	self.opt_profile = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("JunkyardProfile", "Profile", "Junkyard")
+	self.panels = {}
+
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Junkyard", options.main)
+	self.panels.main = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Junkyard", "Junkyard")
+
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("JunkyardJunk", options.junk)
+	self.panels.junk = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("JunkyardJunk", options.junk.name, "Junkyard")
+
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("JunkyardNotJunk", options.notjunk)
+	self.panels.notjunk = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("JunkyardNotJunk", options.notjunk.name, "Junkyard")
+
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("JunkyardBags", options.bags)
+	self.panels.bags = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("JunkyardBags", options.bags.name, "Junkyard")
+
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("JunkyardProfile", options.profile)
+	self.panels.profile = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("JunkyardProfile", options.profile.name, "Junkyard")
+
+	self:RegisterChatCommand("junkyard", "CmdOptions")
+	self:RegisterChatCommand("sell", "CmdSell")
+	self:RegisterChatCommand("repair", "CmdRepair")
 
 	self.tooltip = CreateFrame("GameTooltip", "JunkyardTooltip")
 	self.tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
@@ -470,8 +643,9 @@ end
 
 function Junkyard:OnMerchantClosed()
 	self.at_merchant = false
-
 	self.frame:Hide()
+
+	self:OnBagEvent("MERCHANT_CLOSED")
 end
 
 function Junkyard:OnMerchantShow()
@@ -484,6 +658,8 @@ function Junkyard:OnMerchantShow()
 	if self.db.profile.auto_sell then
 		self:CmdSell()
 	end
+
+	self:OnBagEvent("MERCHANT_SHOW")
 end
 
 function Junkyard:PrintError(message)
