@@ -48,11 +48,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 		<ButtonText name="$parentText" setAllPoints="true" justifyH="LEFT"/>
 		<NormalFont style="GameFontHighlight"/>
+
+		<Frames>
+			<Frame name="$parentMoneyFrame" inherits="SmallMoneyFrameTemplate">
+				<Anchors>
+					<Anchor point="RIGHT"/>
+				</Anchors>
+
+				<Scripts>
+					<OnLoad function="JunkyardSellFrameItemMoneyFrame_OnLoad"/>
+				</Scripts>
+			</Frame>
+		</Frames>
 	</Button>
 
 	<Frame name="JunkyardSellFrame" parent="UIParent" frameStrata="FULLSCREEN_DIALOG" toplevel="true" enableMouse="true" movable="true" hidden="true">
 		<Size>
-			<AbsDimension x="400" y="248"/>
+			<AbsDimension x="400" y="264"/>
 		</Size>
 
 		<Anchors>
@@ -148,7 +160,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				<Anchors>
 					<Anchor point="BOTTOMLEFT">
 						<Offset>
-							<AbsDimension x="17" y="45"/>
+							<AbsDimension x="17" y="61"/>
 						</Offset>
 					</Anchor>
 

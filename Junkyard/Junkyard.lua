@@ -484,7 +484,7 @@ function Junkyard:CmdSell()
 		return
 	end
 
-	local _, count, enchanted, gem1, gem2, gem3, gem4, gemmed, id, link, lsubtype, ltype, quality, sell, slot, slots, soulbound, subtype, type
+	local _, count, enchanted, gem1, gem2, gem3, gem4, gemmed, id, link, lsubtype, ltype, price, quality, sell, slot, slots, soulbound, subtype, type
 
 	local class = select(2, UnitClass("player"))
 	local indices = {}
@@ -500,11 +500,11 @@ function Junkyard:CmdSell()
 
 			if link then
 				sell = false
-				quality, _, _, ltype, lsubtype = select(3, GetItemInfo(link))
 				id, enchanted, gem1, gem2, gem3, gem4 = strsplit(":", link:sub(18))
 				id = tonumber(id)
 				enchanted = tonumber(enchanted) > 0
 				gemmed = tonumber(gem1) > 0 or tonumber(gem2) > 0 or tonumber(gem3) > 0 or tonumber(gem4) > 0
+				link, quality, _, _, ltype, lsubtype, _, _, _, price = select(2, GetItemInfo(id))
 
 				if profile.junk_unusable or profile.junk_light then
 					type = LBIR[ltype]
@@ -559,9 +559,9 @@ function Junkyard:CmdSell()
 						count = select(2, GetContainerItemInfo(bag, slot))
 
 						if indices[id] then
-							table.insert(items[indices[id]], {bag, slot, count, link})
+							table.insert(items[indices[id]], {bag=bag, slot=slot, count=count})
 						else
-							table.insert(items, { {bag, slot, count, quality, link} })
+							table.insert(items, { {bag=bag, slot=slot, count=count, quality=quality, link=link, price=price} })
 							indices[id] = #items
 						end
 					else
