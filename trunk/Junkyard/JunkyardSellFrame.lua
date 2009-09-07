@@ -62,10 +62,8 @@ end
 
 function JunkyardSellFrameItem_OnClick(self, motion)
 	for i, info in ipairs(table.remove(items, GetItemFromID(self:GetID()))) do
-		bag, slot = unpack(info)
-
 		ShowMerchantSellCursor(1)
-		UseContainerItem(bag, slot)
+		UseContainerItem(info.bag, info.slot)
 	end
 
 	if #items > 0 then
@@ -81,9 +79,9 @@ function JunkyardSellFrameItem_OnEnter(self, motion)
 	over = self
 
 	GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
-	GameTooltip:SetBagItem(item[1][1], item[1][2])
+	GameTooltip:SetHyperlink(item[1].link)
 
-	JunkyardSellFrameItemHighlight:SetVertexColor(GetItemQualityColor(item[1][4]))
+	JunkyardSellFrameItemHighlight:SetVertexColor(GetItemQualityColor(item[1].quality))
 	JunkyardSellFrameItemHighlightFrame:SetPoint("TOPRIGHT", self, 0, -1)
 	JunkyardSellFrameItemHighlightFrame:Show()
 end
@@ -94,6 +92,12 @@ function JunkyardSellFrameItem_OnLeave(self, motion)
 	GameTooltip:Hide()
 
 	JunkyardSellFrameItemHighlightFrame:Hide()
+end
+
+function JunkyardSellFrameItemMoneyFrame_OnLoad(self)
+	-- the "STATIC" moneyType needs no events, but has no OnLoadFunc, so fake it
+	self.small = 1
+	MoneyFrame_SetType(self, "STATIC")
 end
 
 function JunkyardSellFrameScrollFrame_OnVerticalScroll(self, offset)
@@ -115,12 +119,14 @@ function JunkyardSellFrameScrollFrame_Update(self)
 			local count = 0
 
 			for i, info in ipairs(items[item]) do
-				count = count + info[3]
+				count = count + info.count
 			end
+
+			MoneyFrame_Update(_G["JunkyardSellFrameItem" .. line .. "MoneyFrame"], count * items[item][1].price)
 
 			count = (count > 1) and (count .. "x ") or ""
 
-			button:SetText(count .. items[item][1][5])
+			button:SetText(count .. items[item][1].link)
 			button:Show()
 		else
 			button:Hide()
@@ -133,14 +139,12 @@ function JunkyardSellFrameScrollFrame_Update(self)
 end
 
 function JunkyardSellFrameSellButton_OnClick(self, button, down)
-	local bag, i, info, item, slot
+	local i, info, item
 
 	for i, item in ipairs(items) do
 		for j, info in ipairs(item) do
-			bag, slot = unpack(info)
-
 			ShowMerchantSellCursor(1)
-			UseContainerItem(bag, slot)
+			UseContainerItem(info.bag, info.slot)
 		end
 	end
 
