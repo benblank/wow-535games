@@ -79,7 +79,14 @@ function JunkyardSellFrameItem_OnEnter(self, motion)
 	over = self
 
 	GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
-	GameTooltip:SetHyperlink(item[1].link)
+
+	-- if there's exactly one of an item, show its real tooltip (in case of
+	-- enchants, etc.), otherwise use generic tooltip for one of that item
+	if #item == 1 and item[1].count == 1 then
+		GameTooltip:SetBagItem(item[1].bag, item[1].slot)
+	else
+		GameTooltip:SetHyperlink(item[1].link)
+	end
 
 	JunkyardSellFrameItemHighlight:SetVertexColor(GetItemQualityColor(item[1].quality))
 	JunkyardSellFrameItemHighlightFrame:SetPoint("TOPRIGHT", self, 0, -1)

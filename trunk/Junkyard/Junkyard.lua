@@ -417,21 +417,6 @@ local function ItemListTool(self, args, list, value, success, dupe)
 	end
 end
 
-function Junkyard:CloseBags()
-	 -- unlike OpenAllBags, this actually does what it says on the tin
-	CloseAllBags()
-end
-
-function Junkyard:OpenBags()
-	-- OpenAllBags doesn't (at least, there's no way to guarantee it will work
-	-- as expected without running CloseAllBags first) - this function is
-	-- patterened after CloseAllBags, which *always* works as expected
-	OpenBackpack();
-	for i=1, NUM_CONTAINER_FRAMES, 1 do
-		OpenBag(i);
-	end
-end
-
 function Junkyard:GetOption(info)
 	return self.db.profile[info[#info]]
 end
@@ -584,9 +569,18 @@ function Junkyard:OnBagEvent(event)
 
 	if self.db.profile[action] then
 		if strsplit("_", action) == "open" then
-			self:OpenBags()
+			-- "OpenAllBags" (from ContainerFrame.lua) doesn't actually open
+			-- all bags (at least, there's no way to guarantee it unless you
+			-- run CloseAllBags first), so this function is patterened after
+			-- CloseAllBags, which *always* works as expected.
+
+			OpenBackpack()
+
+			for i=1, NUM_CONTAINER_FRAMES, 1 do
+				OpenBag(i)
+			end
 		else
-			self:CloseBags()
+			CloseAllBags()
 		end
 	end
 end

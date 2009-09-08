@@ -52,7 +52,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		<Frames>
 			<Frame name="$parentMoneyFrame" inherits="SmallMoneyFrameTemplate">
 				<Anchors>
-					<Anchor point="RIGHT"/>
+					<Anchor point="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
 				</Anchors>
 
 				<Scripts>
