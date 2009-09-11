@@ -50,7 +50,7 @@ L["MSG_NOTJUNK_ADDED_DUPE"] = function(link) return "Your \"not junk\" list alre
 L["MSG_NOTJUNK_REMOVED"] = function(link) return "Removed " .. link .. " from your \"not junk\" list." end
 L["MSG_NOTJUNK_REMOVED_DUPE"] = function(link) return "Your \"not junk\" list does not contain " .. link .. "." end
 L["MSG_NO_MERCHANT"] = "You are not speaking to a merchant."
-L["MSG_UNKNOWN_TYPE"] = function(link, type, subtype) return "Item " .. link .. " has unknown type \"" .. type .. ", " .. subtype .. "\" and will not be sold.  Please check to see if a new version of this addon is available." end
+L["MSG_UNKNOWN_TYPE"] = function(link, type, subtype) return "Item " .. link .. " has unknown type \"" .. type .. ", " .. subtype .. "\" and will not be sold.  Please check to see if a new version of Junkyard is available." end
 
 L["OPT_AUTO_REPAIR"] = "Repair equipment at merchants"
 L["OPT_AUTO_REPAIR_DESC"] = "When set, all equipment will automatically be repaired when talking to a merchant who has that ability."
@@ -71,6 +71,8 @@ L["OPT_BAGS_OPEN_GUILD"] = "Visiting the guild bank"
 L["OPT_BAGS_OPEN_MAIL"] = "Arriving at a mailbox"
 L["OPT_BAGS_OPEN_MERCHANT"] = "Talking with a merchant"
 L["OPT_BAGS_OPEN_TRADE"] = "Trading with another player"
+L["OPT_COMPARE"] = "Always show Blizzard item comparisons"
+L["OPT_COMPARE_DESC"] = "This is a hidden setting within WoW itself and will remain on even if Junkyard is uninstalled unless turned off first."
 L["OPT_JUNK"] = "\"Junk\""
 L["OPT_JUNK_LIGHT"] = "Light-weight, soulbound armor is junk"
 L["OPT_JUNK_LIGHT_DESC"] = "When set, armor which is soulbound and lighter-weight than a class typically wears (taking level into account) is considered junk.  For example, leather is light-weight for Warriors.  Some specs (healadins wearing spellpower cloth, high-level hunters wearing agility leather) probably want to leave this off."
