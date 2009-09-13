@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	<Button name="JunkyardSellFrameItemTemplate" virtual="true">
 		<Size>
-			<AbsDimension x="329" y="16"/>
+			<AbsDimension x="0" y="16"/>
 		</Size>
 
 		<Scripts>
@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	<Frame name="JunkyardSellFrame" parent="UIParent" frameStrata="FULLSCREEN_DIALOG" toplevel="true" enableMouse="true" movable="true" hidden="true">
 		<Size>
-			<AbsDimension x="400" y="264"/>
+			<AbsDimension x="400" y="236"/>
 		</Size>
 
 		<Anchors>
@@ -123,48 +123,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		</Layers>
 
 		<Frames>
-			<Button name="JunkyardSellFrameSellButton" inherits="UIPanelButtonTemplate2">
-				<Size>
-					<AbsDimension x="100" y="24"/>
-				</Size>
-
+			<Button name="JunkyardSellFrameCloseButton" inherits="UIPanelCloseButton">
 				<Anchors>
-					<Anchor point="BOTTOMLEFT">
+					<Anchor point="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="68" y="17"/>
+							<AbsDimension x="-8" y="8"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
-
-				<Scripts>
-					<OnClick function="JunkyardSellFrameSellButton_OnClick"/>
-					<OnLoad function="JunkyardSellFrameSellButton_OnLoad"/>
-				</Scripts>
-			</Button>
-
-			<Button name="JunkyardSellFrameCancelButton" inherits="UIPanelButtonTemplate2" text="CANCEL">
-				<Size>
-					<AbsDimension x="100" y="24"/>
-				</Size>
-
-				<Anchors>
-					<Anchor point="BOTTOMRIGHT">
-						<Offset>
-							<AbsDimension x="-68" y="17"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-
-				<Scripts>
-					<OnClick function="JunkyardSellFrameCancelButton_OnClick"/>
-				</Scripts>
 			</Button>
 
 			<Frame name="JunkyardSellFrameListFrame">
 				<Anchors>
 					<Anchor point="BOTTOMLEFT">
 						<Offset>
-							<AbsDimension x="17" y="61"/>
+							<AbsDimension x="17" y="33"/>
 						</Offset>
 					</Anchor>
 
@@ -193,10 +166,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 				<Frames>
 					<Frame name="JunkyardSellFrameItemHighlightFrame" hidden="true">
-						<Size>
-							<AbsDimension x="329" y="16"/>
-						</Size>
-
 						<Layers>
 							<Layer level="ARTWORK">
 								<Texture name="JunkyardSellFrameItemHighlight" file="Interface\Buttons\UI-Listbox-Highlight2"/>
@@ -208,7 +177,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						<Anchors>
 							<Anchor point="TOPLEFT">
 								<Offset>
-									<AbsDimension x="8" y="-6"/>
+									<AbsDimension x="8" y="-7"/>
 								</Offset>
 							</Anchor>
 						</Anchors>
@@ -216,56 +185,82 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 					<Button name="JunkyardSellFrameItem2" inherits="JunkyardSellFrameItemTemplate" id="2">
 						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardSellFrameItem1" relativePoint="BOTTOMLEFT"/>
 							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem1" relativePoint="BOTTOMRIGHT"/>
 						</Anchors>
 					</Button>
 
 					<Button name="JunkyardSellFrameItem3" inherits="JunkyardSellFrameItemTemplate" id="3">
 						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardSellFrameItem2" relativePoint="BOTTOMLEFT"/>
 							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem2" relativePoint="BOTTOMRIGHT"/>
 						</Anchors>
 					</Button>
 
 					<Button name="JunkyardSellFrameItem4" inherits="JunkyardSellFrameItemTemplate" id="4">
 						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardSellFrameItem3" relativePoint="BOTTOMLEFT"/>
 							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem3" relativePoint="BOTTOMRIGHT"/>
 						</Anchors>
 					</Button>
 
 					<Button name="JunkyardSellFrameItem5" inherits="JunkyardSellFrameItemTemplate" id="5">
 						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardSellFrameItem4" relativePoint="BOTTOMLEFT"/>
 							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem4" relativePoint="BOTTOMRIGHT"/>
 						</Anchors>
 					</Button>
 
 					<Button name="JunkyardSellFrameItem6" inherits="JunkyardSellFrameItemTemplate" id="6">
 						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardSellFrameItem5" relativePoint="BOTTOMLEFT"/>
 							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem5" relativePoint="BOTTOMRIGHT"/>
 						</Anchors>
 					</Button>
 
 					<Button name="JunkyardSellFrameItem7" inherits="JunkyardSellFrameItemTemplate" id="7">
 						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardSellFrameItem6" relativePoint="BOTTOMLEFT"/>
 							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem6" relativePoint="BOTTOMRIGHT"/>
 						</Anchors>
 					</Button>
 
 					<Button name="JunkyardSellFrameItem8" inherits="JunkyardSellFrameItemTemplate" id="8">
 						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardSellFrameItem7" relativePoint="BOTTOMLEFT"/>
 							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem7" relativePoint="BOTTOMRIGHT"/>
 						</Anchors>
 					</Button>
 
 					<Button name="JunkyardSellFrameItem9" inherits="JunkyardSellFrameItemTemplate" id="9">
 						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardSellFrameItem8" relativePoint="BOTTOMLEFT"/>
 							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem8" relativePoint="BOTTOMRIGHT"/>
 						</Anchors>
 					</Button>
 
 					<Button name="JunkyardSellFrameItem10" inherits="JunkyardSellFrameItemTemplate" id="10">
 						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardSellFrameItem9" relativePoint="BOTTOMLEFT"/>
 							<Anchor point="TOPRIGHT" relativeTo="JunkyardSellFrameItem9" relativePoint="BOTTOMRIGHT"/>
 						</Anchors>
+					</Button>
+
+					<Button name="JunkyardSellFrameSellAllButton" inherits="JunkyardSellFrameItemTemplate" id="0">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardSellFrameItem10" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+
+							<Anchor point="RIGHT" relativeTo="JunkyardSellFrameItem10" relativePoint="RIGHT"/>
+						</Anchors>
+
+						<Scripts>
+							<OnClick function="JunkyardSellFrameSellAllButton_OnClick"/>
+							<OnLoad function="JunkyardSellFrameSellAllButton_OnLoad"/>
+						</Scripts>
 					</Button>
 
 					<ScrollFrame name="JunkyardSellFrameScrollFrame" inherits="FauxScrollFrameTemplate">
