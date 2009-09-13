@@ -44,6 +44,8 @@ end
 
 function JunkyardSellFrame_OnHide(self)
 	items = {}
+
+	PlaySound("igMainMenuContinue");
 end
 
 function JunkyardSellFrame_OnLoad(self)
@@ -56,40 +58,41 @@ function JunkyardSellFrame_OnLoad(self)
 	end
 end
 
-function JunkyardSellFrameCancelButton_OnClick(self, button, down)
-	self:GetParent():Hide()
-end
-
 function JunkyardSellFrameItem_OnClick(self, motion)
 	for i, info in ipairs(table.remove(items, GetItemFromID(self:GetID()))) do
 		ShowMerchantSellCursor(1)
 		UseContainerItem(info.bag, info.slot)
 	end
 
-	if #items > 0 then
-		JunkyardSellFrameScrollFrame_Update(JunkyardSellFrameScrollFrame)
-	else
-		JunkyardSellFrame:Hide()
-	end
+	JunkyardSellFrameScrollFrame_Update(JunkyardSellFrameScrollFrame)
 end
 
 function JunkyardSellFrameItem_OnEnter(self, motion)
-	local item = items[GetItemFromID(self:GetID())]
-
 	over = self
 
-	GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+	local id = self:GetID()
 
-	-- if there's exactly one of an item, show its real tooltip (in case of
-	-- enchants, etc.), otherwise use generic tooltip for one of that item
-	if #item == 1 and item[1].count == 1 then
-		GameTooltip:SetBagItem(item[1].bag, item[1].slot)
+	if id ~= 0 then
+		local item = items[GetItemFromID(id)]
+
+		GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+
+		-- if there's exactly one of an item, show its real tooltip (in case of
+		-- enchants, etc.), otherwise use generic tooltip for one of that item
+		if #item == 1 and item[1].count == 1 then
+			GameTooltip:SetBagItem(item[1].bag, item[1].slot)
+		else
+			GameTooltip:SetHyperlink(item[1].link)
+		end
+
+		local r, g, b = GetItemQualityColor(item[1].quality)
+		JunkyardSellFrameItemHighlight:SetVertexColor(r, g, b, .6)
 	else
-		GameTooltip:SetHyperlink(item[1].link)
+		JunkyardSellFrameItemHighlight:SetVertexColor(1, 1, 1, .6)
 	end
 
-	JunkyardSellFrameItemHighlight:SetVertexColor(GetItemQualityColor(item[1].quality))
-	JunkyardSellFrameItemHighlightFrame:SetPoint("TOPRIGHT", self, 0, -1)
+	JunkyardSellFrameItemHighlightFrame:SetPoint("TOPLEFT", self)
+	JunkyardSellFrameItemHighlightFrame:SetPoint("BOTTOMRIGHT", self)
 	JunkyardSellFrameItemHighlightFrame:Show()
 end
 
@@ -112,6 +115,17 @@ function JunkyardSellFrameScrollFrame_OnVerticalScroll(self, offset)
 end
 
 function JunkyardSellFrameScrollFrame_Update(self)
+	if #items == 0 then
+		JunkyardSellFrame:Hide()
+		return
+	end
+
+	if #items <= lines then
+		JunkyardSellFrameItem1:SetPoint("TOPRIGHT", -8, -7);
+	else
+		JunkyardSellFrameItem1:SetPoint("TOPRIGHT", -26, -7);
+	end
+
 	local button, item, numitems, line, offset
 
 	numitems = #items
@@ -125,7 +139,7 @@ function JunkyardSellFrameScrollFrame_Update(self)
 		if item <= numitems then
 			local count = 0
 
-			for i, info in ipairs(items[item]) do
+			for _, info in ipairs(items[item]) do
 				count = count + info.count
 			end
 
@@ -140,12 +154,26 @@ function JunkyardSellFrameScrollFrame_Update(self)
 		end
 	end
 
+	local total = 0
+
+	for _, item in ipairs(items) do
+		local count = 0
+
+		for _, info in ipairs(item) do
+			count = count + info.count
+		end
+
+		total = total + item[1].price * count
+	end
+
+	MoneyFrame_Update(JunkyardSellFrameSellAllButtonMoneyFrame, total)
+
 	if over then
 		JunkyardSellFrameItem_OnEnter(over)
 	end
 end
 
-function JunkyardSellFrameSellButton_OnClick(self, button, down)
+function JunkyardSellFrameSellAllButton_OnClick(self, button, down)
 	local i, info, item
 
 	for i, item in ipairs(items) do
@@ -158,6 +186,6 @@ function JunkyardSellFrameSellButton_OnClick(self, button, down)
 	JunkyardSellFrame:Hide()
 end
 
-function JunkyardSellFrameSellButton_OnLoad(self)
+function JunkyardSellFrameSellAllButton_OnLoad(self)
 	self:SetText(L["BUTTON_SELL"])
 end

@@ -140,6 +140,7 @@ local options = {
 				order = 50,
 				width = "full",
 				set = function(info, value) Junkyard:CmdJunkListAdd(value) end,
+				hidden = "AllowBagsHack",
 			},
 
 			["junklist-remove"] = {
@@ -191,6 +192,7 @@ local options = {
 				order = 40,
 				width = "full",
 				set = function(info, value) Junkyard:CmdNotJunkListAdd(value) end,
+				hidden = "AllowBagsHack",
 			},
 
 			["notjunklist-remove"] = {
@@ -434,6 +436,37 @@ function Junkyard:SetOption(info, value)
 	self.db.profile[info[#info]] = value
 end
 
+local realIOFO = nil
+local realOFOH = nil
+
+local fakeIOFO = function()
+	return nil
+end
+
+local fakeOFOH = function(self)
+	IsOptionFrameOpen = realIOFO
+	realIOFO = nil
+
+	OptionsFrame_OnHide = realOFOH
+	realOFOH = nil
+
+	OptionsFrame_OnHide(self)
+end
+
+function Junkyard:AllowBagsHack(info)
+	if realIOFO == nil then
+		realIOFO = IsOptionFrameOpen
+		IsOptionFrameOpen = fakeIOFO
+	end
+
+	if realOFOH == nil then
+		realOFOH = OptionsFrame_OnHide
+		OptionsFrame_OnHide = fakeOFOH
+	end
+
+	return false -- called as a "hidden" handler
+end
+
 function Junkyard:CmdJunkListAdd(args)
 	ItemListTool(self, args, self.db.profile.junk_list, true, "MSG_JUNK_ADDED", "MSG_JUNK_ADDED_DUPE")
 end
@@ -549,7 +582,7 @@ function Junkyard:CmdSell()
 				end
 
 				if sell then
-					if profile.prompt then
+					if profile.prompt_sell then
 						count = select(2, GetContainerItemInfo(bag, slot))
 
 						if indices[id] then
