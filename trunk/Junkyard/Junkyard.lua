@@ -43,7 +43,7 @@ local UseContainerItem = UseContainerItem
 local L = LibStub("AceLocale-3.0"):GetLocale("Junkyard")
 local LBIR = LibStub("LibBabble-Inventory-3.0"):GetReverseLookupTable()
 
-Junkyard = LibStub("AceAddon-3.0"):NewAddon("Junkyard", "AceConsole-3.0", "AceEvent-3.0")
+Junkyard = LibStub("AceAddon-3.0"):NewAddon("Junkyard", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 
 local options = {
 	main = {
@@ -140,6 +140,7 @@ local options = {
 				order = 50,
 				width = "full",
 				set = function(info, value) Junkyard:CmdJunkListAdd(value) end,
+				dialogControl = "LinkBox",
 				hidden = "AllowBagsHack",
 			},
 
@@ -436,35 +437,16 @@ function Junkyard:SetOption(info, value)
 	self.db.profile[info[#info]] = value
 end
 
-local realIOFO = nil
-local realOFOH = nil
-
-local fakeIOFO = function()
-	return nil
-end
-
-local fakeOFOH = function(self)
-	IsOptionFrameOpen = realIOFO
-	realIOFO = nil
-
-	OptionsFrame_OnHide = realOFOH
-	realOFOH = nil
-
-	OptionsFrame_OnHide(self)
-end
-
 function Junkyard:AllowBagsHack(info)
-	if realIOFO == nil then
-		realIOFO = IsOptionFrameOpen
-		IsOptionFrameOpen = fakeIOFO
-	end
-
-	if realOFOH == nil then
-		realOFOH = OptionsFrame_OnHide
-		OptionsFrame_OnHide = fakeOFOH
-	end
+	self:RawHook("IsOptionFrameOpen", function() return nil end, true)
+	self:SecureHook("OptionsFrame_OnHide", "AllowBagsUnhack")
 
 	return false -- called as a "hidden" handler
+end
+
+function Junkyard:AllowBagsUnhack()
+	self:Unhook("IsOptionFrameOpen")
+	self:Unhook("OptionsFrame_OnHide")
 end
 
 function Junkyard:CmdJunkListAdd(args)
