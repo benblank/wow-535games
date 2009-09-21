@@ -19,6 +19,7 @@ Enter Doolittle.  With single keypress, you can get a randomly-selected mount of
   * Auto-summoning of companions — "hands-free" minipet management!
   * Finer-grained control in mount macros (select speeds or even specific mounts)
   * Option to select specific companions via '/companion' command
+  * "Preview" macros — see which pet/mount will be summoned before you press the button
 
 = Usage =
 
@@ -46,6 +47,13 @@ Just summons a random companion.
 == `/mount` ==
 
 On its own, summons a random mount according to the "default mount macro" (see the Configuration section below).  The macro which comes with Doolittle is `[mounted]dismount;[swimming]swimming;[flyable]flying;ground` — in other words, dismount if you're mounted, otherwise summon a swimming mount if you're swimming, otherwise summon a flying mount if you're in an area where you can fly, otherwise summon a plain old ground mount.  However, you can specify your own macro, too.  All macro options are supported (though not all make sense, like `[combat]` or `[target=]`) and you can choose from the following commands:
+
+|| `dismount` || Unsurprisingly, dismounts you. ||
+|| `flying` || Summons a flying mount.  If you have no flying mounts, are in Northrend and don't know Cold Weather Flying, or are in Dalaran (and not in Krasus' Landing) or Wintergrasp, summons a ground mount instead. ||
+|| `ground` || Summons a ground mount. ||
+|| `swimming` || Summons a swimming mount.  If you have no swimming mounts, summons a ground mount instead. ||
+
+=== Examples ===
 
 _Coming Soon_
 
