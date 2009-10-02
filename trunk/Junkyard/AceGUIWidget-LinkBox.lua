@@ -33,12 +33,7 @@ do
 			return false
 		end
 
-		local text = this:GetText()
-		if text ~= "" and string.sub(text, -1) ~= " " then
-			this:Insert(" ")
-		end
-
-		this:Insert(link)
+		this:Insert(" " .. link)
 		return true
 	end
 	

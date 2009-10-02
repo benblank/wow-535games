@@ -31,6 +31,11 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 -- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+-- local references to commonly-used global variables for faster access
+local MoneyFrame_Update = MoneyFrame_Update
+local ShowMerchantSellCursor = ShowMerchantSellCursor
+local UseContainerItem = UseContainerItem
+
 local L = LibStub("AceLocale-3.0"):GetLocale("Junkyard")
 
 local lines = 10

@@ -144,6 +144,14 @@ local options = {
 				hidden = "AllowBagsHack",
 			},
 
+			["junklist-select"] = {
+				name = L["OPT_JUNKLIST"],
+				type = "multiselect",
+				order = 55,
+				width = "full",
+				values = function() return Junkyard:GetJunkList() end,
+			},
+
 			["junklist-remove"] = {
 				name = L["OPT_JUNKLIST_REMOVE"],
 				desc = L["OPT_JUNKLIST_REMOVE_DESC"],
@@ -151,6 +159,7 @@ local options = {
 				order = 60,
 				width = "full",
 				set = function(info, value) Junkyard:CmdJunkListRemove(value) end,
+				dialogControl = "LinkBox",
 			},
 		},
 	},
@@ -193,6 +202,7 @@ local options = {
 				order = 40,
 				width = "full",
 				set = function(info, value) Junkyard:CmdNotJunkListAdd(value) end,
+				dialogControl = "LinkBox",
 				hidden = "AllowBagsHack",
 			},
 
@@ -203,6 +213,7 @@ local options = {
 				order = 50,
 				width = "full",
 				set = function(info, value) Junkyard:CmdNotJunkListRemove(value) end,
+				dialogControl = "LinkBox",
 			},
 		},
 	},
@@ -438,8 +449,13 @@ function Junkyard:SetOption(info, value)
 end
 
 function Junkyard:AllowBagsHack(info)
-	self:RawHook("IsOptionFrameOpen", function() return nil end, true)
-	self:SecureHook("OptionsFrame_OnHide", "AllowBagsUnhack")
+	if not self:IsHooked("IsOptionFrameOpen") then
+		self:RawHook("IsOptionFrameOpen", function() return nil end, true)
+	end
+
+	if not self:IsHooked("OptionsFrame_OnHide") then
+		self:SecureHook("OptionsFrame_OnHide", "AllowBagsUnhack")
+	end
 
 	return false -- called as a "hidden" handler
 end
@@ -586,6 +602,17 @@ function Junkyard:CmdSell()
 		self.frame:SetItems(items)
 		self.frame:Show()
 	end
+end
+
+function Junkyard:GetJunkList()
+	local map = {}
+
+	for i, id in ipairs(self.db.profile.notjunk_list) do
+		map[id] = select(2, GetItemInfo(id))
+print(id, map[id])
+	end
+
+	return map
 end
 
 function Junkyard:OnBagEvent(event)
