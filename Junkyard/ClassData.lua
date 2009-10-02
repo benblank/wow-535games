@@ -219,6 +219,7 @@ Junkyard.Weapon = {
 		["Fist Weapons"] = true,
 		["Guns"] = true,
 		["Miscellaneous"] = true,
+		["One-Handed Axes"] = true,
 		["One-Handed Maces"] = true,
 		["One-Handed Swords"] = true,
 		["Thrown"] = true,
