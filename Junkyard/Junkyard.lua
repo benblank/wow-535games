@@ -45,6 +45,9 @@ local LBIR = LibStub("LibBabble-Inventory-3.0"):GetReverseLookupTable()
 
 Junkyard = LibStub("AceAddon-3.0"):NewAddon("Junkyard", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 
+local opts_list = {}
+local opts_selected = {}
+
 local options = {
 	main = {
 		name = "Junkyard",
@@ -131,6 +134,7 @@ local options = {
 				name = L["OPT_JUNKLIST"],
 				type = "header",
 				order = 40,
+				hidden = "OptionsHack",
 			},
 
 			["junklist-add"] = {
@@ -140,15 +144,6 @@ local options = {
 				order = 50,
 				width = "full",
 				set = function(info, value) Junkyard:CmdJunkListAdd(value) end,
-				hidden = "AllowBagsHack",
-			},
-
-			["junklist-select"] = {
-				name = L["OPT_JUNKLIST"],
-				type = "multiselect",
-				order = 55,
-				width = "full",
-				values = function() return Junkyard:GetJunkList() end,
 			},
 
 			["junklist-remove"] = {
@@ -158,6 +153,30 @@ local options = {
 				order = 60,
 				width = "full",
 				set = function(info, value) Junkyard:CmdJunkListRemove(value) end,
+			},
+
+			["junklist-select"] = {
+				name = L["OPT_JUNKLIST"],
+				type = "multiselect",
+				order = 70,
+				width = "full",
+				values = function() return Junkyard:GetJunkList() end,
+				set = function(info, key, checked) opts_selected[key] = checked end,
+				get = function(info, key, checked) return opts_selected[key] end,
+			},
+
+			["junklist-select-remove"] = {
+				name = L["OPT_REMOVE_SELECTED"],
+				type = "execute",
+				order = 80,
+				func = "CmdJunkListRemoveSelected",
+			},
+
+			["junklist-select-clear"] = {
+				name = L["OPT_CLEAR_SELECTED"],
+				type = "execute",
+				order = 90,
+				func = function() opts_selected = {} end,
 			},
 		},
 	},
@@ -191,6 +210,7 @@ local options = {
 				name = L["OPT_NOTJUNKLIST"],
 				type = "header",
 				order = 30,
+				hidden = "OptionsHack",
 			},
 
 			["notjunklist-add"] = {
@@ -200,7 +220,6 @@ local options = {
 				order = 40,
 				width = "full",
 				set = function(info, value) Junkyard:CmdNotJunkListAdd(value) end,
-				hidden = "AllowBagsHack",
 			},
 
 			["notjunklist-remove"] = {
@@ -210,6 +229,30 @@ local options = {
 				order = 50,
 				width = "full",
 				set = function(info, value) Junkyard:CmdNotJunkListRemove(value) end,
+			},
+
+			["notjunklist-select"] = {
+				name = L["OPT_JUNKLIST"],
+				type = "multiselect",
+				order = 60,
+				width = "full",
+				values = function() return Junkyard:GetNotJunkList() end,
+				set = function(info, key, checked) opts_selected[key] = checked end,
+				get = function(info, key, checked) return opts_selected[key] end,
+			},
+
+			["notjunklist-select-remove"] = {
+				name = L["OPT_REMOVE_SELECTED"],
+				type = "execute",
+				order = 70,
+				func = "CmdNotJunkListRemoveSelected",
+			},
+
+			["notjunklist-select-clear"] = {
+				name = L["OPT_CLEAR_SELECTED"],
+				type = "execute",
+				order = 80,
+				func = function() opts_selected = {} end,
 			},
 		},
 	},
@@ -370,17 +413,17 @@ local defaults = {
 		},
 
 		notjunk_list = {
-			7189, -- Goblin Rocket Boots
-			10506, -- Deepdive Helmet
-			10542, -- Goblin Mining Helmet
-			10543, -- Goblin Construction Helmet
-			10588, -- Goblin Rocket Helmet
-			10721, -- Gnomish Harm Prevention Belt
-			10724, -- Gnomish Rocket Boots
-			10726, -- Gnomish Mind Control Cap
-			19969, -- Nat Pagle's Extreme Anglin' Boots
-			19972, -- Lucky Fishing Hat
-			33820, -- Weather-Beaten Fishing Hat
+			[7189] = true, -- Goblin Rocket Boots
+			[10506] = true, -- Deepdive Helmet
+			[10542] = true, -- Goblin Mining Helmet
+			[10543] = true, -- Goblin Construction Helmet
+			[10588] = true, -- Goblin Rocket Helmet
+			[10721] = true, -- Gnomish Harm Prevention Belt
+			[10724] = true, -- Gnomish Rocket Boots
+			[10726] = true, -- Gnomish Mind Control Cap
+			[19969] = true, -- Nat Pagle's Extreme Anglin' Boots
+			[19972] = true, -- Lucky Fishing Hat
+			[33820] = true, -- Weather-Beaten Fishing Hat
 		},
 	},
 }
@@ -401,7 +444,7 @@ local bag_events = {
 }
 
 local function ItemListTool(self, args, list, value, success, dupe)
-	local id, link
+	local _, id, link, price
 
 	local found = false
 	local pat_id = "^%d+$"
@@ -417,14 +460,18 @@ local function ItemListTool(self, args, list, value, success, dupe)
 			found = true
 
 			id = tonumber(id)
-			link = select(2, GetItemInfo(id))
+			link, _, _, _, _, _, _, _, _, price = select(2, GetItemInfo(id))
 
-			if list[id] == value then
-				self:Print(L[dupe](link))
+			if price == 0 and list == Junkyard.db.profile.junk_list and value == true then
+				self:Print(L["MSG_NO_SELL_PRICE"](link))
 			else
-				list[id] = value
+				if list[id] == value then
+					self:Print(L[dupe](link))
+				else
+					list[id] = value
 
-				self:Print(L[success](link))
+					self:Print(L[success](link))
+				end
 			end
 		end
 	end
@@ -436,6 +483,14 @@ local function ItemListTool(self, args, list, value, success, dupe)
 	end
 end
 
+local function RemoveSelected(list)
+	for key in pairs(opts_selected) do
+		list[opts_list[key]] = value or nil -- use nil instead of false to save memory and disk space
+	end
+
+	opts_selected = {}
+end
+
 function Junkyard:GetOption(info)
 	return self.db.profile[info[#info]]
 end
@@ -444,19 +499,19 @@ function Junkyard:SetOption(info, value)
 	self.db.profile[info[#info]] = value
 end
 
-function Junkyard:AllowBagsHack(info)
+function Junkyard:OptionsHack(info)
 	if not self:IsHooked("IsOptionFrameOpen") then
 		self:RawHook("IsOptionFrameOpen", function() return nil end, true)
 	end
 
 	if not self:IsHooked("OptionsFrame_OnHide") then
-		self:SecureHook("OptionsFrame_OnHide", "AllowBagsUnhack")
+		self:SecureHook("OptionsFrame_OnHide", "OptionsUnhack")
 	end
 
 	return false -- called as a "hidden" handler
 end
 
-function Junkyard:AllowBagsUnhack()
+function Junkyard:OptionsUnhack()
 	self:Unhook("IsOptionFrameOpen")
 	self:Unhook("OptionsFrame_OnHide")
 end
@@ -469,12 +524,20 @@ function Junkyard:CmdJunkListRemove(args)
 	ItemListTool(self, args, self.db.profile.junk_list, nil, "MSG_JUNK_REMOVED", "MSG_JUNK_REMOVED_DUPE")
 end
 
+function Junkyard:CmdJunkListRemoveSelected()
+	RemoveSelected(self.db.profile.junk_list)
+end
+
 function Junkyard:CmdNotJunkListAdd(args)
 	ItemListTool(self, args, self.db.profile.notjunk_list, true, "MSG_NOTJUNK_ADDED", "MSG_NOTJUNK_ADDED_DUPE")
 end
 
 function Junkyard:CmdNotJunkListRemove(args)
 	ItemListTool(self, args, self.db.profile.notjunk_list, nil, "MSG_NOTJUNK_REMOVED", "MSG_NOTJUNK_REMOVED_DUPE")
+end
+
+function Junkyard:CmdNotJunkListRemoveSelected()
+	RemoveSelected(self.db.profile.notjunk_list)
 end
 
 function Junkyard:CmdOptions(which)
@@ -563,6 +626,10 @@ function Junkyard:CmdSell()
 					sell = true
 				end
 
+				if price == 0 then
+					sell = false
+				end
+
 				if profile.notjunk_enchanted and enchanted then
 					sell = false
 				end
@@ -600,15 +667,46 @@ function Junkyard:CmdSell()
 	end
 end
 
-function Junkyard:GetJunkList()
+local function GetList(list)
+	local link, name
 	local map = {}
 
-	for i, id in ipairs(self.db.profile.notjunk_list) do
-		map[id] = select(2, GetItemInfo(id))
-print(id, map[id])
+	for id in pairs(list) do
+		name, link = GetItemInfo(id)
+
+		if not link then
+			-- query from server; this is a potentially dangerous
+			-- operation for "junk" items which are rare enough, but if
+			-- they're so rare, why are they in your "junk" list at all?
+			Junkyard.tooltip:ClearLines()
+			Junkyard.tooltip:SetHyperlink("item:" .. id .. ":0:0:0:0:0:0:0")
+
+			name, link = GetItemInfo(id)
+		end
+
+		if not link then
+			-- occasionally, SetHyperlink will successfully cache the item
+			-- (i.e. not cause a disconnect) but the data still won't be
+			-- available immediately
+			link = "item #" .. id
+			name = link
+		end
+
+		-- AceGUI sorts multiselects by key
+		name = name .. id
+		opts_list[name] = id
+		map[name] = link
 	end
 
 	return map
+end
+
+function Junkyard:GetJunkList()
+	return GetList(self.db.profile.junk_list)
+end
+
+function Junkyard:GetNotJunkList()
+	return GetList(self.db.profile.notjunk_list)
 end
 
 function Junkyard:OnBagEvent(event)
