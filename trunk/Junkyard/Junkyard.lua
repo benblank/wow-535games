@@ -140,7 +140,6 @@ local options = {
 				order = 50,
 				width = "full",
 				set = function(info, value) Junkyard:CmdJunkListAdd(value) end,
-				dialogControl = "LinkBox",
 				hidden = "AllowBagsHack",
 			},
 
@@ -159,7 +158,6 @@ local options = {
 				order = 60,
 				width = "full",
 				set = function(info, value) Junkyard:CmdJunkListRemove(value) end,
-				dialogControl = "LinkBox",
 			},
 		},
 	},
@@ -202,7 +200,6 @@ local options = {
 				order = 40,
 				width = "full",
 				set = function(info, value) Junkyard:CmdNotJunkListAdd(value) end,
-				dialogControl = "LinkBox",
 				hidden = "AllowBagsHack",
 			},
 
@@ -213,7 +210,6 @@ local options = {
 				order = 50,
 				width = "full",
 				set = function(info, value) Junkyard:CmdNotJunkListRemove(value) end,
-				dialogControl = "LinkBox",
 			},
 		},
 	},

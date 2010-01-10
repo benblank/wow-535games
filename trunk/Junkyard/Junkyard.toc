@@ -10,8 +10,6 @@
 embeds.xml
 Locales\locales.xml
 
-AceGUIWidget-LinkBox.lua
-
 Junkyard.lua
 JunkyardSellFrame.xml
 ClassData.lua
