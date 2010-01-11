@@ -38,6 +38,7 @@ if not L then
 end
 
 L["ERROR_INAVLID_MOUNT_TYPE"] = function(command) return "Not a recognized mount type: \"" .. command .. "\"" end
+L["ERROR_NO_COMPANIONS"] = "You do not have any companions which can be used here."
 L["ERROR_NO_MOUNTS"] = function(mounted) return "You do not have any" .. (mounted and " other" or "") .. " mounts which can be used here." end
 
 L["KEY_OPTIONS"] = "Options"
