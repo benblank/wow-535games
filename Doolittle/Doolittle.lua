@@ -306,8 +306,13 @@ function Doolittle:CmdMount(macro)
 	if command == "dismount" then
 		Dismount()
 		return
-	elseif command == "flying" and (zone == LBZ["Wintergrasp"] or (zone == LBZ["Dalaran"] and subzone ~= LBZ["Krasus' Landing"])) then
+	-- you can't fly in Wintergrasp when the battle is active
+	elseif command == "flying" and (zone == LBZ["Wintergrasp"] and GetWintergraspWaitTime() == nil) then
 		command = "ground"
+	-- you can't fly in Dalaran (except on Krasus' Landing)
+	elseif command == "flying" and (zone == LBZ["Dalaran"] and subzone ~= LBZ["Krasus' Landing"]) then
+		command = "ground"
+	-- you can't fly in Northrend w/o Cold Weather Flying
 	elseif command == "flying" and GetCurrentMapContinent() == 4 and not IsUsableSpell(GetSpellLink(54197):sub(27, -6)) then
 		command = "ground"
 	end
