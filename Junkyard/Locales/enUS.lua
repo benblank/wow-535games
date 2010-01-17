@@ -39,7 +39,6 @@ end
 
 L["BUTTON_SELL"] = "Sell All"
 
-L["MSG_CANNOT_REPAIR"] = "This merchant cannot repair your equipment."
 L["MSG_INVALID_ITEM"] = "Not a valid item.  Please use a bare item ID (e.g. \"12345\"), an item reference (e.g. \"item:12345\" or \"item:12345:0:0:0:0:0:0:0\") or an item link (by shift-clicking on an item)."
 L["MSG_JUNK_ADDED"] = function(link) return "Added " .. link .. " to your \"junk\" list." end
 L["MSG_JUNK_ADDED_DUPE"] = function(link) return "Your \"junk\" list already contains " .. link .. "." end
@@ -51,6 +50,11 @@ L["MSG_NOTJUNK_REMOVED"] = function(link) return "Removed " .. link .. " from yo
 L["MSG_NOTJUNK_REMOVED_DUPE"] = function(link) return "Your \"not junk\" list does not contain " .. link .. "." end
 L["MSG_NO_MERCHANT"] = "You are not speaking to a merchant."
 L["MSG_NO_SELL_PRICE"] = function(link) return "Did not add " .. link .. " to your \"junk\" list because it cannot be sold." end
+L["MSG_REPAIR_GUILD"] = "Equipment repaired using guild funds."
+L["MSG_REPAIR_GUILD_POOR"] = "Insufficient guild funds for repair."
+L["MSG_REPAIR_INVALID"] = "This merchant cannot repair your equipment."
+L["MSG_REPAIR_PERSONAL"] = "Equipment repaired using personal funds."
+L["MSG_REPAIR_PERSONAL_POOR"] = "Insufficient personal funds for repair."
 L["MSG_UNKNOWN_TYPE"] = function(link, type, subtype) return "Item " .. link .. " has unknown type \"" .. type .. ", " .. subtype .. "\" and will not be sold.  Please check to see if a new version of Junkyard is available." end
 
 L["OPT_AUTO_REPAIR"] = "Repair equipment at merchants"
@@ -100,3 +104,7 @@ L["OPT_NOTJUNKLIST_REMOVE_DESC"] = "Remove an item currently considered \"not ju
 L["OPT_PROMPT_SELL"] = "Ask before selling items"
 L["OPT_PROMPT_SELL_DESC"] = "When set, a window will appear showing the items to be sold and allowing you to cancel the sale."
 L["OPT_REMOVE_SELECTED"] = "Remove Selected"
+L["OPT_REPAIR_FUNDS"] = "When repairing, use:"
+L["OPT_REPAIR_FUNDS_AUTO"] = "guild funds if available, personal funds otherwise"
+L["OPT_REPAIR_FUNDS_GUILD"] = "guild funds only"
+L["OPT_REPAIR_FUNDS_PERSONAL"] = "personal funds only"

@@ -84,11 +84,27 @@ local options = {
 				set = "SetOption",
 			},
 
+			repair_funds = {
+				name = L["OPT_REPAIR_FUNDS"],
+				type = "select",
+				order = 35,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+
+				values = {
+					auto     = L["OPT_REPAIR_FUNDS_AUTO"],
+					guild    = L["OPT_REPAIR_FUNDS_GUILD"],
+					personal = L["OPT_REPAIR_FUNDS_PERSONAL"],
+				},
+			},
+
 			compare = {
 				name = L["OPT_COMPARE"],
 				desc = L["OPT_COMPARE_DESC"],
 				type = "toggle",
 				order = 40,
+				width = "full",
 				get = function(info) return GetCVarBool("alwaysCompareItems") end,
 				set = function(info, value) SetCVar("alwaysCompareItems", value and "1" or "0") end,
 			},
@@ -408,6 +424,7 @@ local defaults = {
 		open_merchant = true,
 		open_trade = true,
 		prompt_sell = true,
+		repair_funds = "auto",
 
 		junk_list = {
 		},
@@ -557,9 +574,44 @@ function Junkyard:CmdRepair()
 		self:PrintError(L["MSG_NO_MERCHANT"])
 		return
 	elseif not CanMerchantRepair() then
-		self:PrintError(L["MSG_CANNOT_REPAIR"])
+		self:PrintError(L["MSG_REPAIR_INVALID"])
 	end
-	RepairAllItems()
+
+	local cost, needs_repair = GetRepairAllCost()
+
+	if not needs_repair then
+		return
+	end
+
+	local funds = self.db.profile.repair_funds
+
+	-- attempt repair from guild bank funds
+	if CanGuildBankRepair() and funds ~= "personal" then
+		local funds = GetGuildBankWithdrawMoney()
+
+		-- withdraw limit is -1 for guild masters
+		if funds == -1 then
+			funds = GetGuildBankMoney()
+		end
+
+		if cost > funds then
+			self:Print(L["MSG_REPAIR_GUILD_POOR"])
+		else
+			RepairAllItems(1)
+			self:Print(L["MSG_REPAIR_GUILD"])
+			return
+		end
+	end
+
+	if funds ~= "guild" then
+		if cost > GetMoney() then
+			self:Print(L["MSG_REPAIR_PERSONAL_POOR"])
+		else
+			RepairAllItems()
+			self:Print(L["MSG_REPAIR_PERSONAL"])
+			return
+		end
+	end
 end
 
 function Junkyard:CmdSell()
