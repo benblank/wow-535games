@@ -38,6 +38,7 @@ if not L then
 end
 
 L["ERROR_INAVLID_MOUNT_TYPE"] = function(command) return "Not a recognized mount type: \"" .. command .. "\"" end
+L["ERROR_LOW_WEIGHT"] = "You may not set weighting factors to less than 1."
 L["ERROR_NO_COMPANIONS"] = "You do not have any companions which can be used here."
 L["ERROR_NO_MOUNTS"] = function(mounted) return "You do not have any" .. (mounted and " other" or "") .. " mounts which can be used here." end
 
@@ -54,24 +55,24 @@ L["LABEL_RATING"] = {
 	[5] = "One of my favorites",
 }
 
-L["OPT_ABOUT"] = "About"
-L["OPT_ABOUT_WEIGHTS"] = "A warning about the options in this section — you don't need to change them.  Really.  I don't even use them.  They exist so that people who are very good at math and care a lot about the statistical distribution of their random mount/companion selection can fiddle with it to their hearts' content.  The rest of us just don't need to worry about it.  :-)\n\nIf you're curious, though, feel free to play around and see how it works (that's why there's a reset button here).  Basically, Doolittle first chooses which rating level it's going to pick from (and the more \"weight\" a rating has, the more often that rating level will be chosen).  Then, it chooses randomly from all the mounts/companions which have that rating (each one is equally likely), so if you have (for example) a lot 4-star mounts and very few 3-star mounts, |cffffff00each|r 4-four star mount might come up less often than each 3-star mount, but the total chance of getting |cffffff00any|r four-star mount is still higher than the total chance of getting any 3-star mount as long as the 4-star rating has a higher weight than the 3-star rating.\n\nSee why I told you not to worry about it?"
 L["OPT_ADVANCED"] = "Advanced"
+L["OPT_ADVANCED_ABOUT"] = "<explain formula and variables here>"
+L["OPT_ADVANCED_SIZE"] = "Pool size weight factor"
+L["OPT_ADVANCED_SIZE_DESC"] = "The higher the number, the more pool size affects weighting.  At 1, pool size is completely disregarded."
+L["OPT_ADVANCED_STARS"] = "Star rating weight factor"
+L["OPT_ADVANCED_STARS_DESC"] = "The higher the number, the more star ratings affect weighting.  At 1, all star ratings have equal probability."
 L["OPT_FASTEST_ONLY"] = "Include fastest only"
 L["OPT_FASTEST_ONLY_DESC"] = "If checked, all other speed category settings for this mount type will be ignored."
 L["OPT_INCLUDE_SPEED"] = function(speed) return "Include " .. speed .. "% mounts" end
 L["OPT_MACRO"] = "Default mount macro"
 L["OPT_MACRO_DESC"] = "The /mount command can be used with macro-style optons; this is the macro which will be run when you don't supply one."
+L["OPT_MACRO_RESET"] = "Reset mount macro"
+L["OPT_MACRO_RESET_DESC"] = "Restore the default macro bundled with Doolittle."
 L["OPT_RANDOM"] = function(mode) return "Select a new " .. (mode == "CRITTER" and "companion" or "mount") .. " [NYI]" end
 L["OPT_RANDOM_DESC"] = function(mode) return "Determines how often a new " .. (mode == "CRITTER" and "companion" or "mount") .. " will be randomly selected." end
 L["OPT_RANDOM_ALWAYS"] = "every time"
 L["OPT_RANDOM_DAILY"] = "once a day"
 L["OPT_RANDOM_SESSION"] = "each session"
-L["OPT_RESET_MACRO"] = "Reset mount macro"
-L["OPT_RESET_WEIGHTS"] = "Reset weights"
-L["OPT_WEIGHT_FOR"] = function(mode, rating) return "Weight for " .. rating .. "-star " .. (mode == "CRITTER" and "companions" or "mounts") end
-L["OPT_WEIGHTS"] = "Weights"
-L["OPT_WEIGHTS_DESC"] = "Mounts whose ratings have a higher weight are more likely to be selected."
 
 L["TERRAIN_HEADING_FLYING"] = "When summoning flying mounts"
 L["TERRAIN_HEADING_GROUND"] = "When summoning ground mounts"

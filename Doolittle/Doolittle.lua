@@ -48,7 +48,7 @@ local options = {
 			keys = {
 				name = KEY_BINDINGS,
 				type = "group",
-				order = 0,
+				order = 10,
 				inline = true,
 				args = {
 					options = {
@@ -81,15 +81,17 @@ local options = {
 				name = L["OPT_MACRO"],
 				desc = L["OPT_MACRO_DESC"],
 				type = "input",
+				order = 30,
 				width = "full",
 				get = function(info) return Doolittle.db.profile.MOUNT.macro end,
 				set = function(info, value) Doolittle.db.profile.MOUNT.macro = value end,
 			},
 
 			resetmacro = {
-				name = L["OPT_RESET_MACRO"],
+				name = L["OPT_MACRO_RESET"],
+				desc = L["OPT_MACRO_RESET_DESC"],
 				type = "execute",
-				order = 10,
+				order = 40,
 				func = "ResetMacro",
 			},
 		},
@@ -102,39 +104,29 @@ local options = {
 		childGroups = "tab",
 		args = {
 			about = {
-				name = L["OPT_ABOUT"],
-				type = "group",
+				name = L["OPT_ADVANCED_ABOUT"],
+				type = "description",
 				order = 10,
-				args = {
-					weights = {
-						name = L["OPT_ABOUT_WEIGHTS"],
-						type = "description",
-						order = 0,
-					},
-
-					reset = {
-						name = L["OPT_RESET_WEIGHTS"],
-						type = "execute",
-						order = 10,
-						func = "ResetWeights",
-					},
-				},
 			},
 
-			CRITTER = {
-				name = COMPANIONS,
-				type = "group",
+			weight_size = {
+				name = L["OPT_ADVANCED_SIZE"],
+				desc = L["OPT_ADVANCED_SIZE_DESC"],
+				type = "input",
 				order = 20,
-				args = {
-				},
+				get = function(info) return tostring(Doolittle.db.profile.weight_size) end,
+				set = function(info, value) Doolittle.db.profile.weight_size = tonumber(value) end,
+				validate = function(info, value) if tonumber(value) < 1 then return L["ERROR_LOW_WEIGHT"] end end,
 			},
 
-			MOUNT = {
-				name = MOUNTS,
-				type = "group",
+			weight_stars = {
+				name = L["OPT_ADVANCED_STARS"],
+				desc = L["OPT_ADVANCED_STARS_DESC"],
+				type = "input",
 				order = 30,
-				args = {
-				},
+				get = function(info) return tostring(Doolittle.db.profile.weight_stars) end,
+				set = function(info, value) Doolittle.db.profile.weight_stars = tonumber(value) end,
+				validate = function(info, value) if tonumber(value) < 1 then return L["ERROR_LOW_WEIGHT"] end end,
 			},
 		},
 	},
@@ -148,14 +140,6 @@ local defaults = {
 			ratings = {
 				["*"] = 3,
 			},
-
-			weights = {
-				[1] = 10,
-				[2] = 16,
-				[3] = 25,
-				[4] = 40,
-				[5] = 63,
-			},
 		},
 
 		MOUNT = {
@@ -165,17 +149,52 @@ local defaults = {
 			ratings = {
 				["*"] = 3,
 			},
-
-			weights = {
-				[1] = 10,
-				[2] = 16,
-				[3] = 25,
-				[4] = 40,
-				[5] = 63,
-			},
 		},
+
+		weight_size = 2,
+		weight_stars = 10,
 	},
 }
+
+local function GetWeight(s, c, x, y)
+	-- apologies for the short variable names, but these are taken
+	-- directly from the formula this function is patterned after 
+
+	local function f(n)
+		local retval = (y ^ ((n - 1) / 5)) / ((c[n] / (c[1] + c[2] + c[3] + c[4] + c[5])) ^ (1 / x))
+
+		return math.abs(retval) == 1/0 and 0 or retval
+	end
+
+	return c[s] == 0 and 0 or f(s) / (f(1) * c[1] + f(2) * c[2] + f(3) * c[3] + f(4) * c[4] + f(5) * c[5])
+end
+
+local function GetWeightedRandom(pool, ratings)
+	-- apologies for the short variable names, but these are taken
+	-- directly from the formula this function is patterned after 
+
+	local c = {} -- count
+	local p = {[0] = 0, nil, nil, nil, nil, 1} -- probability
+	local x = Doolittle.db.profile.weight_size
+	local y = Doolittle.db.profile.weight_stars
+
+	for i = 1, 5 do
+		ratings[i] = ratings[i] * pool
+		c[i] = ratings[i]:size()
+	end
+
+	for s = 1, 4 do -- p[5] will always be 1 (delta precision), so don't bother calculating
+		p[s] = p[s - 1] + GetWeight(s, c, x, y) * c[s]
+	end
+
+	local rand = math.random()
+
+	for i = 1, 5 do
+		if rand < p[i] then
+			return ratings[i][ratings[i]()]
+		end
+	end
+end
 
 local function GetSelectedCompanion()
 	local mode = PetPaperDollFrameCompanionFrame.mode
@@ -202,14 +221,13 @@ end
 function Doolittle:BuildOptionsAndDefaults()
 	for mode in pairs{CRITTER=1, MOUNT=1} do
 		local main = options.main.args
-		local advanced = options.advanced.args[mode].args
 		local defaults = defaults.profile[mode]
 
 		main["random" .. mode] = {
 			name = L["OPT_RANDOM"](mode),
 			desc = L["OPT_RANDOM_DESC"](mode),
 			type = "select",
-			order = 10,
+			order = 20,
 			style = "dropdown",
 			get = function(info) return self.db.profile[mode].random end,
 			set = function(info, value) self.db.profile[mode].random = value end,
@@ -219,28 +237,6 @@ function Doolittle:BuildOptionsAndDefaults()
 				always = L["OPT_RANDOM_ALWAYS"],
 			},
 		}
-
-		advanced.weights = {
-			name = L["OPT_WEIGHTS"],
-			desc = L["OPT_WEIGHTS_DESC"],
-			type = "group",
-			inline = true,
-			args = {
-			},
-		}
-
-		for i = 1, 5 do
-			advanced.weights.args["rating" .. i] = {
-				name = L["OPT_WEIGHT_FOR"](mode, i),
-				type = "range",
-				width = "full",
-				min = 1,
-				max = 100,
-				step = 1,
-				get = function(info) return self.db.profile[mode].weights[i] end,
-				set = function(info, value) self.db.profile[mode].weights[i] = value end,
-			}
-		end
 
 		if mode == "MOUNT" then
 			for terrain, speeds in pairs(self.MOUNT.speeds) do
@@ -343,26 +339,7 @@ function Doolittle:CmdMount(macro)
 		return
 	end
 
-	pools = pools.ratings
-	local rating
-	local ratings = {}
-	local tickets = {}
-
-	for i = 1, 5 do
-		rating = pools[i] * pool
-
-		if rating:size() > 0 then
-			ratings[i] = rating
-
-			for j = 1, profile.weights[i] do
-				table.insert(tickets, i)
-			end
-		end
-	end
-
-	rating = tickets[math.random(#tickets)]
-
-	CallCompanion("MOUNT", ratings[rating][ratings[rating]()][1])
+	CallCompanion("MOUNT", GetWeightedRandom(pool, pools.ratings)[1])
 end
 
 function Doolittle:CmdOptions(which)
@@ -396,26 +373,7 @@ function Doolittle:CmdSummon()
 		return
 	end
 
-	pools = pools.ratings
-	local rating
-	local ratings = {}
-	local tickets = {}
-
-	for i = 1, 5 do
-		rating = pools[i] * pool
-
-		if rating:size() > 0 then
-			ratings[i] = rating
-
-			for j = 1, profile.weights[i] do
-				table.insert(tickets, i)
-			end
-		end
-	end
-
-	rating = tickets[math.random(#tickets)]
-
-	CallCompanion("CRITTER", ratings[rating][ratings[rating]()][1])
+	CallCompanion("CRITTER", GetWeightedRandom(pool, pools.ratings)[1])
 end
 
 function Doolittle:DisplayError(message)
@@ -506,12 +464,6 @@ end
 
 function Doolittle:ResetMacro()
 	self.db.profile.MOUNT.macro = nil
-	self.db:RegisterDefaults(defaults) -- rebuild metatable(s)
-end
-
-function Doolittle:ResetWeights()
-	self.db.profile.CRITTER.weights = nil
-	self.db.profile.MOUNT.weights = nil
 	self.db:RegisterDefaults(defaults) -- rebuild metatable(s)
 end
 
