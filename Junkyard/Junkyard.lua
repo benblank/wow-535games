@@ -84,8 +84,8 @@ local options = {
 				set = "SetOption",
 			},
 
-			repair_funds = {
-				name = L["OPT_REPAIR_FUNDS"],
+			repair_source = {
+				name = L["OPT_REPAIR_SOURCE"],
 				type = "select",
 				order = 35,
 				width = "full",
@@ -93,9 +93,9 @@ local options = {
 				set = "SetOption",
 
 				values = {
-					auto     = L["OPT_REPAIR_FUNDS_AUTO"],
-					guild    = L["OPT_REPAIR_FUNDS_GUILD"],
-					personal = L["OPT_REPAIR_FUNDS_PERSONAL"],
+					auto     = L["OPT_REPAIR_SOURCE_AUTO"],
+					guild    = L["OPT_REPAIR_SOURCE_GUILD"],
+					personal = L["OPT_REPAIR_SOURCE_PERSONAL"],
 				},
 			},
 
@@ -444,7 +444,7 @@ local defaults = {
 		open_skill = false,
 		open_trade = true,
 		prompt_sell = true,
-		repair_funds = "auto",
+		repair_source = "auto",
 
 		junk_list = {
 		},
@@ -605,11 +605,13 @@ function Junkyard:CmdRepair()
 		return
 	end
 
-	local funds = self.db.profile.repair_funds
+	local funds
+	local size = select(2, DEFAULT_CHAT_FRAME:GetFont())
+	local source = self.db.profile.repair_source
 
 	-- attempt repair from guild bank funds
-	if CanGuildBankRepair() and funds ~= "personal" then
-		local funds = GetGuildBankWithdrawMoney()
+	if CanGuildBankRepair() and source ~= "personal" then
+		funds = GetGuildBankWithdrawMoney()
 
 		-- withdraw limit is -1 for guild masters
 		if funds == -1 then
@@ -617,23 +619,26 @@ function Junkyard:CmdRepair()
 		end
 
 		if cost > funds then
-			self:Print(L["MSG_REPAIR_GUILD_POOR"])
+			self:Print(L["MSG_REPAIR_GUILD_POOR"](GetCoinTextureString(funds, size)))
 		else
 			RepairAllItems(1)
-			self:Print(L["MSG_REPAIR_GUILD"])
+			self:Print(L["MSG_REPAIR_GUILD"](GetCoinTextureString(cost, size)))
 			return
 		end
 	end
 
-	if funds ~= "guild" then
-		if cost > GetMoney() then
-			self:Print(L["MSG_REPAIR_PERSONAL_POOR"])
+	if source ~= "guild" then
+		funds = GetMoney()
+		if cost > funds then
+			self:Print(L["MSG_REPAIR_PERSONAL_POOR"](GetCoinTextureString(funds, size)))
 		else
 			RepairAllItems()
-			self:Print(L["MSG_REPAIR_PERSONAL"])
+			self:Print(L["MSG_REPAIR_PERSONAL"](GetCoinTextureString(cost, size)))
 			return
 		end
 	end
+
+	self:DisplayWarning(L["MSG_REPAIR_POOR"](GetCoinTextureString(cost, size)))
 end
 
 function Junkyard:CmdSell()
