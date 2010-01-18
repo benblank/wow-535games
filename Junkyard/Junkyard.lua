@@ -329,6 +329,15 @@ local options = {
 				set = "SetOption",
 			},
 
+			open_skill = {
+				name = L["OPT_BAGS_OPEN_SKILL"],
+				type = "toggle",
+				order = 65,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
+
 			open_trade = {
 				name = L["OPT_BAGS_OPEN_TRADE"],
 				type = "toggle",
@@ -389,6 +398,15 @@ local options = {
 				set = "SetOption",
 			},
 
+			close_skill = {
+				name = L["OPT_BAGS_CLOSE_SKILL"],
+				type = "toggle",
+				order = 135,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
+
 			close_trade = {
 				name = L["OPT_BAGS_CLOSE_TRADE"],
 				type = "toggle",
@@ -410,6 +428,7 @@ local defaults = {
 		close_guild = true,
 		close_mail = true,
 		close_merchant = true,
+		close_skill = false,
 		close_trade = true,
 		debug = false,
 		junk_light = false,
@@ -422,6 +441,7 @@ local defaults = {
 		open_guild = true,
 		open_mail = true,
 		open_merchant = true,
+		open_skill = false,
 		open_trade = true,
 		prompt_sell = true,
 		repair_funds = "auto",
@@ -456,6 +476,8 @@ local bag_events = {
 	MAIL_SHOW             = "open_mail",
 	MERCHANT_CLOSED       = "close_merchant",
 	MERCHANT_SHOW         = "open_merchant",
+	TRADE_SKILL_CLOSE     = "close_skill",
+	TRADE_SKILL_SHOW      = "open_skill",
 	TRADE_CLOSED          = "close_trade",
 	TRADE_SHOW            = "open_trade",
 }
@@ -766,18 +788,13 @@ function Junkyard:OnBagEvent(event)
 
 	if self.db.profile[action] then
 		if strsplit("_", action) == "open" then
-			-- "OpenAllBags" (from ContainerFrame.lua) doesn't actually open
-			-- all bags (at least, there's no way to guarantee it unless you
-			-- run CloseAllBags first), so this function is patterened after
-			-- CloseAllBags, which *always* works as expected.
-
-			OpenBackpack()
-
-			for i=1, NUM_CONTAINER_FRAMES, 1 do
+			for i = 0, 11 do
 				OpenBag(i)
 			end
 		else
-			CloseAllBags()
+			for i = 0, 11 do
+				CloseBag(i)
+			end
 		end
 	end
 end
@@ -793,6 +810,8 @@ function Junkyard:OnEnable()
 	self:RegisterEvent("GUILDBANKFRAME_OPENED", "OnBagEvent")
 	self:RegisterEvent("MAIL_CLOSED", "OnBagEvent")
 	self:RegisterEvent("MAIL_SHOW", "OnBagEvent")
+	self:RegisterEvent("TRADE_SKILL_CLOSE", "OnBagEvent")
+	self:RegisterEvent("TRADE_SKILL_SHOW", "OnBagEvent")
 	self:RegisterEvent("TRADE_CLOSED", "OnBagEvent")
 	self:RegisterEvent("TRADE_SHOW", "OnBagEvent")
 end
