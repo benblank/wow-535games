@@ -2,10 +2,10 @@
 ## Title: Junkyard
 ## Notes: Flexible junk seller and vendor helper.
 ## Author: Malefactor @ Draenor US
-## Version: 0.6
+## Version: svn
 ## SavedVariables: JunkyardDB
-## OptionalDeps: Ace3
-## X-Embeds: Ace3
+## OptionalDeps: Ace3, LibBabble-Inventory
+## X-Embeds: Ace3, LibBabble-Inventory
 
 embeds.xml
 Locales\locales.xml
