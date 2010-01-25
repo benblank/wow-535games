@@ -1,0 +1,21 @@
+## Interface: 30300
+## Title: Hitch
+## Notes: Tools, helpers, and automation for multiboxers.
+## Author: Malefactor
+## X-Author-Server: Draenor US
+## Version: svn
+## X-Website: http://code.google.com/p/wow-535games/
+## X-License: New BSD License
+## X-Category: Miscellaneous
+## X-Localizations: enUS
+## SavedVariables: HitchDB
+## OptionalDeps: Ace3
+## X-Embeds: Ace3
+
+embeds.xml
+Locales\locales.xml
+
+Hitch.lua
+
+Modules\Communication.lua
+Modules\Quests.lua
