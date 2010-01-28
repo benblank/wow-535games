@@ -10,8 +10,8 @@ Phase 1: What do I want the quests module to do, baseline?
 
   * Share a quest between all team members
   * Auto-accept quests from other team members
-  * ?Possible to auto-complete quests?  --check events to see if there's a way to turn quests in without alt-tabbing to activate the npc; some way to communicate that action between toons via the addon channel?  Probably not, too close to botting... still, worth checking. Maybe look at some of the daily quest auto-turn-in addons, see what they're hooking.
+ 
 
 Phase 2:
-
+  * ?Possible to auto-complete quests?  --check events to see if there's a way to turn quests in without alt-tabbing to activate the npc; some way to communicate that action between toons via the addon channel?  Probably not, too close to botting... still, worth checking. Maybe look at some of the daily quest auto-turn-in addons, see what they're hooking.
   * do I want to do some sort of quest tracking, to help see where I missed a step on a chain with which character?  Maybe some sort of quest completed log?  That might be a bit ambitious, and possibly redundant to the WoWHead quest stuff & Bliz XML feed.
