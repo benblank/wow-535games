@@ -1,0 +1,10 @@
+#summary Home page for Hitch, a WoW addon to help multiboxers manage their toons in-game.
+
+= Introduction =
+Hitch is a WoW addon for managing multiboxing toons in-game.
+
+This is a stub page so I can branch the Quests module off. Ben will probably fill this in at some point.
+
+= Details =
+
+HitchQuests is where I'm gathering my thoughts about what needs to work how. JV.
