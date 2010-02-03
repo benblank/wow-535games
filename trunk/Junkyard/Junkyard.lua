@@ -430,7 +430,6 @@ local defaults = {
 		close_merchant = true,
 		close_skill = false,
 		close_trade = true,
-		debug = false,
 		junk_light = false,
 		junk_poor = true,
 		junk_unusable = false,
@@ -517,7 +516,7 @@ local function ItemListTool(self, args, list, value, success, dupe)
 
 	if not found then
 		self:PrintError(L["MSG_INVALID_ITEM"])
-		if self.db.profile.debug then self:Print(args:gsub("|", "||")) end
+
 		return
 	end
 end
@@ -654,6 +653,7 @@ function Junkyard:CmdSell()
 	local items = {}
 	local level = UnitLevel("player")
 	local profile = self.db.profile
+	local sold = 0
 
 	for bag = 0, NUM_BAG_SLOTS do
 		slots = GetContainerNumSlots(bag)
@@ -722,9 +722,9 @@ function Junkyard:CmdSell()
 				end
 
 				if sell then
-					if profile.prompt_sell then
-						count = select(2, GetContainerItemInfo(bag, slot))
+					count = select(2, GetContainerItemInfo(bag, slot))
 
+					if profile.prompt_sell then
 						if indices[id] then
 							table.insert(items[indices[id]], {bag=bag, slot=slot, count=count})
 						else
@@ -734,6 +734,8 @@ function Junkyard:CmdSell()
 					else
 						ShowMerchantSellCursor(1)
 						UseContainerItem(bag, slot)
+
+						sold = sold + count * price
 					end
 				end
 			end
@@ -743,6 +745,10 @@ function Junkyard:CmdSell()
 	if #items > 0 then
 		self.frame:SetItems(items)
 		self.frame:Show()
+	end
+
+	if sold > 0 then
+		self:Print(L["MSG_SOLD"](GetCoinTextureString(sold, select(2, DEFAULT_CHAT_FRAME:GetFont()))))
 	end
 end
 
@@ -767,7 +773,7 @@ local function GetList(list)
 			-- occasionally, SetHyperlink will successfully cache the item
 			-- (i.e. not cause a disconnect) but the data still won't be
 			-- available immediately
-			link = "item #" .. id
+			link = L["UNKNOWN_ITEM"](id)
 			name = link
 		end
 
