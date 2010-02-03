@@ -38,6 +38,7 @@ if not L then
 end
 
 L["BUTTON_SELL"] = "Sell All"
+L["UNKNOWN_ITEM"] = function(id) return "Unknown item with ID " .. id .. " (close and reopen this window to view)" end
 
 L["MSG_INVALID_ITEM"] = "Not a valid item.  Please use a bare item ID (e.g. \"12345\"), an item reference (e.g. \"item:12345\" or \"item:12345:0:0:0:0:0:0:0\") or an item link (by shift-clicking on an item)."
 L["MSG_JUNK_ADDED"] = function(link) return "Added " .. link .. " to your \"junk\" list." end
@@ -56,6 +57,7 @@ L["MSG_REPAIR_INVALID"] = "This merchant cannot repair your equipment."
 L["MSG_REPAIR_PERSONAL"] = function(cost) return "Equipment repaired for " .. cost .. " using personal funds." end
 L["MSG_REPAIR_PERSONAL_POOR"] = function(funds) return "Insufficient personal funds for repair.  (" .. funds .. " available)" end
 L["MSG_REPAIR_POOR"] = function(cost) return "Could not repair equipment because " .. cost .. " was not available." end
+L["MSG_SOLD"] = function(total) return "Sold junk for " .. total .. "." end
 L["MSG_UNKNOWN_TYPE"] = function(link, type, subtype) return "Item " .. link .. " has unknown type \"" .. type .. ", " .. subtype .. "\" and will not be sold.  Please check to see if a new version of Junkyard is available." end
 
 L["OPT_AUTO_REPAIR"] = "Repair equipment at merchants"
