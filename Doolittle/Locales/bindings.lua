@@ -1,4 +1,4 @@
--- $Id: bindings.lua 56 2009-07-27 00:40:06Z dark.ryder $
+-- $Id$
 
 -- Copyright (c) 2009, Ben Blank
 --

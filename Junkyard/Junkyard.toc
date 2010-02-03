@@ -7,7 +7,7 @@
 ## OptionalDeps: Ace3, LibBabble-Inventory
 ## X-Embeds: Ace3, LibBabble-Inventory
 
-embeds.xml
+Libs\libs.xml
 Locales\locales.xml
 
 Junkyard.lua

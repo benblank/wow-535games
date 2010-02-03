@@ -12,7 +12,7 @@
 ## OptionalDeps: Ace3
 ## X-Embeds: Ace3
 
-embeds.xml
+Libs\libs.xml
 Locales\locales.xml
 
 Hitch.lua

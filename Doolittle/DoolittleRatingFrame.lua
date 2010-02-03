@@ -1,4 +1,4 @@
--- $Id: DoolittleRatingFrame.lua 51 2009-07-23 15:29:41Z dark.ryder $
+-- $Id$
 
 -- Copyright (c) 2009, Ben Blank
 --

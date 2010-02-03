@@ -1,4 +1,4 @@
--- $Id: Junkyard.lua 26 2009-06-14 01:50:29Z drdark $
+-- $Id$
 
 -- Copyright (c) 2009, Ben Blank
 --
