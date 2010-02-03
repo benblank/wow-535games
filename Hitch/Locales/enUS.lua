@@ -31,10 +31,10 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 -- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-local L = LibStub("AceLocale-3.0"):NewLocale("Doolittle", "enUS", true)
+local L = LibStub("AceLocale-3.0"):NewLocale("Hitch", "enUS", true)
 
 if not L then
 	return
 end
 
-L["PROMPT_TEAM_INVITE"] = function(master) return master .. " has invited you to join a multiboxing team." end
+L["PROMPT_TEAM_INVITE"] = function(leader) return leader .. " has invited you to join a Hitch team." end
