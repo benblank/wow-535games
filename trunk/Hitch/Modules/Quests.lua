@@ -1,4 +1,4 @@
--- $Id: Hitch.lua -1   $
+-- $Id$
 
 -- Copyright (c) 2009, Ben Blank
 --

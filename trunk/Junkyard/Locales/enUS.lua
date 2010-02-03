@@ -1,4 +1,4 @@
--- $Id: enUS.lua 23 2009-06-07 18:02:20Z drdark $
+-- $Id$
 
 -- Copyright (c) 2009, Ben Blank
 --

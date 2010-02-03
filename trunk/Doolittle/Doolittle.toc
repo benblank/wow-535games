@@ -12,7 +12,7 @@
 ## OptionalDeps: Ace3, LibAboutPanel, LibBabble-Zone
 ## X-Embeds: Ace3, LibAboutPanel, LibBabble-Zone
 
-embeds.xml
+Libs\libs.xml
 Locales\locales.xml
 
 Pool.lua
