@@ -33,5 +33,30 @@
 
 local LibStub = LibStub
 local Hitch = LibStub("AceAddon-3.0"):GetAddon("Hitch")
-local Communication = Hitch:NewModule("Communication", "AceEvent-3.0")
+local Hitch_Follow = Hitch:NewModule("Follow")
 local L = LibStub("AceLocale-3.0"):GetLocale("Hitch")
+
+function Hitch_Follow:OnEnable()
+	self:RegisterEvent("AUTOFOLLOW_BEGIN", "OnFollowStart")
+	self:RegisterEvent("AUTOFOLLOW_END", "OnFollowStop")
+end
+
+function Hitch_Follow:OnFollowStart(event, who)
+	self.following = Hitch:GetID(who)
+end
+
+function Hitch_Follow:OnFollowStop()
+	if self.following then
+		self:Send(self.following, "OnLostFollower", UnitName("player"))
+	end
+
+	self.following = nil
+end
+
+function Hitch_Follow:OnInitialize()
+	self.following = nil
+end
+
+function Hitch_Follow:OnLostFollower(follower)
+	RaidWarningFrame_OnEvent(RaidWarningFrame, "CHAT_MSG_RAID_WARNING", "Lost follower: " .. follower)
+end

@@ -17,5 +17,4 @@ Locales\locales.xml
 
 Hitch.lua
 
-Modules\Communication.lua
-Modules\Quests.lua
+Modules\modules.xml

@@ -33,5 +33,5 @@
 
 local LibStub = LibStub
 local Hitch = LibStub("AceAddon-3.0"):GetAddon("Hitch")
-local Quests = Hitch:NewModule("Quests", "AceEvent-3.0")
+local Hitch_Quests = Hitch:NewModule("Quests", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Hitch")
