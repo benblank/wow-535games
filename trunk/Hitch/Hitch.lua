@@ -37,12 +37,40 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Hitch")
 
 _G["Hitch"] = Hitch
 
+StaticPopupDialogs["HITCH_TEAM_INVITE"] = {
+	text = L["PROMPT_TEAM_INVITE"],
+	button1 = ACCEPT,
+	button2 = DECLINE,
+	sound = "igPlayerInvite",
+	timeout = 60,
+	whileDead = 1,
+	hideOnEscape = 1,
+
+	OnShow = function(self)
+		self.inviteAccepted = nil;
+	end,
+
+	OnAccept = function(self)
+		Hitch:AcceptInvite();
+
+		self.inviteAccepted = 1;
+	end,
+
+	OnCancel = function(self)
+		Hitch:DeclineInvite();
+	end,
+
+	OnHide = function(self)
+		if not self.inviteAccepted then
+			Hitch:DeclineInvite();
+		end
+	end,
+};
+
 Hitch:SetDefaultModuleLibraries("AceEvent-3.0")
 
 Hitch:SetDefaultModulePrototype({
-	Deserialize = function(self, ...) Hitch:Deserialize(...) end,
-	Print       = function(self, ...) Hitch:Print(...) end,
-	Serialize   = function(self, ...) Hitch:Serialize(...) end,
+	Print = function(self, ...) Hitch:Print(...) end,
 
 	Send = function(self, id, func, args)
 		Hitch:Send(id, self:GetName(), func, args)
@@ -61,30 +89,20 @@ local options = {
 
 local defaults = {
 	profile = {
+		team = { UnitName("player") },
 	},
 }
 
-local valid_ids = {"all", "leader", "followers", "follower1", "follower2", "follower3", "follower4", "player"}
+function Hitch:AcceptInvite()
+	-- this will be updated by a call from the leader; also clears "inviter"
+	self:SetTeam(self.names.inviter, self.names.player)
+	self:Send("leader", "Hitch", "OnAcceptInvite", self.names.player)
+end
 
-Hitch.ids = {
-	all = "all",
-	leader = "leader",
-	followers = "followers",
-	follower1 = "follower1",
-	follower2 = "follower2",
-	follower3 = "follower3",
-	follower4 = "follower4",
-	player = "player",
-
-	Palter = "leader",
-	Shatterhoof = "follower1",
-}
-
-Hitch.names = {
-	player = "Palter",
-	leader = "Palter",
-	follower1 = "Shatterhoof",
-}
+function Hitch:DeclineInvite()
+	self:Send("inviter", "Hitch", "OnDeclineInvite", self.names.player, L["REASON_CANCEL"])
+	self.names.inviter = nil
+end
 
 function Hitch:GetID(name)
 	local id = self.ids[name]
@@ -122,10 +140,50 @@ function Hitch:GetName(id)
 	return nil
 end
 
+function Hitch:Invite(follower)
+	if self.names.inviter then
+		-- can't invite while being invited
+		return
+	end
+
+	if self.names.invitee then
+		-- can't invite again during an invite
+		return
+	end
+
+	if self.ids[follower] then
+		-- already a teammate
+		return
+	end
+
+	if self.names.follower4 then
+		-- team is full
+		return
+	end
+
+	self.names.invitee = follower
+	self:Send("invitee", "Hitch", "OnInvite", self.names.player)
+end
+
+function Hitch:OnAcceptInvite(invitee)
+	if not self.names.follower1 then
+		self:SetTeam(self.names.player, invitee)
+	elseif not self.names.follower2 then
+		self:SetTeam(self.names.player, self.names.follower1, invitee)
+	elseif not self.names.follower3 then
+		self:SetTeam(self.names.player, self.names.follower1, self.names.follower2, invitee)
+	else
+		self:SetTeam(self.names.player, self.names.follower1, self.names.follower2, self.names.follower3, invitee)
+	end
+
+	self:Send("followers", "Hitch", "SetTeam", self.names.player, self.names.follower1, self.names.follower2, self.names.follower3, self.names.follower4)
+	self:Send("all", "Hitch", "OnTeamJoin", invitee)
+end
+
 function Hitch:OnCommReceived(prefix, message, channel)
 	local success, targets, module_name, func_name, args = self:Deserialize(message)
 
-	if not targets[UnitName("player")] then
+	if not targets[self.names.player] then
 		-- message is not targeted at this character
 		return
 	end
@@ -187,6 +245,46 @@ function Hitch:OnInitialize()
 	self.panels.main = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Hitch", "Hitch")
 
 	self:UpdateRoster()
+	self:SetTeam(unpack(self.db.profile.team))
+end
+
+function Hitch:OnInvite(inviter)
+	if self.names.follower1 then
+		-- already on a team
+
+		self.names.inviter = inviter
+		self:Send("inviter", "Hitch", "OnDeclineInvite", self.names.player, L["REASON_ON_TEAM"])
+		self.names.inviter = nil
+
+		return
+	end
+
+	if self.names.inviter then
+		-- currently showing an invite
+
+		if self.names.inviter ~= leader then
+			local real_inviter = self.names.inviter
+
+			self.names.inviter = inviter
+			self:Send("inviter", "Hitch", "OnDeclineInvite", self.names.player, L["REASON_BUSY"])
+			self.names.inviter = real_inviter
+		end
+
+		return
+	end
+
+	self.names.inviter = inviter
+	StaticPopup_Show("HITCH_TEAM_INVITE", inviter)
+end
+
+function Hitch:OnTeamJoin(invitee)
+	if invitee = self.names.player then
+		self:Print(L["MSG_JOINED_INVITEE"](self.names.leader))
+	elseif self.names.leader == self.names.player then
+		self:Print(L["MSG_JOINED_LEADER"](invitee))
+	else
+		self:Print(L["MSG_JOINED_FOLLOWER"](invitee))
+	end
 end
 
 function Hitch:Send(id, module, func, ...)
@@ -198,7 +296,7 @@ function Hitch:Send(id, module, func, ...)
 	end
 
 	local name
-	local player = UnitName("player")
+	local player = self.names.player
 	local targets = {}
 	local whispers = {}
 
@@ -258,7 +356,7 @@ function Hitch:Send(id, module, func, ...)
 	end
 
 	if id == "player" and not exclude_player then
-		name = UnitName("player")
+		name = self.names.player
 
 		if not targets[name] then
 			targets[name] = true
@@ -279,6 +377,34 @@ function Hitch:Send(id, module, func, ...)
 			self:OnCommReceived("HitchRPC", message, "LOCAL")
 		else
 			self:SendCommMessage("HitchRPC", message, "WHISPER", target, "NORMAL")
+		end
+	end
+end
+
+function Hitch:SetTeam(leader, ...)
+	self.db.profile.team = { leader, unpack(...) }
+
+	self.ids = {
+		all = "all",
+		leader = "leader",
+		followers = "followers",
+		follower1 = "follower1",
+		follower2 = "follower2",
+		follower3 = "follower3",
+		follower4 = "follower4",
+		player = "player",
+	}
+
+	self.names = {}
+
+	self.ids[leader] = "leader"
+	self.names.leader = leader
+	self.names.player = UnitName("player")
+
+	for i, follower in ipairs(...) do
+		if follower then
+			self.ids[follower] = "follower" .. i
+			self.names["follower" .. i] = follower
 		end
 	end
 end

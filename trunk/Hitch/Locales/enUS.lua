@@ -37,4 +37,11 @@ if not L then
 	return
 end
 
-L["PROMPT_TEAM_INVITE"] = function(leader) return leader .. " has invited you to join a Hitch team." end
+L["MSG_JOIN_FOLLOWER"] = function(follower) return follower .. " has joined the team." end
+L["MSG_JOIN_INVITEE"] = function(leader) return "You have joined " .. leader .. "'s team." end
+
+L["PROMPT_TEAM_INVITE"] = "%s has invited you to join a Hitch team."
+
+L["REASON_BUSY"] = "%s could not join your team because they are being invited by someone else."
+L["REASON_CANCEL"] = "%s did not accept your invitation."
+L["REASON_ON_TEAM"] = "%s is already on a team."
