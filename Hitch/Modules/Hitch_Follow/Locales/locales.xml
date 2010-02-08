@@ -1,4 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ /Development/WoW/Interface/FrameXML/UI.xsd">
-	<Include file="Hitch_Follow\Hitch_Follow.xml"/>
-	<Include file="Hitch_Quests\Hitch_Quests.xml"/>
+	<Script file="enUS.lua"/>
+
+	<Script file="bindings.lua"/>
 </Ui>
