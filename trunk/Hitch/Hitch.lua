@@ -75,6 +75,10 @@ Hitch:SetDefaultModulePrototype({
 	Send = function(self, id, func, args)
 		Hitch:Send(id, self:GetName(), func, args)
 	end,
+
+	SendName = function(self, id, func, args)
+		Hitch:SendName(id, self:GetName(), func, args)
+	end,
 })
 
 local options = {
@@ -94,14 +98,15 @@ local defaults = {
 }
 
 function Hitch:AcceptInvite()
-	-- this will be updated by a call from the leader; also clears "inviter"
-	self:SetTeam(self.names.inviter, self.names.player)
+	-- this will be updated by a call from the leader
+	self:SetTeam(self.inviter, self.names.player)
+	self.inviter = nil
 	self:Send("leader", "Hitch", "OnAcceptInvite", self.names.player)
 end
 
 function Hitch:DeclineInvite()
-	self:Send("inviter", "Hitch", "OnDeclineInvite", self.names.player, L["REASON_CANCEL"])
-	self.names.inviter = nil
+	self:SendName(self.inviter, "Hitch", "OnDeclineInvite", self.names.player, "REASON_CANCEL")
+	self.inviter = nil
 end
 
 function Hitch:GetID(name)
@@ -140,29 +145,29 @@ function Hitch:GetName(id)
 	return nil
 end
 
-function Hitch:Invite(follower)
-	if self.names.inviter then
-		-- can't invite while being invited
+function Hitch:Invite(invitee)
+	if self.inviter then
+		self:Print(L["REASON_INVITED"](invitee, self.inviter))
 		return
 	end
 
-	if self.names.invitee then
-		-- can't invite again during an invite
+	if self.invitee then
+		self:Print(L["REASON_INVITING"](invitee, self.invitee))
 		return
 	end
 
-	if self.ids[follower] then
-		-- already a teammate
+	if self.ids[invitee] then
+		self:Print(L["REASON_TEAMMATE"](invitee))
 		return
 	end
 
 	if self.names.follower4 then
-		-- team is full
+		self:Print(L["REASON_FULL"](invitee))
 		return
 	end
 
-	self.names.invitee = follower
-	self:Send("invitee", "Hitch", "OnInvite", self.names.player)
+	self.invitee = invitee
+	self:SendName(invitee, "Hitch", "OnInvite", self.names.player)
 end
 
 function Hitch:OnAcceptInvite(invitee)
@@ -176,6 +181,7 @@ function Hitch:OnAcceptInvite(invitee)
 		self:SetTeam(self.names.player, self.names.follower1, self.names.follower2, self.names.follower3, invitee)
 	end
 
+	self.invitee = nil
 	self:Send("followers", "Hitch", "SetTeam", self.names.player, self.names.follower1, self.names.follower2, self.names.follower3, self.names.follower4)
 	self:Send("all", "Hitch", "OnTeamJoin", invitee)
 end
@@ -183,15 +189,15 @@ end
 function Hitch:OnCommReceived(prefix, message, channel)
 	local success, targets, module_name, func_name, args = self:Deserialize(message)
 
-	if not targets[self.names.player] then
-		-- message is not targeted at this character
-		return
-	end
-
 	if not success then
 		--TODO: error handling (deserialization failure)
 
-		self:Print("deserialization failure")
+		self:Print("deserialization failure: " .. targets)
+		return
+	end
+
+	if channel == "PARTY" and not targets[self.names.player] then
+		-- party message not targeted at this character
 		return
 	end
 
@@ -229,6 +235,11 @@ function Hitch:OnCommReceived(prefix, message, channel)
 	func(module, unpack(args))
 end
 
+function Hitch:OnDeclineInvite(invitee, reason)
+	self:Print(L[reason](invitee))
+	self.invitee = nil
+end
+
 function Hitch:OnEnable()
 	self:RegisterComm("HitchRPC")
 	self:RegisterEvent("PARTY_MEMBERS_CHANGED", "UpdateRoster")
@@ -252,33 +263,27 @@ function Hitch:OnInvite(inviter)
 	if self.names.follower1 then
 		-- already on a team
 
-		self.names.inviter = inviter
-		self:Send("inviter", "Hitch", "OnDeclineInvite", self.names.player, L["REASON_ON_TEAM"])
-		self.names.inviter = nil
+		self:SendName(inviter, "Hitch", "OnDeclineInvite", self.names.player, "REASON_ON_TEAM")
 
 		return
 	end
 
-	if self.names.inviter then
+	if self.inviter then
 		-- currently showing an invite
 
-		if self.names.inviter ~= leader then
-			local real_inviter = self.names.inviter
-
-			self.names.inviter = inviter
-			self:Send("inviter", "Hitch", "OnDeclineInvite", self.names.player, L["REASON_BUSY"])
-			self.names.inviter = real_inviter
+		if self.inviter ~= inviter then
+			self:SendName(inviter, "Hitch", "OnDeclineInvite", self.names.player, "REASON_BUSY")
 		end
 
 		return
 	end
 
-	self.names.inviter = inviter
+	self.inviter = inviter
 	StaticPopup_Show("HITCH_TEAM_INVITE", inviter)
 end
 
 function Hitch:OnTeamJoin(invitee)
-	if invitee = self.names.player then
+	if invitee == self.names.player then
 		self:Print(L["MSG_JOINED_INVITEE"](self.names.leader))
 	elseif self.names.leader == self.names.player then
 		self:Print(L["MSG_JOINED_LEADER"](invitee))
@@ -297,6 +302,8 @@ function Hitch:Send(id, module, func, ...)
 
 	local name
 	local player = self.names.player
+	local nParty = 0
+	local party = {}
 	local targets = {}
 	local whispers = {}
 
@@ -307,8 +314,11 @@ function Hitch:Send(id, module, func, ...)
 			if not targets[name] then
 				targets[name] = true
 
-				if not self.roster[name] then
-					table.insert(whispers, name)
+				if self.roster[name] then
+					party[name] = true
+					nParty = nParty + 1
+				else
+					whispers[name] = true
 				end
 			end
 		end
@@ -323,8 +333,11 @@ function Hitch:Send(id, module, func, ...)
 					if not targets[name] then
 						targets[name] = true
 
-						if not self.roster[name] then
-							table.insert(whispers, name)
+						if self.roster[name] then
+							party[name] = true
+							nParty = nParty + 1
+						else
+							whispers[name] = true
 						end
 					end
 				end
@@ -347,8 +360,11 @@ function Hitch:Send(id, module, func, ...)
 				if not targets[name] then
 					targets[name] = true
 
-					if not self.roster[name] then
-						table.insert(whispers, name)
+					if self.roster[name] then
+						party[name] = true
+						nParty = nParty + 1
+					else
+						whispers[name] = true
 					end
 				end
 			end
@@ -362,28 +378,32 @@ function Hitch:Send(id, module, func, ...)
 			targets[name] = true
 
 			if not self.roster[name] then
-				table.insert(whispers, name)
+				whispers[name] = true
 			end
 		end
 	end
 
-	local message = self:Serialize(targets, module, func, {...})
+	if nParty then
+		self:SendCommMessage("HitchRPC", self:Serialize(targets, module, func, {...}), "PARTY", nil, "NORMAL")
+	end
 
-	self:SendCommMessage("HitchRPC", message, "PARTY", nil, "NORMAL")
+	for target, _ in pairs(whispers) do
+		self:SendName(target, module, func, ...)
+	end
+end
 
-	for _, target in ipairs(whispers) do
-		if target == player then
-			-- trigger callback directly rather than whispering oneself
-			self:OnCommReceived("HitchRPC", message, "LOCAL")
-		else
-			self:SendCommMessage("HitchRPC", message, "WHISPER", target, "NORMAL")
-		end
+function Hitch:SendName(name, module, func, ...)
+	local message = self:Serialize(nil, module, func, {...})
+
+	if name == self.names.player then
+		-- trigger callback directly rather than whispering oneself
+		self:OnCommReceived("HitchRPC", message, "LOCAL")
+	else
+		self:SendCommMessage("HitchRPC", message, "WHISPER", name, "NORMAL")
 	end
 end
 
 function Hitch:SetTeam(leader, ...)
-	self.db.profile.team = { leader, unpack(...) }
-
 	self.ids = {
 		all = "all",
 		leader = "leader",
@@ -395,17 +415,24 @@ function Hitch:SetTeam(leader, ...)
 		player = "player",
 	}
 
-	self.names = {}
+	self.names = {
+		leader = leader,
+		player = UnitName("player")
+	}
 
 	self.ids[leader] = "leader"
-	self.names.leader = leader
-	self.names.player = UnitName("player")
 
-	for i, follower in ipairs(...) do
-		if follower then
-			self.ids[follower] = "follower" .. i
-			self.names["follower" .. i] = follower
+	if ... then
+		self.db.profile.team = { leader, unpack(...) }
+
+		for i, follower in ipairs(...) do
+			if follower then
+				self.ids[follower] = "follower" .. i
+				self.names["follower" .. i] = follower
+			end
 		end
+	else
+		self.db.profile.team = { leader }
 	end
 end
 

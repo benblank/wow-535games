@@ -31,7 +31,9 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 -- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-local LibStub = LibStub
-local Hitch = LibStub("AceAddon-3.0"):GetAddon("Hitch")
-local Hitch_Quests = Hitch:NewModule("Quests", "AceEvent-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("Hitch")
+local L = LibStub("AceLocale-3.0"):NewLocale("Hitch_Quests", "enUS", true)
+
+if not L then
+	return
+end
+

@@ -31,21 +31,10 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 -- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-local L = LibStub("AceLocale-3.0"):NewLocale("Hitch", "enUS", true)
+local L = LibStub("AceLocale-3.0"):NewLocale("Hitch_Follow", "enUS", true)
 
 if not L then
 	return
 end
 
-L["MSG_JOIN_FOLLOWER"] = function(follower) return follower .. " has joined the team." end
-L["MSG_JOIN_INVITEE"] = function(leader) return "You have joined " .. leader .. "'s team." end
-
-L["PROMPT_TEAM_INVITE"] = "%s has invited you to join a Hitch team."
-
-L["REASON_BUSY"] = function(invitee) return invitee .. " could not join your team because they are being invited by someone else." end
-L["REASON_CANCEL"] = function(invitee) return invitee .. " did not accept your invitation." end
-L["REASON_FULL"] = function(invitee) return "You cannot invite " .. invitee .. " because your team is already full." end
-L["REASON_INVITED"] = function(invitee, inviter) return "You cannot invite " .. invitee .. " to your team because you are currently being invited to " .. inviter .. "'s team." end
-L["REASON_INVITING"] = function(invitee1, invitee) return "You cannot invite " .. invitee1 .. " to your team because you are currently inviting " .. invitee2 .. "." end
-L["REASON_ON_TEAM"] = function(invitee) return invitee .. " is already on a team." end
-L["REASON_TEAMMATE"] = function(invitee) return invitee .. " is already on your team." end
+L["MSG_FOLLOW_BROKE"] = function(follower) return follower .. " has stopped following you." end
