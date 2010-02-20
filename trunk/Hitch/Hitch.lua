@@ -404,31 +404,36 @@ function Hitch:SendName(name, module, func, ...)
 end
 
 function Hitch:SetTeam(leader, ...)
+	local player = UnitName("player")
+
 	self.ids = {
 		all = "all",
 		leader = "leader",
 		followers = "followers",
-		follower1 = "follower1",
-		follower2 = "follower2",
-		follower3 = "follower3",
-		follower4 = "follower4",
 		player = "player",
 	}
 
 	self.names = {
 		leader = leader,
-		player = UnitName("player")
+		player = player
 	}
 
 	self.ids[leader] = "leader"
+	self.ids[player] = "player"
+	self.names[leader] = leader
+	self.names[player] = player
 
 	if ... then
-		self.db.profile.team = { leader, unpack(...) }
+		self.db.profile.team = { leader, ... }
 
-		for i, follower in ipairs(...) do
+		for i, follower in ipairs({ ... }) do
 			if follower then
-				self.ids[follower] = "follower" .. i
-				self.names["follower" .. i] = follower
+				local id = "follower" .. i
+
+				self.ids[follower] = id
+				self.ids[id]       = id
+				self.names[follower] = follower
+				self.names[id]       = follower
 			end
 		end
 	else
