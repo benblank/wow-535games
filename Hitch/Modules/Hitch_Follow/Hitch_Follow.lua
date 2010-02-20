@@ -42,7 +42,8 @@ function Hitch_Follow:OnEnable()
 end
 
 function Hitch_Follow:OnFollowStart(event, who)
-	self.following = who
+	-- hack; GetName returns nil for non-teammates
+	self.following = Hitch:GetName(who)
 end
 
 function Hitch_Follow:OnFollowStop()

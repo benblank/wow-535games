@@ -37,8 +37,9 @@ if not L then
 	return
 end
 
-L["MSG_JOIN_FOLLOWER"] = function(follower) return follower .. " has joined the team." end
-L["MSG_JOIN_INVITEE"] = function(leader) return "You have joined " .. leader .. "'s team." end
+L["MSG_JOINED_FOLLOWER"] = function(follower) return follower .. " has joined the team." end
+L["MSG_JOINED_INVITEE"] = function(leader) return "You have joined " .. leader .. "'s team." end
+L["MSG_JOINED_LEADER"] = function(follower) return follower .. " has joined your team." end
 
 L["PROMPT_TEAM_INVITE"] = "%s has invited you to join a Hitch team."
 
