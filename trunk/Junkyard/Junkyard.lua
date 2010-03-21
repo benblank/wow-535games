@@ -693,7 +693,7 @@ function Junkyard:CmdSell()
 					sell = true
 				end
 
-				if profile.junk_light and type == "Armor" and soulbound and level >= (self.Armor[class][subtype] or 1000) then
+				if profile.junk_light and soulbound and type == "Armor" and subtype ~= "Back" and level >= (self.Armor[class][subtype] or 1000) then
 					sell = true
 				end
 
