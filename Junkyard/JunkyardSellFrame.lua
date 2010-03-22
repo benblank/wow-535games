@@ -131,7 +131,7 @@ function JunkyardSellFrameScrollFrame_Update(self)
 		JunkyardSellFrameItem1:SetPoint("TOPRIGHT", -26, -7);
 	end
 
-	local button, item, numitems, line, offset
+	local button, item, numitems, offset
 
 	numitems = #items
 	FauxScrollFrame_Update(self, numitems, lines, lineheight)
@@ -179,8 +179,6 @@ function JunkyardSellFrameScrollFrame_Update(self)
 end
 
 function JunkyardSellFrameSellAllButton_OnClick(self, button, down)
-	local i, info, item
-
 	for i, item in ipairs(items) do
 		for j, info in ipairs(item) do
 			ShowMerchantSellCursor(1)
