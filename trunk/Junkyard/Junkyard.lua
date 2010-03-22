@@ -429,7 +429,7 @@ local defaults = {
 		close_mail = true,
 		close_merchant = true,
 		close_skill = false,
-		close_trade = true,
+		close_trade = false,
 		junk_light = false,
 		junk_poor = true,
 		junk_unusable = false,
@@ -615,6 +615,8 @@ function Junkyard:CmdRepair()
 		-- withdraw limit is -1 for guild masters
 		if funds == -1 then
 			funds = GetGuildBankMoney()
+		else
+			funds = math.min(funds, GetGuildBankMoney())
 		end
 
 		if cost > funds then
@@ -796,35 +798,42 @@ end
 
 function Junkyard:OnBagEvent(event)
 	local action = bag_events[event]
+	local maxbag = 4
+
+	if action == "close_merchant" then
+		self.at_merchant = false
+		self.frame:Hide()
+	elseif action == "open_merchant" then
+		self.at_merchant = true
+
+		if CanMerchantRepair() and self.db.profile.auto_repair then
+			self:CmdRepair()
+		end
+
+		if self.db.profile.auto_sell then
+			self:CmdSell()
+		end
+	elseif action == "open_bank" or action == "close_bank" then
+		maxbag = 11
+	end
 
 	if self.db.profile[action] then
 		if strsplit("_", action) == "open" then
-			for i = 0, 11 do
-				OpenBag(i)
-			end
+			action = OpenBag
 		else
-			for i = 0, 11 do
-				CloseBag(i)
-			end
+			action = CloseBag
+		end
+
+		for i = 0, maxbag do
+			action(i)
 		end
 	end
 end
 
 function Junkyard:OnEnable()
-	self:RegisterEvent("MERCHANT_CLOSED", "OnMerchantClosed")
-	self:RegisterEvent("MERCHANT_SHOW", "OnMerchantShow")
-	self:RegisterEvent("AUCTION_HOUSE_CLOSED", "OnBagEvent")
-	self:RegisterEvent("AUCTION_HOUSE_SHOW", "OnBagEvent")
-	self:RegisterEvent("BANKFRAME_CLOSED", "OnBagEvent")
-	self:RegisterEvent("BANKFRAME_OPENED", "OnBagEvent")
-	self:RegisterEvent("GUILDBANKFRAME_CLOSED", "OnBagEvent")
-	self:RegisterEvent("GUILDBANKFRAME_OPENED", "OnBagEvent")
-	self:RegisterEvent("MAIL_CLOSED", "OnBagEvent")
-	self:RegisterEvent("MAIL_SHOW", "OnBagEvent")
-	self:RegisterEvent("TRADE_SKILL_CLOSE", "OnBagEvent")
-	self:RegisterEvent("TRADE_SKILL_SHOW", "OnBagEvent")
-	self:RegisterEvent("TRADE_CLOSED", "OnBagEvent")
-	self:RegisterEvent("TRADE_SHOW", "OnBagEvent")
+	for event, action in pairs(bag_events) do
+		self:RegisterEvent(event, "OnBagEvent")
+	end
 end
 
 function Junkyard:OnInitialize()
@@ -860,27 +869,6 @@ function Junkyard:OnInitialize()
 	self.frame = JunkyardSellFrame
 
 	self.at_merchant = false
-end
-
-function Junkyard:OnMerchantClosed()
-	self.at_merchant = false
-	self.frame:Hide()
-
-	self:OnBagEvent("MERCHANT_CLOSED")
-end
-
-function Junkyard:OnMerchantShow()
-	self.at_merchant = true
-
-	if CanMerchantRepair() and self.db.profile.auto_repair then
-		self:CmdRepair()
-	end
-
-	if self.db.profile.auto_sell then
-		self:CmdSell()
-	end
-
-	self:OnBagEvent("MERCHANT_SHOW")
 end
 
 function Junkyard:PrintError(message)
