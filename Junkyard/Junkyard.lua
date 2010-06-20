@@ -347,6 +347,24 @@ local options = {
 				set = "SetOption",
 			},
 
+			skip_ammo = {
+				name = L["OPT_BAGS_SKIP_AMMO"],
+				type = "toggle",
+				order = 75,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
+
+			skip_soul = {
+				name = L["OPT_BAGS_SKIP_SOUL"],
+				type = "toggle",
+				order = 76,
+				width = "full",
+				get = "GetOption",
+				set = "SetOption",
+			},
+
 			close = {
 				name = L["OPT_BAGS_CLOSE"],
 				type = "header",
@@ -444,6 +462,8 @@ local defaults = {
 		open_trade = true,
 		prompt_sell = true,
 		repair_source = "auto",
+		skip_ammo = true,
+		skip_soul = true,
 
 		junk_list = {
 		},
@@ -799,6 +819,7 @@ end
 function Junkyard:OnBagEvent(event)
 	local action = bag_events[event]
 	local maxbag = 4
+	local use_skips = false
 
 	if action == "close_merchant" then
 		self.at_merchant = false
@@ -820,12 +841,34 @@ function Junkyard:OnBagEvent(event)
 	if self.db.profile[action] then
 		if strsplit("_", action) == "open" then
 			action = OpenBag
+			use_skips = true
 		else
 			action = CloseBag
 		end
 
 		for i = 0, maxbag do
-			action(i)
+			repeat -- my kingdom for `continue` >.<
+				if use_skips then
+					bagtype = select(2, GetContainerNumFreeSlots(i))
+
+					-- quivers
+					if self.db.profile.skip_ammo and bagtype == 1 then
+						break
+					end
+
+					-- ammo bags
+					if self.db.profile.skip_ammo and bagtype == 2 then
+						break
+					end
+
+					-- soul bags
+					if self.db.profile.skip_soul and bagtype == 4 then
+						break
+					end
+				end
+
+				action(i)
+			until true
 		end
 	end
 end
