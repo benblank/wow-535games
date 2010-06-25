@@ -40,6 +40,9 @@ local strsplit = strsplit
 local tonumber = tonumber
 local UseContainerItem = UseContainerItem
 
+-- the meaning of the word "type" is overloaded by both WoW and AceConfig
+local typeof = type
+
 local L = LibStub("AceLocale-3.0"):GetLocale("Junkyard")
 local LBIR = LibStub("LibBabble-Inventory-3.0"):GetReverseLookupTable()
 
@@ -610,6 +613,12 @@ function Junkyard:CmdOptions(which)
 	end
 end
 
+function Junkyard:CmdIsJunk(id_or_link)
+	local is_junk, link = self:IsJunk(id_or_link)
+
+	self:Print(L["MSG_ISJUNK"](is_junk, link))
+end
+
 function Junkyard:CmdRepair()
 	if not self.at_merchant then
 		self:PrintError(L["MSG_NO_MERCHANT"])
@@ -668,13 +677,12 @@ function Junkyard:CmdSell()
 		return
 	end
 
-	local _, count, enchanted, gem1, gem2, gem3, gem4, gemmed, id, link, lsubtype, ltype, price, quality, sell, slot, slots, soulbound, subtype, type
+	local _, count, id, is_junk, link, price, quality, slots
 
 	local class = select(2, UnitClass("player"))
 	local indices = {}
 	local items = {}
 	local level = UnitLevel("player")
-	local profile = self.db.profile
 	local sold = 0
 
 	for bag = 0, NUM_BAG_SLOTS do
@@ -684,69 +692,12 @@ function Junkyard:CmdSell()
 			link = GetContainerItemLink(bag, slot)
 
 			if link then
-				sell = false
-				id, enchanted, gem1, gem2, gem3, gem4 = strsplit(":", link:sub(18))
-				id = tonumber(id)
-				enchanted = tonumber(enchanted) > 0
-				gemmed = tonumber(gem1) > 0 or tonumber(gem2) > 0 or tonumber(gem3) > 0 or tonumber(gem4) > 0
-				link, quality, _, _, ltype, lsubtype, _, _, _, price = select(2, GetItemInfo(id))
+				is_junk, _, id, quality, price = self:IsJunk(link)
 
-				if profile.junk_unusable or profile.junk_light then
-					type = LBIR[ltype]
-					subtype = LBIR[lsubtype]
-
-					if self[type] then
-						if self[type].known[subtype] then
-							self.tooltip:ClearLines()
-							self.tooltip:SetBagItem(bag, slot)
-							soulbound = JunkyardTooltipTextLeft2:GetText() == ITEM_SOULBOUND
-						else
-							soulbound = false -- prevent type-based sales from occurring
-							self:PrintWarning(L["MSG_UNKNOWN_TYPE"](link, ltype, lsubtype))
-						end
-					else
-						soulbound = false
-					end
-				else
-					soulbound = false
-				end
-
-				if profile.junk_poor and quality == 0 then
-					sell = true
-				end
-
-				if profile.junk_light and soulbound and type == "Armor" and subtype ~= "Back" and level >= (self.Armor[class][subtype] or 1000) then
-					sell = true
-				end
-
-				if profile.junk_unusable and soulbound and not self[type][class][subtype] then
-					sell = true
-				end
-
-				if profile.junk_list[id] then
-					sell = true
-				end
-
-				if price == 0 then
-					sell = false
-				end
-
-				if profile.notjunk_enchanted and enchanted then
-					sell = false
-				end
-
-				if profile.notjunk_gemmed and gemmed then
-					sell = false
-				end
-
-				if profile.notjunk_list[id] then
-					sell = false
-				end
-
-				if sell then
+				if is_junk then
 					count = select(2, GetContainerItemInfo(bag, slot))
 
-					if profile.prompt_sell then
+					if self.db.profile.prompt_sell then
 						if indices[id] then
 							table.insert(items[indices[id]], {bag=bag, slot=slot, count=count})
 						else
@@ -901,6 +852,7 @@ function Junkyard:OnInitialize()
 	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("JunkyardProfile", options.profile)
 	self.panels.profile = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("JunkyardProfile", options.profile.name, "Junkyard")
 
+	self:RegisterChatCommand("isjunk", "CmdIsJunk")
 	self:RegisterChatCommand("junkyard", "CmdOptions")
 	self:RegisterChatCommand("sell", "CmdSell")
 	self:RegisterChatCommand("repair", "CmdRepair")
@@ -922,4 +874,86 @@ end
 function Junkyard:PrintWarning(message)
 	self:Print("[|cffefea1aWarning|r] " .. message)
 	PlaySoundFile([[Sound\interface\Error.wav]])
+end
+
+function Junkyard:IsJunk(id_or_link)
+	local _, enchanted, gem1, gem2, gem3, gem4, gemmed, id, link, lsubtype, ltype, price, quality, slot, slots, soulbound, subtype, type
+
+	local is_junk = false
+	local profile = self.db.profile
+
+	-- IsJunk("7073")
+	if typeof(id_or_link) == "string" and id_or_link:match("^%d+$") then
+		id_or_link = tonumber(id_or_link)
+	end
+
+	-- IsJunk(7073)
+	if typeof(id_or_link) == "number" then
+		id = id_or_link
+		enchanted = false
+		gemmed = false
+		link, quality, _, _, ltype, lsubtype, _, _, _, price = select(2, GetItemInfo(id))
+
+	-- IsJunk("item:7073:0:0:0:0:0:0:0")
+	-- IsJunk("|cff9d9d9d|Hitem:7073:0:0:0:0:0:0:0|h[Broken Fang]|h|r")
+	else
+		link = strtrim(id_or_link)
+		id, enchanted, gem1, gem2, gem3, gem4 = strsplit(":", link:sub(link:sub(0, 1) == "|" and 18 or 6))
+		id = tonumber(id)
+		enchanted = tonumber(enchanted) > 0
+		gemmed = tonumber(gem1) > 0 or tonumber(gem2) > 0 or tonumber(gem3) > 0 or tonumber(gem4) > 0
+		quality, _, _, ltype, lsubtype, _, _, _, price = select(3, GetItemInfo(id))
+	end
+
+	if profile.junk_unusable or profile.junk_light then
+		type = LBIR[ltype]
+		subtype = LBIR[lsubtype]
+
+		if self[type] then
+			if self[type].known[subtype] then
+				self.tooltip:ClearLines()
+				self.tooltip:SetHyperlink(link)
+				soulbound = JunkyardTooltipTextLeft2:GetText() == ITEM_SOULBOUND
+			else
+				soulbound = false -- prevent type-based sales from occurring
+				self:PrintWarning(L["MSG_UNKNOWN_TYPE"](link, ltype, lsubtype))
+			end
+		else
+			soulbound = false
+		end
+	end
+
+	if profile.junk_poor and quality == 0 then
+		is_junk = true
+	end
+
+	if profile.junk_light and soulbound and type == "Armor" and subtype ~= "Back" and level >= (self.Armor[class][subtype] or 1000) then
+		is_junk = true
+	end
+
+	if profile.junk_unusable and soulbound and not self[type][class][subtype] then
+		is_junk = true
+	end
+
+	if profile.junk_list[id] then
+		is_junk = true
+	end
+
+	if price == 0 then
+		is_junk = false
+	end
+
+	if profile.notjunk_enchanted and enchanted then
+		is_junk = false
+	end
+
+	if profile.notjunk_gemmed and gemmed then
+		is_junk = false
+	end
+
+	if profile.notjunk_list[id] then
+		is_junk = false
+	end
+
+	return is_junk, link, id, quality, price -- extra values are used by CmdIsJunk and CmdSell
 end
