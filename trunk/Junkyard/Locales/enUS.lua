@@ -41,6 +41,7 @@ L["BUTTON_SELL"] = "Sell All"
 L["UNKNOWN_ITEM"] = function(id) return "Unknown item with ID " .. id .. " (close and reopen this window to view)" end
 
 L["MSG_INVALID_ITEM"] = "Not a valid item.  Please use a bare item ID (e.g. \"12345\"), an item reference (e.g. \"item:12345\" or \"item:12345:0:0:0:0:0:0:0\") or an item link (by shift-clicking on an item)."
+L["MSG_ISJUNK"] = function(is_junk, link) return link .. (is_junk and " IS junk" or " is NOT junk") end
 L["MSG_JUNK_ADDED"] = function(link) return "Added " .. link .. " to your \"junk\" list." end
 L["MSG_JUNK_ADDED_DUPE"] = function(link) return "Your \"junk\" list already contains " .. link .. "." end
 L["MSG_JUNK_REMOVED"] = function(link) return "Removed " .. link .. " from your \"junk\" list." end
