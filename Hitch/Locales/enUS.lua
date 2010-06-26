@@ -47,6 +47,6 @@ L["REASON_BUSY"] = function(invitee) return invitee .. " could not join your tea
 L["REASON_CANCEL"] = function(invitee) return invitee .. " did not accept your invitation." end
 L["REASON_FULL"] = function(invitee) return "You cannot invite " .. invitee .. " because your team is already full." end
 L["REASON_INVITED"] = function(invitee, inviter) return "You cannot invite " .. invitee .. " to your team because you are currently being invited to " .. inviter .. "'s team." end
-L["REASON_INVITING"] = function(invitee1, invitee) return "You cannot invite " .. invitee1 .. " to your team because you are currently inviting " .. invitee2 .. "." end
+L["REASON_INVITING"] = function(invitee1, invitee2) return "You cannot invite " .. invitee1 .. " to your team because you are currently inviting " .. invitee2 .. "." end
 L["REASON_ON_TEAM"] = function(invitee) return invitee .. " is already on a team." end
 L["REASON_TEAMMATE"] = function(invitee) return invitee .. " is already on your team." end
