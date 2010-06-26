@@ -47,22 +47,22 @@ StaticPopupDialogs["HITCH_TEAM_INVITE"] = {
 	hideOnEscape = 1,
 
 	OnShow = function(self)
-		self.inviteAccepted = nil;
+		self.inviteAccepted = nil
 	end,
 
 	OnAccept = function(self)
 		Hitch:AcceptInvite();
 
-		self.inviteAccepted = 1;
+		self.inviteAccepted = 1
 	end,
 
 	OnCancel = function(self)
-		Hitch:DeclineInvite();
+		Hitch:DeclineInvite()
 	end,
 
 	OnHide = function(self)
 		if not self.inviteAccepted then
-			Hitch:DeclineInvite();
+			Hitch:DeclineInvite()
 		end
 	end,
 };
