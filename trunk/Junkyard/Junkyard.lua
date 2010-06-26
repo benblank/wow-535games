@@ -614,9 +614,9 @@ function Junkyard:CmdOptions(which)
 end
 
 function Junkyard:CmdIsJunk(id_or_link)
-	local is_junk, link = self:IsJunk(id_or_link)
+	local is_junk, conditions, link = self:IsJunk(id_or_link)
 
-	self:Print(L["MSG_ISJUNK"](is_junk, link))
+	self:Print(L["MSG_ISJUNK"](is_junk, conditions, link))
 end
 
 function Junkyard:CmdRepair()
@@ -692,7 +692,7 @@ function Junkyard:CmdSell()
 			link = GetContainerItemLink(bag, slot)
 
 			if link then
-				is_junk, _, id, quality, price = self:IsJunk(link)
+				is_junk, _, _, id, quality, price = self:IsJunk(link)
 
 				if is_junk then
 					count = select(2, GetContainerItemInfo(bag, slot))
@@ -881,6 +881,7 @@ function Junkyard:IsJunk(id_or_link)
 
 	local is_junk = false
 	local profile = self.db.profile
+	local conditions = {}
 
 	-- IsJunk("7073")
 	if typeof(id_or_link) == "string" and id_or_link:match("^%d+$") then
@@ -925,35 +926,43 @@ function Junkyard:IsJunk(id_or_link)
 
 	if profile.junk_poor and quality == 0 then
 		is_junk = true
+		table.insert(conditions, "junk_poor")
 	end
 
 	if profile.junk_light and soulbound and type == "Armor" and subtype ~= "Back" and level >= (self.Armor[class][subtype] or 1000) then
 		is_junk = true
+		table.insert(conditions, "junk_light")
 	end
 
 	if profile.junk_unusable and soulbound and not self[type][class][subtype] then
 		is_junk = true
+		table.insert(conditions, "junk_unusable")
 	end
 
 	if profile.junk_list[id] then
 		is_junk = true
+		table.insert(conditions, "junk_list")
 	end
 
 	if price == 0 then
 		is_junk = false
+		table.insert(conditions, "price")
 	end
 
 	if profile.notjunk_enchanted and enchanted then
 		is_junk = false
+		table.insert(conditions, "notjunk_enchanted")
 	end
 
 	if profile.notjunk_gemmed and gemmed then
 		is_junk = false
+		table.insert(conditions, "notjunk_gemmed")
 	end
 
 	if profile.notjunk_list[id] then
 		is_junk = false
+		table.insert(conditions, "notjunk_list")
 	end
 
-	return is_junk, link, id, quality, price -- extra values are used by CmdIsJunk and CmdSell
+	return is_junk, conditions, link, id, quality, price -- extra values are used by CmdIsJunk and CmdSell
 end
