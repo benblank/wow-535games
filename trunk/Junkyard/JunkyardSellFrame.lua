@@ -33,7 +33,6 @@
 
 -- local references to commonly-used global variables for faster access
 local MoneyFrame_Update = MoneyFrame_Update
-local ShowMerchantSellCursor = ShowMerchantSellCursor
 local UseContainerItem = UseContainerItem
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Junkyard")
@@ -65,7 +64,6 @@ end
 
 function JunkyardSellFrameItem_OnClick(self, motion)
 	for i, info in ipairs(table.remove(items, GetItemFromID(self:GetID()))) do
-		ShowMerchantSellCursor(1)
 		UseContainerItem(info.bag, info.slot)
 	end
 
@@ -181,7 +179,6 @@ end
 function JunkyardSellFrameSellAllButton_OnClick(self, button, down)
 	for i, item in ipairs(items) do
 		for j, info in ipairs(item) do
-			ShowMerchantSellCursor(1)
 			UseContainerItem(info.bag, info.slot)
 		end
 	end
