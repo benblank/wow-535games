@@ -35,9 +35,10 @@
 local GetContainerItemLink = GetContainerItemLink
 local GetItemInfo = GetItemInfo
 local LibStub = LibStub
-local ShowMerchantSellCursor = ShowMerchantSellCursor
 local strsplit = strsplit
 local tonumber = tonumber
+local UnitClass = UnitClass
+local UnitLevel = UnitLevel
 local UseContainerItem = UseContainerItem
 
 -- the meaning of the word "type" is overloaded by both WoW and AceConfig
@@ -546,7 +547,7 @@ end
 
 local function RemoveSelected(list)
 	for key in pairs(opts_selected) do
-		list[opts_list[key]] = value or nil -- use nil instead of false to save memory and disk space
+		list[opts_list[key]] = nil
 	end
 
 	opts_selected = {}
@@ -679,10 +680,8 @@ function Junkyard:CmdSell()
 
 	local _, count, id, is_junk, link, price, quality, slots
 
-	local class = select(2, UnitClass("player"))
 	local indices = {}
 	local items = {}
-	local level = UnitLevel("player")
 	local sold = 0
 
 	for bag = 0, NUM_BAG_SLOTS do
@@ -705,7 +704,6 @@ function Junkyard:CmdSell()
 							indices[id] = #items
 						end
 					else
-						ShowMerchantSellCursor(1)
 						UseContainerItem(bag, slot)
 
 						sold = sold + count * price
@@ -877,7 +875,7 @@ function Junkyard:PrintWarning(message)
 end
 
 function Junkyard:IsJunk(id_or_link)
-	local _, enchanted, gem1, gem2, gem3, gem4, gemmed, id, link, lsubtype, ltype, price, quality, slot, slots, soulbound, subtype, type
+	local _, class, enchanted, gem1, gem2, gem3, gem4, gemmed, id, level, link, loc, lsubtype, ltype, price, quality, slot, slots, soulbound, subtype, type
 
 	local is_junk = false
 	local profile = self.db.profile
@@ -893,7 +891,7 @@ function Junkyard:IsJunk(id_or_link)
 		id = id_or_link
 		enchanted = false
 		gemmed = false
-		link, quality, _, _, ltype, lsubtype, _, _, _, price = select(2, GetItemInfo(id))
+		link, quality, _, _, ltype, lsubtype, _, loc, _, price = select(2, GetItemInfo(id))
 
 	-- IsJunk("item:7073:0:0:0:0:0:0:0")
 	-- IsJunk("|cff9d9d9d|Hitem:7073:0:0:0:0:0:0:0|h[Broken Fang]|h|r")
@@ -903,7 +901,7 @@ function Junkyard:IsJunk(id_or_link)
 		id = tonumber(id)
 		enchanted = tonumber(enchanted) > 0
 		gemmed = tonumber(gem1) > 0 or tonumber(gem2) > 0 or tonumber(gem3) > 0 or tonumber(gem4) > 0
-		quality, _, _, ltype, lsubtype, _, _, _, price = select(3, GetItemInfo(id))
+		quality, _, _, ltype, lsubtype, _, loc, _, price = select(3, GetItemInfo(id))
 	end
 
 	if profile.junk_unusable or profile.junk_light then
@@ -915,6 +913,11 @@ function Junkyard:IsJunk(id_or_link)
 				self.tooltip:ClearLines()
 				self.tooltip:SetHyperlink(link)
 				soulbound = JunkyardTooltipTextLeft2:GetText() == ITEM_SOULBOUND
+
+				if soulbound then
+					class = select(2, UnitClass("player"))
+					level = UnitLevel("player")
+				end
 			else
 				soulbound = false -- prevent type-based sales from occurring
 				self:PrintWarning(L["MSG_UNKNOWN_TYPE"](link, ltype, lsubtype))
@@ -929,7 +932,7 @@ function Junkyard:IsJunk(id_or_link)
 		table.insert(conditions, "junk_poor")
 	end
 
-	if profile.junk_light and soulbound and type == "Armor" and subtype ~= "Back" and level >= (self.Armor[class][subtype] or 1000) then
+	if profile.junk_light and soulbound and type == "Armor" and loc ~= "INVTYPE_CLOAK" and level >= (self.Armor[class][subtype] or 1000) then
 		is_junk = true
 		table.insert(conditions, "junk_light")
 	end
