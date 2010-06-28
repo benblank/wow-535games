@@ -617,7 +617,11 @@ end
 function Junkyard:CmdIsJunk(id_or_link)
 	local is_junk, conditions, link = self:IsJunk(id_or_link)
 
-	self:Print(L["MSG_ISJUNK"](is_junk, conditions, link))
+	if is_junk == nil then
+		self:Print(L["MSG_ISJUNK_USAGE"])
+	else
+		self:Print(L["MSG_ISJUNK"](is_junk, conditions, link))
+	end
 end
 
 function Junkyard:CmdRepair()
@@ -899,6 +903,12 @@ function Junkyard:IsJunk(id_or_link)
 		link = strtrim(id_or_link)
 		id, enchanted, gem1, gem2, gem3, gem4 = strsplit(":", link:sub(link:sub(0, 1) == "|" and 18 or 6))
 		id = tonumber(id)
+
+		if id == nil then
+			-- invalid argument
+			return nil
+		end
+
 		enchanted = tonumber(enchanted) > 0
 		gemmed = tonumber(gem1) > 0 or tonumber(gem2) > 0 or tonumber(gem3) > 0 or tonumber(gem4) > 0
 		quality, _, _, ltype, lsubtype, _, loc, _, price = select(3, GetItemInfo(id))
@@ -910,9 +920,42 @@ function Junkyard:IsJunk(id_or_link)
 
 		if self[type] then
 			if self[type].known[subtype] then
-				self.tooltip:ClearLines()
-				self.tooltip:SetHyperlink(link)
-				soulbound = JunkyardTooltipTextLeft2:GetText() == ITEM_SOULBOUND
+				-------------------
+				--   UGLY HACK   --
+				-------------------
+
+				-- Even with a hyperlink created from a bag item (which
+				-- uniquely identifies the item instance), :SetHyperlink never
+				-- reports whether the item is soulbound.  Instead, we must
+				-- hunt through the player's bags to see whether the item from
+				-- which the link was created exists there so that we can see
+				-- whether or not it's soulbound.  Yuck!
+
+				local slots
+
+				for bag = 0, NUM_BAG_SLOTS do
+					slots = GetContainerNumSlots(bag)
+
+					for slot = 1, slots do
+						if link == GetContainerItemLink(bag, slot) then
+							self.tooltip:ClearLines()
+							self.tooltip:SetBagItem(bag, slot)
+							soulbound = JunkyardTooltipTextLeft2:GetText() == ITEM_SOULBOUND
+
+							break
+						end
+					end
+
+					if soulbound ~= nil then
+						break
+					end
+				end
+
+				if soulbound == nil then
+					self.tooltip:ClearLines()
+					self.tooltip:SetHyperlink(link)
+					soulbound = JunkyardTooltipTextLeft2:GetText() == ITEM_SOULBOUND
+				end
 
 				if soulbound then
 					class = select(2, UnitClass("player"))
