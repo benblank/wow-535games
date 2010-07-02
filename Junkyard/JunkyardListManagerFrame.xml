@@ -1,0 +1,257 @@
+<!-- $Id$
+
+Copyright (c) 2009, Ben Blank
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+* Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+
+* Neither the name of 535 Design nor the names of its contributors
+  may be used to endorse or promote products derived from this
+  software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED.	IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ /Development/WoW/Interface/FrameXML/UI.xsd">
+	<Script file="JunkyardListManagerFrame.lua"/>
+
+	<Button name="JunkyardListManagerFrameItemTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="0" y="16"/>
+		</Size>
+
+		<Scripts>
+			<OnClick function="JunkyardListManagerFrameItem_OnClick"/>
+			<OnEnter function="JunkyardListManagerFrameItem_OnEnter"/>
+			<OnLeave function="JunkyardListManagerFrameItem_OnLeave"/>
+		</Scripts>
+
+		<ButtonText name="$parentText" setAllPoints="true" justifyH="LEFT"/>
+		<NormalFont style="GameFontHighlight"/>
+	</Button>
+
+	<Frame name="JunkyardListManagerFrame" parent="UIParent" frameStrata="FULLSCREEN_DIALOG" toplevel="true" enableMouse="true" movable="true" hidden="true">
+		<Size>
+			<AbsDimension x="400" y="236"/>
+		</Size>
+
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+
+		<Scripts>
+			<OnHide function="JunkyardListManagerFrame_OnHide"/>
+			<OnLoad function="JunkyardListManagerFrame_OnLoad"/>
+			<OnShow function="JunkyardListManagerFrame_OnShow"/>
+		</Scripts>
+
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset top="8" right="8" bottom="8" left="8"/>
+			</BackgroundInsets>
+
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="JunkyardListManagerFrameTitleTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<FontString name="JunkyardListManagerFrameTitleText" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="JunkyardListManagerFrameTitleTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<Button name="JunkyardListManagerFrameCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Frame name="JunkyardListManagerFrameListFrame">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="17" y="33"/>
+						</Offset>
+					</Anchor>
+
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-17" y="-28"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+
+					<BorderColor r="0.6" g="0.6" b="0.6"/>
+				</Backdrop>
+
+				<Frames>
+					<Frame name="JunkyardListManagerFrameItemHighlightFrame" hidden="true">
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="JunkyardListManagerFrameItemHighlight" file="Interface\Buttons\UI-Listbox-Highlight2"/>
+							</Layer>
+						</Layers>
+					</Frame>
+
+					<Button name="JunkyardListManagerFrameItem1" inherits="JunkyardListManagerFrameItemTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="8" y="-7"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardListManagerFrameItem2" inherits="JunkyardListManagerFrameItemTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardListManagerFrameItem1" relativePoint="BOTTOMLEFT"/>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardListManagerFrameItem1" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardListManagerFrameItem3" inherits="JunkyardListManagerFrameItemTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardListManagerFrameItem2" relativePoint="BOTTOMLEFT"/>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardListManagerFrameItem2" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardListManagerFrameItem4" inherits="JunkyardListManagerFrameItemTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardListManagerFrameItem3" relativePoint="BOTTOMLEFT"/>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardListManagerFrameItem3" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardListManagerFrameItem5" inherits="JunkyardListManagerFrameItemTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardListManagerFrameItem4" relativePoint="BOTTOMLEFT"/>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardListManagerFrameItem4" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardListManagerFrameItem6" inherits="JunkyardListManagerFrameItemTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardListManagerFrameItem5" relativePoint="BOTTOMLEFT"/>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardListManagerFrameItem5" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardListManagerFrameItem7" inherits="JunkyardListManagerFrameItemTemplate" id="7">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardListManagerFrameItem6" relativePoint="BOTTOMLEFT"/>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardListManagerFrameItem6" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardListManagerFrameItem8" inherits="JunkyardListManagerFrameItemTemplate" id="8">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardListManagerFrameItem7" relativePoint="BOTTOMLEFT"/>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardListManagerFrameItem7" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardListManagerFrameItem9" inherits="JunkyardListManagerFrameItemTemplate" id="9">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardListManagerFrameItem8" relativePoint="BOTTOMLEFT"/>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardListManagerFrameItem8" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<Button name="JunkyardListManagerFrameItem10" inherits="JunkyardListManagerFrameItemTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="JunkyardListManagerFrameItem9" relativePoint="BOTTOMLEFT"/>
+							<Anchor point="TOPRIGHT" relativeTo="JunkyardListManagerFrameItem9" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+
+					<ScrollFrame name="JunkyardListManagerFrameScrollFrame" inherits="FauxScrollFrameTemplate">
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="8" y="7"/>
+								</Offset>
+							</Anchor>
+
+							<Anchor point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-29" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+
+						<Scripts>
+							<OnVerticalScroll function="JunkyardListManagerFrameScrollFrame_OnVerticalScroll"/>
+						</Scripts>
+					</ScrollFrame>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
+</Ui>

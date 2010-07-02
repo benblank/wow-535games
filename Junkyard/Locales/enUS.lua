@@ -38,7 +38,7 @@ if not L then
 end
 
 L["BUTTON_SELL"] = "Sell All"
-L["UNKNOWN_ITEM"] = function(id) return "Unknown item with ID " .. id .. " (close and reopen this window to view)" end
+L["UNKNOWN_ITEM"] = function(id) return "Unknown item with ID " .. id .. " (try closing and reopening this window)" end
 
 L["MSG_INVALID_ITEM"] = "Not a valid item.  Please use a bare item ID (e.g. \"12345\"), an item reference (e.g. \"item:12345\" or \"item:12345:0:0:0:0:0:0:0\") or an item link (by shift-clicking on an item)."
 L["MSG_ISJUNK"] = function(is_junk, conditions, link) return link .. (is_junk and " IS junk" or " is NOT junk") .. (#conditions > 0 and " (" .. table.concat(conditions, ", ") .. ")" or "") end

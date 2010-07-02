@@ -42,7 +42,7 @@ local lineheight = 16
 
 local items, over
 
-local function GetItemFromID(id)
+local function GetIndexFromButton(id)
 	return FauxScrollFrame_GetOffset(JunkyardSellFrameScrollFrame) + tonumber(id)
 end
 
@@ -63,7 +63,7 @@ function JunkyardSellFrame_OnLoad(self)
 end
 
 function JunkyardSellFrameItem_OnClick(self, motion)
-	for i, info in ipairs(table.remove(items, GetItemFromID(self:GetID()))) do
+	for i, info in ipairs(table.remove(items, GetIndexFromButton(self:GetID()))) do
 		UseContainerItem(info.bag, info.slot)
 	end
 
@@ -76,7 +76,7 @@ function JunkyardSellFrameItem_OnEnter(self, motion)
 	local id = self:GetID()
 
 	if id ~= 0 then
-		local item = items[GetItemFromID(id)]
+		local item = items[GetIndexFromButton(id)]
 
 		GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
 
@@ -118,39 +118,40 @@ function JunkyardSellFrameScrollFrame_OnVerticalScroll(self, offset)
 end
 
 function JunkyardSellFrameScrollFrame_Update(self)
-	if #items == 0 then
+	local button, index, offset
+	local numitems = #items
+
+	if numitems == 0 then
 		JunkyardSellFrame:Hide()
 		return
 	end
 
-	if #items <= lines then
+	if numitems <= lines then
 		JunkyardSellFrameItem1:SetPoint("TOPRIGHT", -8, -7);
 	else
+		-- leave room for scroll bar
 		JunkyardSellFrameItem1:SetPoint("TOPRIGHT", -26, -7);
 	end
 
-	local button, item, numitems, offset
-
-	numitems = #items
 	FauxScrollFrame_Update(self, numitems, lines, lineheight)
 	offset = FauxScrollFrame_GetOffset(self)
 
 	for line = 1, lines do
-		item = line + offset
+		index = line + offset
 		button = _G["JunkyardSellFrameItem" .. line]
 
-		if item <= numitems then
+		if index <= numitems then
 			local count = 0
 
-			for _, info in ipairs(items[item]) do
+			for _, info in ipairs(items[index]) do
 				count = count + info.count
 			end
 
-			MoneyFrame_Update(_G["JunkyardSellFrameItem" .. line .. "MoneyFrame"], count * items[item][1].price)
+			MoneyFrame_Update(_G["JunkyardSellFrameItem" .. line .. "MoneyFrame"], count * items[index][1].price)
 
 			count = (count > 1) and (count .. "x ") or ""
 
-			button:SetText(count .. items[item][1].link)
+			button:SetText(count .. items[index][1].link)
 			button:Show()
 		else
 			button:Hide()
