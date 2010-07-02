@@ -951,6 +951,7 @@ function Junkyard:IsJunk(id_or_link)
 					end
 				end
 
+				-- I don't think this can ever set `soulbound` to true?
 				if soulbound == nil then
 					self.tooltip:ClearLines()
 					self.tooltip:SetHyperlink(link)

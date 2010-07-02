@@ -11,5 +11,6 @@ Libs\libs.xml
 Locales\locales.xml
 
 Junkyard.lua
+JunkyardListManagerFrame.xml
 JunkyardSellFrame.xml
 ClassData.lua
