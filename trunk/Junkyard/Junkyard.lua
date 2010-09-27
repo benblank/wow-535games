@@ -639,7 +639,6 @@ function Junkyard:CmdRepair()
 	end
 
 	local funds
-	local size = select(2, DEFAULT_CHAT_FRAME:GetFont())
 	local source = self.db.profile.repair_source
 
 	-- attempt repair from guild bank funds
@@ -654,10 +653,10 @@ function Junkyard:CmdRepair()
 		end
 
 		if cost > funds then
-			self:Print(L["MSG_REPAIR_GUILD_POOR"](GetCoinTextureString(funds, size)))
+			self:Print(L["MSG_REPAIR_GUILD_POOR"](GetCoinTextureString(funds, 0)))
 		else
 			RepairAllItems(1)
-			self:Print(L["MSG_REPAIR_GUILD"](GetCoinTextureString(cost, size)))
+			self:Print(L["MSG_REPAIR_GUILD"](GetCoinTextureString(cost, 0)))
 			return
 		end
 	end
@@ -665,15 +664,15 @@ function Junkyard:CmdRepair()
 	if source ~= "guild" then
 		funds = GetMoney()
 		if cost > funds then
-			self:Print(L["MSG_REPAIR_PERSONAL_POOR"](GetCoinTextureString(funds, size)))
+			self:Print(L["MSG_REPAIR_PERSONAL_POOR"](GetCoinTextureString(funds, 0)))
 		else
 			RepairAllItems()
-			self:Print(L["MSG_REPAIR_PERSONAL"](GetCoinTextureString(cost, size)))
+			self:Print(L["MSG_REPAIR_PERSONAL"](GetCoinTextureString(cost, 0)))
 			return
 		end
 	end
 
-	self:DisplayWarning(L["MSG_REPAIR_POOR"](GetCoinTextureString(cost, size)))
+	self:DisplayWarning(L["MSG_REPAIR_POOR"](GetCoinTextureString(cost, 0)))
 end
 
 function Junkyard:CmdSell()
@@ -723,7 +722,7 @@ function Junkyard:CmdSell()
 	end
 
 	if sold > 0 then
-		self:Print(L["MSG_SOLD"](GetCoinTextureString(sold, select(2, DEFAULT_CHAT_FRAME:GetFont()))))
+		self:Print(L["MSG_SOLD"](GetCoinTextureString(sold, 0)))
 	end
 end
 
