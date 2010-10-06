@@ -615,7 +615,32 @@ function Junkyard:CmdOptions(which)
 end
 
 function Junkyard:CmdIsJunk(id_or_link)
-	local is_junk, conditions, link = self:IsJunk(id_or_link)
+	-------------------
+	--   UGLY HACK   --
+	-------------------
+
+	-- Even with a hyperlink created from a bag item (which
+	-- uniquely identifies the item instance), :SetHyperlink never
+	-- reports whether the item is soulbound.  Instead, we must
+	-- hunt through the player's bags to see whether the item from
+	-- which the link was created exists there so that we can see
+	-- whether or not it's soulbound.  Yuck!
+
+	local slots, is_junk, conditions, link
+
+	for bag = 0, NUM_BAG_SLOTS do
+		slots = GetContainerNumSlots(bag)
+
+		for slot = 1, slots do
+			if id_or_link == GetContainerItemLink(bag, slot) then
+				is_junk, conditions, link = self:IsJunk(bag, slot)
+			end
+		end
+	end
+
+	if is_junk == nil then
+		is_junk, conditions, link = self:IsJunk(id_or_link)
+	end
 
 	if is_junk == nil then
 		self:Print(L["MSG_ISJUNK_USAGE"])
@@ -691,26 +716,22 @@ function Junkyard:CmdSell()
 		slots = GetContainerNumSlots(bag)
 
 		for slot = 1, slots do
-			link = GetContainerItemLink(bag, slot)
+			is_junk, _, link, id, quality, price = self:IsJunk(bag, slot)
 
-			if link then
-				is_junk, _, _, id, quality, price = self:IsJunk(link)
+			if is_junk then
+				count = select(2, GetContainerItemInfo(bag, slot))
 
-				if is_junk then
-					count = select(2, GetContainerItemInfo(bag, slot))
-
-					if self.db.profile.prompt_sell then
-						if indices[id] then
-							table.insert(items[indices[id]], {bag=bag, slot=slot, count=count})
-						else
-							table.insert(items, { {bag=bag, slot=slot, count=count, quality=quality, link=link, price=price} })
-							indices[id] = #items
-						end
+				if self.db.profile.prompt_sell then
+					if indices[id] then
+						table.insert(items[indices[id]], {bag=bag, slot=slot, count=count})
 					else
-						UseContainerItem(bag, slot)
-
-						sold = sold + count * price
+						table.insert(items, { {bag=bag, slot=slot, count=count, quality=quality, link=link, price=price} })
+						indices[id] = #items
 					end
+				else
+					UseContainerItem(bag, slot)
+
+					sold = sold + count * price
 				end
 			end
 		end
@@ -877,29 +898,29 @@ function Junkyard:PrintWarning(message)
 	PlaySoundFile([[Sound\interface\Error.wav]])
 end
 
-function Junkyard:IsJunk(id_or_link)
-	local _, class, enchanted, gem1, gem2, gem3, gem4, gemmed, id, level, link, loc, lsubtype, ltype, price, quality, slot, slots, soulbound, subtype, type
+function Junkyard:IsJunk(id_or_link, slot)
+	local _, class, enchanted, gem1, gem2, gem3, gem4, gemmed, id, level, link, loc, lsubtype, ltype, price, quality, soulbound, subtype, type
 
 	local is_junk = false
 	local profile = self.db.profile
 	local conditions = {}
 
-	-- IsJunk("7073")
-	if typeof(id_or_link) == "string" and id_or_link:match("^%d+$") then
-		id_or_link = tonumber(id_or_link)
-	end
+	if typeof(slot) == "number" or (typeof(id_or_link) == "string" and not id_or_link:match("^%d+$")) then
+		if typeof(slot) == "number" then
+			-- IsJunk(0, 11)
+			bag = id_or_link
+			link = GetContainerItemLink(bag, slot)
 
-	-- IsJunk(7073)
-	if typeof(id_or_link) == "number" then
-		id = id_or_link
-		enchanted = false
-		gemmed = false
-		link, quality, _, _, ltype, lsubtype, _, loc, _, price = select(2, GetItemInfo(id))
+			if link == nil then
+				-- empty bag slot
+				return nil
+			end
+		else
+			-- IsJunk("item:7073:0:0:0:0:0:0:0")
+			-- IsJunk("|cff9d9d9d|Hitem:7073:0:0:0:0:0:0:0|h[Broken Fang]|h|r")
+			link = strtrim(id_or_link)
+		end
 
-	-- IsJunk("item:7073:0:0:0:0:0:0:0")
-	-- IsJunk("|cff9d9d9d|Hitem:7073:0:0:0:0:0:0:0|h[Broken Fang]|h|r")
-	else
-		link = strtrim(id_or_link)
 		id, enchanted, gem1, gem2, gem3, gem4 = strsplit(":", link:sub(link:sub(0, 1) == "|" and 18 or 6))
 		id = tonumber(id)
 
@@ -911,51 +932,28 @@ function Junkyard:IsJunk(id_or_link)
 		enchanted = tonumber(enchanted) > 0
 		gemmed = tonumber(gem1) > 0 or tonumber(gem2) > 0 or tonumber(gem3) > 0 or tonumber(gem4) > 0
 		quality, _, _, ltype, lsubtype, _, loc, _, price = select(3, GetItemInfo(id))
+	else
+		-- IsJunk("7073")
+		if typeof(id_or_link) == "string" and id_or_link:match("^%d+$") then
+			id_or_link = tonumber(id_or_link)
+		end
+
+		-- IsJunk(7073)
+		id = id_or_link
+		enchanted = false
+		gemmed = false
+		link, quality, _, _, ltype, lsubtype, _, loc, _, price = select(2, GetItemInfo(id))
 	end
 
 	if profile.junk_unusable or profile.junk_light then
 		type = LBIR[ltype]
 		subtype = LBIR[lsubtype]
 
-		if self[type] then
+		if self[type] and typeof(slot) == "number" then
 			if self[type].known[subtype] then
-				-------------------
-				--   UGLY HACK   --
-				-------------------
-
-				-- Even with a hyperlink created from a bag item (which
-				-- uniquely identifies the item instance), :SetHyperlink never
-				-- reports whether the item is soulbound.  Instead, we must
-				-- hunt through the player's bags to see whether the item from
-				-- which the link was created exists there so that we can see
-				-- whether or not it's soulbound.  Yuck!
-
-				local slots
-
-				for bag = 0, NUM_BAG_SLOTS do
-					slots = GetContainerNumSlots(bag)
-
-					for slot = 1, slots do
-						if link == GetContainerItemLink(bag, slot) then
-							self.tooltip:ClearLines()
-							self.tooltip:SetBagItem(bag, slot)
-							soulbound = JunkyardTooltipTextLeft2:GetText() == ITEM_SOULBOUND
-
-							break
-						end
-					end
-
-					if soulbound ~= nil then
-						break
-					end
-				end
-
-				-- I don't think this can ever set `soulbound` to true?
-				if soulbound == nil then
-					self.tooltip:ClearLines()
-					self.tooltip:SetHyperlink(link)
-					soulbound = JunkyardTooltipTextLeft2:GetText() == ITEM_SOULBOUND
-				end
+				self.tooltip:ClearLines()
+				self.tooltip:SetBagItem(bag, slot)
+				soulbound = JunkyardTooltipTextLeft2:GetText() == ITEM_SOULBOUND
 
 				if soulbound then
 					class = select(2, UnitClass("player"))
