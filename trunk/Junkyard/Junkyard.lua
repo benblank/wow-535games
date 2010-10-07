@@ -505,6 +505,26 @@ local bag_events = {
 	TRADE_SHOW            = "open_trade",
 }
 
+local broker = LibStub("LibDataBroker-1.1", true):NewDataObject("Junkyard", {
+	type = "data source",
+	icon = [[Interface\GossipFrame\BankerGossipIcon]],
+	text = L["LABEL_JUNK"]
+})
+
+function broker:OnTooltipShow()
+	self:AddLine(L["LABEL_JUNK"])
+
+	for i, item in pairs(Junkyard.junk) do
+		local count = 0
+
+		for j, stack in pairs(item) do
+			count = count + stack.count
+		end
+
+		self:AddDoubleLine(count .. "x" .. item[1].link, GetCoinTextureString(count * item[1].price, 0))
+	end
+end
+
 local function ItemListTool(self, args, list, value, success, dupe)
 	local _, id, link, price
 
@@ -706,44 +726,25 @@ function Junkyard:CmdSell()
 		return
 	end
 
-	local _, count, id, is_junk, link, price, quality, slots
+	local slots
 
-	local indices = {}
-	local items = {}
-	local sold = 0
+	if self.db.profile.prompt_sell then
+		if #items > 0 then
+			self.frame:SetItems(items)
+			self.frame:Show()
+		end
+	else
+		for i, item in pairs(Junkyard.junk) do
+			local count = 0
 
-	for bag = 0, NUM_BAG_SLOTS do
-		slots = GetContainerNumSlots(bag)
-
-		for slot = 1, slots do
-			is_junk, _, link, id, quality, price = self:IsJunk(bag, slot)
-
-			if is_junk then
-				count = select(2, GetContainerItemInfo(bag, slot))
-
-				if self.db.profile.prompt_sell then
-					if indices[id] then
-						table.insert(items[indices[id]], {bag=bag, slot=slot, count=count})
-					else
-						table.insert(items, { {bag=bag, slot=slot, count=count, quality=quality, link=link, price=price} })
-						indices[id] = #items
-					end
-				else
-					UseContainerItem(bag, slot)
-
-					sold = sold + count * price
-				end
+			for j, stack in pairs(item) do
+				UseContainerItem(stack.bag, stack.slot)
 			end
 		end
-	end
 
-	if #items > 0 then
-		self.frame:SetItems(items)
-		self.frame:Show()
-	end
-
-	if sold > 0 then
-		self:Print(L["MSG_SOLD"](GetCoinTextureString(sold, 0)))
+		if self.junk_total > 0 then
+			self:Print(L["MSG_SOLD"](GetCoinTextureString(self.junk_total, 0)))
+		end
 	end
 end
 
@@ -846,7 +847,43 @@ function Junkyard:OnBagEvent(event)
 	end
 end
 
+function Junkyard:OnBagUpdate()
+	local _, count, id, is_junk, link, price, quality, slots
+
+	local indices = {}
+	local items = {}
+	local total = 0
+
+	for bag = 0, NUM_BAG_SLOTS do
+		slots = GetContainerNumSlots(bag)
+
+		for slot = 1, slots do
+			is_junk, _, link, id, quality, price = self:IsJunk(bag, slot)
+
+			if is_junk then
+				count = select(2, GetContainerItemInfo(bag, slot))
+
+				if indices[id] then
+					table.insert(items[indices[id]], {bag=bag, slot=slot, count=count})
+				else
+					table.insert(items, { {bag=bag, slot=slot, count=count, quality=quality, link=link, price=price} })
+					indices[id] = #items
+				end
+
+				total = total + count * price
+			end
+		end
+	end
+
+	self.junk = items
+	self.junk_total = total
+
+	broker.text = L["LABEL_JUNK"] .. GetCoinTextureString(total, 0)
+end
+
 function Junkyard:OnEnable()
+	self:RegisterEvent("BAG_UPDATE", "OnBagUpdate")
+
 	for event, action in pairs(bag_events) do
 		self:RegisterEvent(event, "OnBagEvent")
 	end
