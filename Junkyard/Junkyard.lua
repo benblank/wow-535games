@@ -521,7 +521,7 @@ function broker:OnTooltipShow()
 			count = count + stack.count
 		end
 
-		self:AddDoubleLine(count .. "x" .. item[1].link, GetCoinTextureString(count * item[1].price, 0))
+		self:AddDoubleLine(count .. "x " .. item[1].link, GetCoinTextureString(count * item[1].price, 0), 1, 1, 1, 1, 1, 1)
 	end
 end
 
@@ -563,6 +563,8 @@ local function ItemListTool(self, args, list, value, success, dupe)
 
 		return
 	end
+
+	self:ScanJunk()
 end
 
 local function RemoveSelected(list)
@@ -571,6 +573,8 @@ local function RemoveSelected(list)
 	end
 
 	opts_selected = {}
+
+	self:ScanJunk()
 end
 
 function Junkyard:GetOption(info)
@@ -579,6 +583,8 @@ end
 
 function Junkyard:SetOption(info, value)
 	self.db.profile[info[#info]] = value
+
+	self:ScanJunk()
 end
 
 function Junkyard:OptionsHack(info)
@@ -729,8 +735,8 @@ function Junkyard:CmdSell()
 	local slots
 
 	if self.db.profile.prompt_sell then
-		if #items > 0 then
-			self.frame:SetItems(items)
+		if #Junkyard.junk > 0 then
+			self.frame:SetItems(Junkyard.junk)
 			self.frame:Show()
 		end
 	else
@@ -847,7 +853,7 @@ function Junkyard:OnBagEvent(event)
 	end
 end
 
-function Junkyard:OnBagUpdate()
+function Junkyard:ScanJunk()
 	local _, count, id, is_junk, link, price, quality, slots
 
 	local indices = {}
@@ -882,7 +888,7 @@ function Junkyard:OnBagUpdate()
 end
 
 function Junkyard:OnEnable()
-	self:RegisterEvent("BAG_UPDATE", "OnBagUpdate")
+	self:RegisterEvent("BAG_UPDATE", "ScanJunk")
 
 	for event, action in pairs(bag_events) do
 		self:RegisterEvent(event, "OnBagEvent")
