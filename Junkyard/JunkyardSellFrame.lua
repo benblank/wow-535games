@@ -178,6 +178,8 @@ function JunkyardSellFrameScrollFrame_Update(self)
 end
 
 function JunkyardSellFrameSellAllButton_OnClick(self, button, down)
+	Junkyard.halt_scanning = true
+
 	for i, item in ipairs(items) do
 		for j, info in ipairs(item) do
 			UseContainerItem(info.bag, info.slot)
@@ -185,6 +187,9 @@ function JunkyardSellFrameSellAllButton_OnClick(self, button, down)
 	end
 
 	JunkyardSellFrame:Hide()
+
+	Junkyard.halt_scanning = false
+	Junkyard:ScanJunk()
 end
 
 function JunkyardSellFrameSellAllButton_OnLoad(self)
