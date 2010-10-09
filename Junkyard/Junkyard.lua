@@ -574,7 +574,7 @@ local function RemoveSelected(list)
 
 	opts_selected = {}
 
-	self:ScanJunk()
+	Junkyard:ScanJunk()
 end
 
 function Junkyard:GetOption(info)
