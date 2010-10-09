@@ -47,7 +47,7 @@ local typeof = type
 local L = LibStub("AceLocale-3.0"):GetLocale("Junkyard")
 local LBIR = LibStub("LibBabble-Inventory-3.0"):GetReverseLookupTable()
 
-Junkyard = LibStub("AceAddon-3.0"):NewAddon("Junkyard", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
+Junkyard = LibStub("AceAddon-3.0"):NewAddon("Junkyard", "AceBucket-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 
 local opts_list = {}
 local opts_selected = {}
@@ -732,6 +732,9 @@ function Junkyard:CmdSell()
 		return
 	end
 
+	-- in case BAG_UPDATE fires while selling
+	self.halt_scanning = true
+
 	local slots
 
 	if self.db.profile.prompt_sell then
@@ -752,6 +755,9 @@ function Junkyard:CmdSell()
 			self:Print(L["MSG_SOLD"](GetCoinTextureString(self.junk_total, 0)))
 		end
 	end
+
+	self.halt_scanning = false
+	self:ScanJunk()
 end
 
 local function GetList(list)
@@ -854,6 +860,10 @@ function Junkyard:OnBagEvent(event)
 end
 
 function Junkyard:ScanJunk()
+	if self.halt_scanning then
+		return
+	end
+
 	local _, count, id, is_junk, link, price, quality, slots
 
 	local indices = {}
@@ -888,7 +898,7 @@ function Junkyard:ScanJunk()
 end
 
 function Junkyard:OnEnable()
-	self:RegisterEvent("BAG_UPDATE", "ScanJunk")
+	self:RegisterBucketEvent("BAG_UPDATE", .5, "ScanJunk")
 
 	for event, action in pairs(bag_events) do
 		self:RegisterEvent(event, "OnBagEvent")
