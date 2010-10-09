@@ -511,6 +511,10 @@ local broker = LibStub("LibDataBroker-1.1", true):NewDataObject("Junkyard", {
 	text = L["LABEL_JUNK"]
 })
 
+function broker:OnClick()
+	Junkyard:CmdOptions("")
+end
+
 function broker:OnTooltipShow()
 	self:AddLine(L["LABEL_JUNK"])
 
