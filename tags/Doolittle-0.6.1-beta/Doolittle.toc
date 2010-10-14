@@ -1,0 +1,21 @@
+## Interface: 40000
+## Title: Doolittle
+## Notes: A manager and randomizer for your mounts and companions.  Give your favorites a higher rating to see them more often and never worry about
+## Author: Malefactor
+## X-Author-Server: Draenor US
+## Version: 0.6.1-beta
+## X-Website: http://code.google.com/p/wow-535games/
+## X-License: New BSD License
+## X-Category: Miscellaneous
+## X-Localizations: enUS
+## SavedVariables: DoolittleDB
+## OptionalDeps: Ace3, LibAboutPanel, LibBabble-Zone
+## X-Embeds: Ace3, LibAboutPanel, LibBabble-Zone
+
+Libs\libs.xml
+Locales\locales.xml
+
+Pool.lua
+Doolittle.lua
+DoolittleRatingFrame.xml
+CompanionData.lua
