@@ -1,4 +1,4 @@
-## Interface: 30300
+## Interface: 40000
 ## Title: Doolittle
 ## Notes: A manager and randomizer for your mounts and companions.  Give your favorites a higher rating to see them more often and never worry about
 ## Author: Malefactor
