@@ -32,7 +32,7 @@
 -- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 local LibStub = LibStub
-local PetPaperDollFrameCompanionFrame = PetPaperDollFrameCompanionFrame
+local SpellBookCompanionsFrame = SpellBookCompanionsFrame
 
 Doolittle = LibStub("AceAddon-3.0"):NewAddon("Doolittle", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 
@@ -197,8 +197,8 @@ local function GetWeightedRandom(pool, ratings)
 end
 
 local function GetSelectedCompanion()
-	local mode = PetPaperDollFrameCompanionFrame.mode
-	local spell = select(3, GetCompanionInfo(mode, PetPaperDollFrame_FindCompanionIndex()))
+	local mode = SpellBookCompanionsFrame.mode
+	local spell = select(3, GetCompanionInfo(mode, SpellBookCompanionsFrame_FindCompanionIndex()))
 
 	return mode, spell
 end
@@ -423,11 +423,11 @@ function Doolittle:OnCompanionUpdate(event, mode)
 end
 
 function Doolittle:OnEnable()
-	Doolittle:RegisterEvent("COMPANION_LEARNED", "OnCompanionUpdate")
-	Doolittle:RegisterEvent("COMPANION_UPDATE", "OnCompanionUpdate")
+	self:RegisterEvent("COMPANION_LEARNED", "OnCompanionUpdate")
+	self:RegisterEvent("COMPANION_UPDATE", "OnCompanionUpdate")
 
 	-- there's no real need for this to be a secure hook, but it has no side effects
-	Doolittle:SecureHook("PetPaperDollFrame_UpdateCompanionPreview", "OnPreviewUpdate")
+	self:SecureHook("SpellBookCompanionsFrame_UpdateCompanionPreview", "OnPreviewUpdate")
 
 	self:OnCompanionUpdate()
 end

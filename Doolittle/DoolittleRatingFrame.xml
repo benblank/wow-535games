@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		<NormalTexture name="$parentTexture" file="Interface\Addons\Doolittle\Star" setAllPoints="true"/>
 	</Button>
 
-	<Frame name="DoolittleRatingFrame" parent="CompanionModelFrame">
+	<Frame name="DoolittleRatingFrame" parent="SpellBookCompanionModelFrame">
 		<Size>
 			<AbsDimension x="128" y="44"/>
 		</Size>
