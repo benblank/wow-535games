@@ -36,15 +36,13 @@ local Junkyard = LibStub("AceAddon-3.0"):GetAddon("Junkyard")
 Junkyard.Armor = {
 	known = {
 		["Cloth"] = true,
-		["Idols"] = true,
 		["Leather"] = true,
 		["Librams"] = true,
 		["Mail"] = true,
 		["Miscellaneous"] = true,
 		["Plate"] = true,
 		["Shields"] = true,
-		["Sigils"] = true,
-		["Totems"] = true,
+		["Relic"] = true,
 	},
 
 	DEATHKNIGHT = {
@@ -53,7 +51,7 @@ Junkyard.Armor = {
 		["Mail"] = -1,
 		["Miscellaneous"] = 1000,
 		["Plate"] = 1000,
-		["Sigils"] = 1000,
+		["Relic"] = 1000,
 	},
 
 	DRUID = {
@@ -78,10 +76,10 @@ Junkyard.Armor = {
 	PALADIN = {
 		["Cloth"] = -1,
 		["Leather"] = -1,
-		["Librams"] = 1000,
 		["Mail"] = 50,
 		["Miscellaneous"] = 1000,
 		["Plate"] = 1000,
+		["Relic"] = 1000,
 		["Shields"] = 1000,
 	},
 
@@ -101,8 +99,8 @@ Junkyard.Armor = {
 		["Leather"] = 50,
 		["Mail"] = 1000,
 		["Miscellaneous"] = 1000,
+		["Relic"] = 1000,
 		["Shields"] = 1000,
-		["Totems"] = 1000,
 	},
 
 	WARLOCK = {
