@@ -481,8 +481,13 @@ local defaults = {
 			[10721] = true, -- Gnomish Harm Prevention Belt
 			[10724] = true, -- Gnomish Rocket Boots
 			[10726] = true, -- Gnomish Mind Control Cap
+			[12185] = true, -- Bloodsail Admiral's Hat
 			[19969] = true, -- Nat Pagle's Extreme Anglin' Boots
 			[19972] = true, -- Lucky Fishing Hat
+			[22742] = true, -- Bloodsail Shirt
+			[22743] = true, -- Bloodsail Sash
+			[22744] = true, -- Bloodsail Boots
+			[22745] = true, -- Bloodsail Pants
 			[33820] = true, -- Weather-Beaten Fishing Hat
 		},
 	},
