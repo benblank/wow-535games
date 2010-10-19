@@ -33,10 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
 <Bindings>
-	<Binding name="DOOLITTLE_OPTIONS" header="DOOLITTLE">
-		Doolittle:CmdOptions()
-	</Binding>
-
 	<Binding name="DOOLITTLE_SUMMON">
 		Doolittle:CmdSummon()
 	</Binding>

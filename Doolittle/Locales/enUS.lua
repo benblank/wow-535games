@@ -42,7 +42,6 @@ L["ERROR_LOW_WEIGHT"] = "You may not set weighting factors to less than 1."
 L["ERROR_NO_COMPANIONS"] = "You do not have any companions which can be used here."
 L["ERROR_NO_MOUNTS"] = function(mounted) return "You do not have any" .. (mounted and " other" or "") .. " mounts which can be used here." end
 
-L["KEY_OPTIONS"] = "Options"
 L["KEY_SUMMON"] = "Summon companion"
 L["KEY_MOUNT"] = "Summon mount"
 
