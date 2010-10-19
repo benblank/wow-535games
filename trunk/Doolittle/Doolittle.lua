@@ -51,14 +51,6 @@ local options = {
 				order = 10,
 				inline = true,
 				args = {
-					options = {
-						name = L["KEY_OPTIONS"],
-						type = "keybinding",
-						order = 10,
-						get = function(info) return GetBindingKey("DOOLITTLE_OPTIONS") end,
-						set = function(info, value) SetBinding(value, "DOOLITTLE_OPTIONS") SaveBindings(GetCurrentBindingSet()) end,
-					},
-
 					summon = {
 						name = L["KEY_SUMMON"],
 						type = "keybinding",
