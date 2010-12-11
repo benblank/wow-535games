@@ -150,7 +150,7 @@ local defaults = {
 
 local function GetWeight(s, c, x, y)
 	-- apologies for the short variable names, but these are taken
-	-- directly from the formula this function is patterned after 
+	-- directly from the formula this function is patterned after
 
 	local function f(n)
 		local retval = (y ^ ((n - 1) / 5)) / ((c[n] / (c[1] + c[2] + c[3] + c[4] + c[5])) ^ (1 / x))
@@ -163,7 +163,7 @@ end
 
 local function GetWeightedRandom(pool, ratings)
 	-- apologies for the short variable names, but these are taken
-	-- directly from the formula this function is patterned after 
+	-- directly from the formula this function is patterned after
 
 	local c = {} -- count
 	local p = {[0] = 0, nil, nil, nil, nil, 1} -- probability
@@ -229,45 +229,6 @@ function Doolittle:BuildOptionsAndDefaults()
 				always = L["OPT_RANDOM_ALWAYS"],
 			},
 		}
-
-		if mode == "MOUNT" then
-			for terrain, speeds in pairs(self.MOUNT.speeds) do
-				defaults[terrain] = {fastest = true}
-
-				main[terrain] = {
-					name = L["TERRAIN_HEADING_" .. terrain:upper()],
-					type = "group",
-					inline = true,
-					order = 100,
-					args = {
-						fastest = {
-							name = L["OPT_FASTEST_ONLY"],
-							desc = L["OPT_FASTEST_ONLY_DESC"],
-							type = "toggle",
-							width = "full",
-							get = function(info) return self.db.profile[mode][terrain].fastest end,
-							set = function(info, value) self.db.profile[mode][terrain].fastest = value end,
-						},
-					},
-				}
-
-				for speed, default in pairs(speeds) do
-					local sspeed = "speed" .. speed
-
-					defaults[terrain][sspeed] = default
-
-					main[terrain].args[sspeed] = {
-						name = L["OPT_INCLUDE_SPEED"](speed),
-						type = "toggle",
-						order = 1000 + speed,
-						width = "full",
-						disabled = function(info) return self.db.profile[mode][terrain].fastest end,
-						get = function(info) return self.db.profile[mode][terrain][sspeed] end,
-						set = function(info, value) self.db.profile[mode][terrain][sspeed] = value end,
-					}
-				end
-			end
-		end
 	end
 end
 
@@ -291,17 +252,19 @@ function Doolittle:CmdMount(macro)
 		command = SecureCmdOptionParse(defmacro)
 	end
 
+	local continent = GetCurrentMapContinent()
+
 	if command == "dismount" then
 		Dismount()
 		return
 	-- you can't fly in Wintergrasp when the battle is active
 	elseif command == "flying" and (zone == LBZ["Wintergrasp"] and GetWintergraspWaitTime() == nil) then
 		command = "ground"
-	-- you can't fly in Dalaran (except on Krasus' Landing)
-	elseif command == "flying" and (zone == LBZ["Dalaran"] and subzone ~= LBZ["Krasus' Landing"]) then
+	-- you can't fly in Azeroth w/o Flight Master's License
+	elseif command == "flying" and (continent == 1 or continent == 2) and not IsUsableSpell(GetSpellLink(90269):sub(27, -6)) then
 		command = "ground"
 	-- you can't fly in Northrend w/o Cold Weather Flying
-	elseif command == "flying" and GetCurrentMapContinent() == 4 and not IsUsableSpell(GetSpellLink(54197):sub(27, -6)) then
+	elseif command == "flying" and continent == 4 and not IsUsableSpell(GetSpellLink(54197):sub(27, -6)) then
 		command = "ground"
 	end
 
@@ -311,19 +274,31 @@ function Doolittle:CmdMount(macro)
 	end
 
 	local pool = self:GetMountPool(command)
+
+	if command == "swimming" then
+		if zone == LBZ["Vashj'ir"] or zone == LBZ["Shimmering Expanse"] or zone == LBZ["Kelp'thar Forest"] or zone == LBZ["Abyssal Depths"] then
+			local ratings = self.MOUNT.pools.ratings
+
+			-- Abyssal Seahorse
+			pool = Pool{ 75207 } * (ratings[1] + ratings[2] + ratings[3] + ratings[4] + ratings[5])
+		else
+			pool = pool - 75207
+		end
+	end
+
+	-- ground mounts can be used anywhere if no flying/swimming mounts are available
+	if not (pool:size() > 0) and command ~= "ground" then
+		pool = self:GetMountPool("ground")
+	end
+
 	local summoned = GetSummonedCompanion("MOUNT")
 
 	if summoned then
 		pool = pool - summoned
 	end
 
-	if GetRealZoneText() ~= LBZ["Temple of Ahn'Qiraj"] then
+	if command == "ground" and zone ~= LBZ["Temple of Ahn'Qiraj"] then
 		pool = pool - pools.aq40
-	end
-
-	-- ground mounts can be used anywhere if no flying/swimming mounts are available
-	if not (pool:size() > 0) and command ~= "ground" then
-		pool = self:GetMountPool("ground")
 	end
 
 	if not (pool:size() > 0) then
@@ -377,28 +352,10 @@ function Doolittle:GetCurrentRating()
 end
 
 function Doolittle:GetMountPool(terrain)
-	local pool
 	local pools = self.MOUNT.pools
 	local tpools = pools[terrain]
-	local profile = self.db.profile.MOUNT[terrain]
 
-	if profile.fastest then
-		if tpools.fastest < 0 then
-			return Pool{}
-		end
-
-		pool = tpools[tpools.fastest]
-	else
-		pool = Pool{}
-
-		for speed, default in pairs(profile) do
-			if speed:sub(1, 5) == "speed" then
-				pool = pool + tpools[tonumber(speed:sub(6))]
-			end
-		end
-	end
-
-	return pool * (pools.ratings[1] + pools.ratings[2] + pools.ratings[3] + pools.ratings[4] + pools.ratings[5])
+	return tpools * (pools.ratings[1] + pools.ratings[2] + pools.ratings[3] + pools.ratings[4] + pools.ratings[5])
 end
 
 function Doolittle:GetRating(mode, spell)
@@ -476,23 +433,6 @@ function Doolittle:ScanCompanions(mode)
 	end
 
 	pools.ratings = ratings
-
-	if mode == "MOUNT" then
-		local fastest
-		local known = ratings[1] + ratings[2] + ratings[3] + ratings[4] + ratings[5]
-
-		for terrain, speeds in pairs(self.MOUNT.speeds) do
-			pools[terrain].fastest = -1
-
-			for speed in pairs(speeds) do
-				fastest = known * pools[terrain][speed]
-
-				if fastest:size() > 0 and speed > pools[terrain].fastest then
-					pools[terrain].fastest = speed
-				end
-			end
-		end
-	end
 end
 
 function Doolittle:SetCurrentRating(newval)
