@@ -3,7 +3,7 @@
 ## Notes: A manager and randomizer for your mounts and companions.  Give your favorites a higher rating to see them more often and never worry about
 ## Author: Malefactor
 ## X-Author-Server: Draenor US
-## Version: svn
+## Version: 0.7-beta
 ## X-Website: http://code.google.com/p/wow-535games/
 ## X-License: New BSD License
 ## X-Category: Miscellaneous
