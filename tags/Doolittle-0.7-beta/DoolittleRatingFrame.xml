@@ -1,0 +1,133 @@
+<!-- $Id$
+
+Copyright (c) 2009, Ben Blank
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+* Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+
+* Neither the name of 535 Design nor the names of its contributors
+  may be used to endorse or promote products derived from this
+  software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED.	IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ /Development/WoW/Interface/FrameXML/UI.xsd">
+	<Script file="DoolittleRatingFrame.lua"/>
+
+	<Button name="DoolittleRatingFrameRatingTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+
+		<Scripts>
+			<OnClick function="DoolittleRatingFrameRating_OnClick"/>
+			<OnEnter function="DoolittleRatingFrameRating_OnEnter"/>
+			<OnLeave function="DoolittleRatingFrameRating_OnLeave"/>
+		</Scripts>
+	</Button>
+
+	<Button name="DoolittleRatingFrameRatingStarTemplate" inherits="DoolittleRatingFrameRatingTemplate" virtual="true">
+		<NormalTexture name="$parentTexture" file="Interface\Addons\Doolittle\Star" setAllPoints="true"/>
+	</Button>
+
+	<Frame name="DoolittleRatingFrame" parent="SpellBookCompanionModelFrame">
+		<Size>
+			<AbsDimension x="128" y="44"/>
+		</Size>
+
+		<Anchors>
+			<Anchor point="TOPRIGHT"/>
+		</Anchors>
+
+		<Layers>
+			<Layer>
+				<FontString name="DoolittleRatingFrameText" inherits="GameFontNormalSmall" justifyH="RIGHT" justifyV="BOTTOM" setAllPoints="true"/>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<Button name="DoolittleRatingFrameRating5" inherits="DoolittleRatingFrameRatingStarTemplate" frameLevel="11" id="5">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0.5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="DoolittleRatingFrameRating4" inherits="DoolittleRatingFrameRatingStarTemplate" frameLevel="12" id="4">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="DoolittleRatingFrameRating5">
+						<Offset>
+							<AbsDimension x="-16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="DoolittleRatingFrameRating3" inherits="DoolittleRatingFrameRatingStarTemplate" frameLevel="13" id="3">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="DoolittleRatingFrameRating4">
+						<Offset>
+							<AbsDimension x="-16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="DoolittleRatingFrameRating2" inherits="DoolittleRatingFrameRatingStarTemplate" frameLevel="14" id="2">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="DoolittleRatingFrameRating3">
+						<Offset>
+							<AbsDimension x="-16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="DoolittleRatingFrameRating1" inherits="DoolittleRatingFrameRatingStarTemplate" frameLevel="15" id="1">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="DoolittleRatingFrameRating2">
+						<Offset>
+							<AbsDimension x="-16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="DoolittleRatingFrameRating0" inherits="DoolittleRatingFrameRatingTemplate" frameLevel="10" id="0">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-96" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<NormalTexture name="$parentTexture" file="Interface\Addons\Doolittle\Exclude" setAllPoints="true"/>
+			</Button>
+		</Frames>
+	</Frame>
+</Ui>
