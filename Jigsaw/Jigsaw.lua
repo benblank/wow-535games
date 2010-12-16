@@ -59,10 +59,23 @@ local function FormatLines(id)
 	if count > 0 then
 		SetSelectedArtifact(id) -- omitting the second parameter selects the "current" artifact for the selected race
 
-		local base, bonus, total = GetArtifactProgress()
+		local base, _, total = GetArtifactProgress()
 		local name, _, rarity, icon, _, sockets = GetSelectedArtifactInfo()
+		local keystones = min(sockets, Jigsaw.keystones[id] or 0)
 
-		return "|T" .. icon .. ":0|t " .. select(4, GetItemQualityColor(rarity)) .. name .. "|r (" .. race .. ")", base .. string.rep("+", sockets) .. "/" .. total
+		local current = base
+
+		if keystones > 0 then
+			current = GREEN_FONT_COLOR_CODE .. (current + keystones * 12) .. string.rep("+", keystones) .. HIGHLIGHT_FONT_COLOR_CODE
+		else
+			current = HIGHLIGHT_FONT_COLOR_CODE ..current
+		end
+
+		if sockets > keystones then
+			current = current .. string.rep("+", sockets - keystones)
+		end
+
+		return "|T" .. icon .. ":0|t " .. select(4, GetItemQualityColor(rarity)) .. name .. "|r (" .. race .. ")", current .. "/" .. total
 	else
 		return race
 	end
@@ -85,6 +98,7 @@ function broker:OnTooltipShow()
 end
 
 function Jigsaw:OnEnable()
+	self:RegisterEvent("BAG_UPDATE", "ScanKeystones")
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE", "ScanCurrency")
 end
 
@@ -92,14 +106,16 @@ function Jigsaw:OnInitialize()
 	self.byid = {}
 	self.byname = {}
 	self.bycurrency = {}
+	self.bykeystone = {}
 
 	for id = 1, GetNumArchaeologyRaces() do
-		local name, currency = GetArchaeologyRaceInfo(id)
+		local name, currency, _, keystone = GetArchaeologyRaceInfo(id)
 		local info = { id = id, name = name, currency = currency }
 
 		self.byid[id] = info
 		self.byname[name] = info
 		self.bycurrency[currency] = info
+		self.bykeystone[keystone] = info
 	end
 end
 
@@ -119,4 +135,20 @@ function Jigsaw:ScanCurrency()
 	end
 
 	self.currency = scan
+end
+
+function Jigsaw:ScanKeystones()
+	local scan = {}
+
+	for bag = 0, 4 do
+		for slot = 1, GetContainerNumSlots(bag) do
+			local info = self.bykeystone[GetContainerItemID(bag, slot)]
+
+			if info then
+				scan[info.id] = (scan[info.id] or 0) + select(2, GetContainerItemInfo(bag, slot))
+			end
+		end
+	end
+
+	self.keystones = scan
 end
