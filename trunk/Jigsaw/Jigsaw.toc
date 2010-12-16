@@ -3,6 +3,7 @@
 ## Notes: Broker display for archaeology.
 ## Author: Malefactor @ Draenor US
 ## Version: svn
+## SavedVariables: JigsawDB
 ## OptionalDeps: Ace3
 ## X-Embeds: Ace3
 
