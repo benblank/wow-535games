@@ -43,6 +43,7 @@ local options = {
 
 local defaults = {
 	profile = {
+		recent = nil,
 	},
 }
 
@@ -52,7 +53,11 @@ local broker = LibStub("LibDataBroker-1.1", true):NewDataObject("Jigsaw", {
 	icon = [[Interface\Archeology\Arch-Icon-Marker]],
 })
 
-local function FormatLines(id)
+function Jigsaw:FormatLines(id)
+	if not self.keystones then
+		self:ScanKeystones()
+	end
+
 	local name, currency = GetArchaeologyRaceInfo(id)
 	local count = GetNumArtifactsByRace(id)
 
@@ -61,7 +66,7 @@ local function FormatLines(id)
 
 		local base, _, total = GetArtifactProgress()
 		local item, _, rarity, icon, _, sockets = GetSelectedArtifactInfo()
-		local keystones = min(sockets, Jigsaw.keystones[id] or 0)
+		local keystones = min(sockets, self.keystones[id] or 0)
 
 		local current = base
 
@@ -89,7 +94,7 @@ function broker:OnTooltipShow()
 	self:AddLine(ARCHAEOLOGY_CURRENT)
 
 	for id = 1, GetNumArchaeologyRaces() do
-		local artifact, progress = FormatLines(id)
+		local artifact, progress = Jigsaw:FormatLines(id)
 
 		if progress then
 			self:AddDoubleLine(artifact, progress)
@@ -100,9 +105,14 @@ end
 function Jigsaw:OnEnable()
 	self:RegisterEvent("BAG_UPDATE", "ScanKeystones")
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE", "ScanCurrency")
+	self:RegisterEvent("ARTIFACT_COMPLETE", "ScanCurrency")
+
+	self:SetText()
 end
 
 function Jigsaw:OnInitialize()
+	self.db = LibStub("AceDB-3.0"):New("JigsawDB", defaults)
+
 	self.byid = {}
 	self.byname = {}
 	self.bycurrency = {}
@@ -127,10 +137,9 @@ function Jigsaw:ScanCurrency()
 
 		scan[currency] = amount
 
-		if self.currency and self.currency[currency] < amount then
-			local artifact, progress = FormatLines(info.id)
-
-			broker.text = artifact .. " " .. progress
+		if self.currency and self.currency[currency] ~= amount then
+			self.db.profile.recent = info.name
+			self:SetText()
 		end
 	end
 
@@ -151,4 +160,12 @@ function Jigsaw:ScanKeystones()
 	end
 
 	self.keystones = scan
+end
+
+function Jigsaw:SetText()
+	if self.db.profile.recent then
+		local artifact, progress = self:FormatLines(self.byname[self.db.profile.recent].id)
+
+		broker.text = artifact .. " " .. progress
+	end
 end
