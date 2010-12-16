@@ -31,8 +31,6 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 -- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-local L = LibStub("AceLocale-3.0"):GetLocale("Jigsaw")
-
 Jigsaw = LibStub("AceAddon-3.0"):NewAddon("Jigsaw", "AceEvent-3.0")
 
 local options = {
@@ -54,10 +52,20 @@ local broker = LibStub("LibDataBroker-1.1", true):NewDataObject("Jigsaw", {
 	icon = [[Interface\Archeology\Arch-Icon-Marker]],
 })
 
-function Jigsaw:OnEnable()
-end
+local function FormatLines(id)
+	local race, currency = GetArchaeologyRaceInfo(id)
+	local count = GetNumArtifactsByRace(id)
 
-function Jigsaw:OnInitialize()
+	if count > 0 then
+		SetSelectedArtifact(id) -- omitting the second parameter selects the "current" artifact for the selected race
+
+		local base, bonus, total = GetArtifactProgress()
+		local name, _, rarity, icon, _, sockets = GetSelectedArtifactInfo()
+
+		return "|T" .. icon .. ":0|t " .. select(4, GetItemQualityColor(rarity)) .. name .. "|r (" .. race .. ")", base .. string.rep("+", sockets) .. "/" .. total
+	else
+		return race
+	end
 end
 
 function broker:OnClick()
@@ -68,16 +76,47 @@ function broker:OnTooltipShow()
 	self:AddLine(ARCHAEOLOGY_CURRENT)
 
 	for id = 1, GetNumArchaeologyRaces() do
-		local race, currency = GetArchaeologyRaceInfo(id)
-		local count = GetNumArtifactsByRace(id)
+		local artifact, progress = FormatLines(id)
 
-		if count > 0 then
-			SetSelectedArtifact(id) -- omitting the second parameter selects the "current" artifact for the selected race
-
-			local base, bonus, total = GetArtifactProgress()
-			local name, _, rarity, icon, _, sockets = GetSelectedArtifactInfo()
-
-			self:AddDoubleLine(race .. ": ", base .. string.rep("+", sockets) .. "/" .. total)
+		if progress then
+			self:AddDoubleLine(artifact, progress)
 		end
 	end
+end
+
+function Jigsaw:OnEnable()
+	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE", "ScanCurrency")
+end
+
+function Jigsaw:OnInitialize()
+	self.byid = {}
+	self.byname = {}
+	self.bycurrency = {}
+
+	for id = 1, GetNumArchaeologyRaces() do
+		local name, currency = GetArchaeologyRaceInfo(id)
+		local info = { id = id, name = name, currency = currency }
+
+		self.byid[id] = info
+		self.byname[name] = info
+		self.bycurrency[currency] = info
+	end
+end
+
+function Jigsaw:ScanCurrency()
+	local scan = {}
+
+	for currency, info in pairs(self.bycurrency) do
+		local amount = select(2, GetCurrencyInfo(currency))
+
+		scan[currency] = amount
+
+		if self.currency and self.currency[currency] < amount then
+			local artifact, progress = FormatLines(info.id)
+
+			broker.text = artifact .. " " .. progress
+		end
+	end
+
+	self.currency = scan
 end
