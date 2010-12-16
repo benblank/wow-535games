@@ -53,14 +53,14 @@ local broker = LibStub("LibDataBroker-1.1", true):NewDataObject("Jigsaw", {
 })
 
 local function FormatLines(id)
-	local race, currency = GetArchaeologyRaceInfo(id)
+	local name, currency = GetArchaeologyRaceInfo(id)
 	local count = GetNumArtifactsByRace(id)
 
 	if count > 0 then
 		SetSelectedArtifact(id) -- omitting the second parameter selects the "current" artifact for the selected race
 
 		local base, _, total = GetArtifactProgress()
-		local name, _, rarity, icon, _, sockets = GetSelectedArtifactInfo()
+		local item, _, rarity, icon, _, sockets = GetSelectedArtifactInfo()
 		local keystones = min(sockets, Jigsaw.keystones[id] or 0)
 
 		local current = base
@@ -75,9 +75,9 @@ local function FormatLines(id)
 			current = current .. string.rep("+", sockets - keystones)
 		end
 
-		return "|T" .. icon .. ":0|t " .. select(4, GetItemQualityColor(rarity)) .. name .. "|r (" .. race .. ")", current .. "/" .. total
+		return "|T" .. icon .. ":0|t " .. select(4, GetItemQualityColor(rarity)) .. item .. "|r (" .. name .. ")", current .. "/" .. total
 	else
-		return race
+		return name
 	end
 end
 
