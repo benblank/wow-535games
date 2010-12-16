@@ -119,7 +119,12 @@ function Pool(a)
 	local c = {}
 
 	setmetatable(c, mt)
-	for _, v in ipairs(a) do c[v] = true end
+
+	if #a then
+		for _, v in ipairs(a) do c[v] = true end
+	else
+		for k, _ in pairs(a) do c[k] = true end
+	end
 
 	return c
 end

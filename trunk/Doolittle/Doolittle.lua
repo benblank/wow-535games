@@ -38,6 +38,7 @@ Doolittle = LibStub("AceAddon-3.0"):NewAddon("Doolittle", "AceConsole-3.0", "Ace
 
 local L = LibStub("AceLocale-3.0"):GetLocale("Doolittle")
 local LBZ = LibStub("LibBabble-Zone-3.0"):GetLookupTable()
+local LM = LibStub("LibMounts-1.0")
 
 local options = {
 	main = {
@@ -277,7 +278,7 @@ function Doolittle:CmdMount(macro)
 
 	if command == "swimming" then
 		if zone == LBZ["Vashj'ir"] or zone == LBZ["Shimmering Expanse"] or zone == LBZ["Kelp'thar Forest"] or zone == LBZ["Abyssal Depths"] then
-			local ratings = self.MOUNT.pools.ratings
+			local ratings = pools.ratings
 
 			-- Abyssal Seahorse
 			pool = Pool{ 75207 } * (ratings[1] + ratings[2] + ratings[3] + ratings[4] + ratings[5])
@@ -333,7 +334,7 @@ function Doolittle:CmdSummon()
 
 	-- TODO: generalize this?
 	-- TODO: check for reagent/option?
-	pool = pool - pools.i17202
+	--pool = pool - pools.i17202
 
 	if not (pool:size() > 0) then
 		self:DisplayError(L["ERROR_NO_COMPANIONS"])
@@ -382,6 +383,15 @@ function Doolittle:OnEnable()
 end
 
 function Doolittle:OnInitialize()
+	self.CRITTER = { pools = { } }
+
+	self.MOUNT = { pools = {
+		aq40     = LM:GetMountList("Temple of Ahn'Qiraj", Pool{}),
+		flying   = LM:GetMountList("air", Pool{}),
+		ground   = LM:GetMountList("ground", Pool{}),
+		swimming = LM:GetMountList("water", Pool{}),
+	} }
+
 	self:BuildOptionsAndDefaults() -- sets defaults; MUST be before AceDB call
 
 	self.db = LibStub("AceDB-3.0"):New("DoolittleDB", defaults)
