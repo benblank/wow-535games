@@ -12,4 +12,5 @@
 	<Include file="Ace3\AceHook-3.0\AceHook-3.0.xml"/>
 	<Include file="LibAboutPanel\lib.xml"/>
 	<Include file="LibBabble-Zone-3.0\lib.xml"/>
+	<Include file="LibMounts-1.0\lib.xml"/>
 </Ui>

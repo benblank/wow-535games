@@ -18,4 +18,3 @@ Locales\locales.xml
 Pool.lua
 Doolittle.lua
 DoolittleRatingFrame.xml
-CompanionData.lua
