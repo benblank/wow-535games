@@ -53,11 +53,7 @@ local broker = LibStub("LibDataBroker-1.1", true):NewDataObject("Jigsaw", {
 	icon = [[Interface\Archeology\Arch-Icon-Marker]],
 })
 
-function Jigsaw:FormatLines(id)
-	if not self.keystones then
-		self:ScanKeystones()
-	end
-
+function Jigsaw:FormatProgress(id)
 	local name, currency = GetArchaeologyRaceInfo(id)
 	local count = GetNumArtifactsByRace(id)
 
@@ -66,7 +62,7 @@ function Jigsaw:FormatLines(id)
 
 		local base, _, total = GetArtifactProgress()
 		local item, _, rarity, icon, _, sockets = GetSelectedArtifactInfo()
-		local keystones = min(sockets, self.keystones[id] or 0)
+		local keystones = min(sockets, GetItemCount(self.byid[id].keystone))
 
 		local current = base
 
@@ -80,7 +76,8 @@ function Jigsaw:FormatLines(id)
 			current = current .. string.rep("+", sockets - keystones)
 		end
 
-		return "|T" .. icon .. ":0|t " .. select(4, GetItemQualityColor(rarity)) .. item .. "|r (" .. name .. ")", current .. "/" .. total
+		-- there is no reliable way to get the artifact *item*'s quality, so fake it by converting "common" (1) to "rare" (3)
+		return name, "|T" .. icon .. ":0|t " .. select(4, GetItemQualityColor(rarity * 3)) .. item .. "|r", current .. "/" .. total .. "|r"
 	else
 		return name
 	end
@@ -94,16 +91,15 @@ function broker:OnTooltipShow()
 	self:AddLine(ARCHAEOLOGY_CURRENT)
 
 	for id = 1, GetNumArchaeologyRaces() do
-		local artifact, progress = Jigsaw:FormatLines(id)
+		local name, artifact, progress = Jigsaw:FormatProgress(id)
 
 		if progress then
-			self:AddDoubleLine(artifact, progress)
+			self:AddDoubleLine(artifact .. " (" .. name .. ")", progress)
 		end
 	end
 end
 
 function Jigsaw:OnEnable()
-	self:RegisterEvent("BAG_UPDATE", "ScanKeystones")
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE", "ScanCurrency")
 	self:RegisterEvent("ARTIFACT_COMPLETE", "ScanCurrency")
 
@@ -120,7 +116,7 @@ function Jigsaw:OnInitialize()
 
 	for id = 1, GetNumArchaeologyRaces() do
 		local name, currency, _, keystone = GetArchaeologyRaceInfo(id)
-		local info = { id = id, name = name, currency = currency }
+		local info = { id = id, name = name, currency = currency, keystone = keystone }
 
 		self.byid[id] = info
 		self.byname[name] = info
@@ -146,26 +142,10 @@ function Jigsaw:ScanCurrency()
 	self.currency = scan
 end
 
-function Jigsaw:ScanKeystones()
-	local scan = {}
-
-	for bag = 0, 4 do
-		for slot = 1, GetContainerNumSlots(bag) do
-			local info = self.bykeystone[GetContainerItemID(bag, slot)]
-
-			if info then
-				scan[info.id] = (scan[info.id] or 0) + select(2, GetContainerItemInfo(bag, slot))
-			end
-		end
-	end
-
-	self.keystones = scan
-end
-
 function Jigsaw:SetText()
 	if self.db.profile.recent then
-		local artifact, progress = self:FormatLines(self.byname[self.db.profile.recent].id)
+		local name, artifact, progress = self:FormatProgress(self.byname[self.db.profile.recent].id)
 
-		broker.text = artifact .. " " .. progress
+		broker.text = name .. " " .. progress
 	end
 end
