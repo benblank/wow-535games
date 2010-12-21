@@ -100,15 +100,33 @@ function broker:OnTooltipShow()
 end
 
 function Jigsaw:OnEnable()
-	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE", "ScanCurrency")
-	self:RegisterEvent("ARTIFACT_COMPLETE", "ScanCurrency")
-
-	self:SetText()
+	self:RegisterEvent("PLAYER_ALIVE", "ScanRaces")
 end
 
 function Jigsaw:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("JigsawDB", defaults)
+end
 
+function Jigsaw:ScanCurrency()
+	local scan = {}
+
+	for currency, info in pairs(self.bycurrency) do
+		local amount = select(2, GetCurrencyInfo(currency))
+
+		scan[currency] = amount
+
+		if self.currency and self.currency[currency] ~= amount then
+			self.db.profile.recent = info.name
+			self:UpdateText()
+		end
+	end
+
+	self.currency = scan
+end
+
+-- this function is essentially a surrogate for OnEnabled, as archaeology
+-- functions don't return proper values at PLAYER_LOGIN but do at PLAYER_ALIVE
+function Jigsaw:ScanRaces(event)
 	self.byid = {}
 	self.byname = {}
 	self.bycurrency = {}
@@ -123,27 +141,17 @@ function Jigsaw:OnInitialize()
 		self.bycurrency[currency] = info
 		self.bykeystone[keystone] = info
 	end
+
+	self:ScanCurrency()
+	self:UpdateText()
+
+	self:UnregisterEvent(event)
+	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE", "ScanCurrency")
+	self:RegisterEvent("ARTIFACT_COMPLETE", "ScanCurrency")
 end
 
-function Jigsaw:ScanCurrency()
-	local scan = {}
-
-	for currency, info in pairs(self.bycurrency) do
-		local amount = select(2, GetCurrencyInfo(currency))
-
-		scan[currency] = amount
-
-		if self.currency and self.currency[currency] ~= amount then
-			self.db.profile.recent = info.name
-			self:SetText()
-		end
-	end
-
-	self.currency = scan
-end
-
-function Jigsaw:SetText()
-	if self.db.profile.recent then
+function Jigsaw:UpdateText()
+	if self.byid and self.byid[1] and self.db.profile.recent then
 		local name, artifact, progress = self:FormatProgress(self.byname[self.db.profile.recent].id)
 
 		broker.text = name .. " " .. progress

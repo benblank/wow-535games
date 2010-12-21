@@ -1,6 +1,6 @@
 ## Interface: 40000
 ## Title: Jigsaw
-## Notes: Broker display for archaeology.
+## Notes: Piece together those artifacts!
 ## Author: Malefactor @ Draenor US
 ## Version: svn
 ## SavedVariables: JigsawDB
