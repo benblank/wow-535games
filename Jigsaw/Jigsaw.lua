@@ -54,6 +54,10 @@ local broker = LibStub("LibDataBroker-1.1", true):NewDataObject("Jigsaw", {
 })
 
 function Jigsaw:FormatProgress(id)
+	if not (self.ready or self:ScanRaces()) then
+		return
+	end
+
 	local name, currency = GetArchaeologyRaceInfo(id)
 	local count = GetNumArtifactsByRace(id)
 
@@ -100,6 +104,9 @@ function broker:OnTooltipShow()
 end
 
 function Jigsaw:OnEnable()
+	self:RegisterEvent("ARTIFACT_COMPLETE", "ScanCurrency")
+	self:RegisterEvent("ARTIFACT_UPDATE", "UpdateText")
+	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE", "ScanCurrency")
 	self:RegisterEvent("PLAYER_ALIVE", "ScanRaces")
 end
 
@@ -108,6 +115,10 @@ function Jigsaw:OnInitialize()
 end
 
 function Jigsaw:ScanCurrency()
+	if not (self.ready or self:ScanRaces()) then
+		return
+	end
+
 	local scan = {}
 
 	for currency, info in pairs(self.bycurrency) do
@@ -124,15 +135,20 @@ function Jigsaw:ScanCurrency()
 	self.currency = scan
 end
 
--- this function is essentially a surrogate for OnEnabled, as archaeology
--- functions don't return proper values at PLAYER_LOGIN but do at PLAYER_ALIVE
 function Jigsaw:ScanRaces(event)
+	local count = GetNumArchaeologyRaces()
+
+	if count == 0 then
+		self.ready = false
+		return self.ready
+	end
+
 	self.byid = {}
 	self.byname = {}
 	self.bycurrency = {}
 	self.bykeystone = {}
 
-	for id = 1, GetNumArchaeologyRaces() do
+	for id = 1, count do
 		local name, currency, _, keystone = GetArchaeologyRaceInfo(id)
 		local info = { id = id, name = name, currency = currency, keystone = keystone }
 
@@ -142,18 +158,20 @@ function Jigsaw:ScanRaces(event)
 		self.bykeystone[keystone] = info
 	end
 
-	self:ScanCurrency()
+	self.ready = true
 	self:UpdateText()
 
-	self:UnregisterEvent(event)
-	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE", "ScanCurrency")
-	self:RegisterEvent("ARTIFACT_COMPLETE", "ScanCurrency")
+	return self.ready
 end
 
 function Jigsaw:UpdateText()
-	if self.byid and self.byid[1] and self.db.profile.recent then
-		local name, artifact, progress = self:FormatProgress(self.byname[self.db.profile.recent].id)
+	if not (self.ready or self:ScanRaces()) then
+		return
+	end
 
-		broker.text = name .. " " .. progress
+	if self.db.profile.recent then
+		local name, _, progress = self:FormatProgress(self.byname[self.db.profile.recent].id)
+
+		broker.text = name .. " " .. (progress or "???")
 	end
 end
