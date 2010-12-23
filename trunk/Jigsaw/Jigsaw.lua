@@ -64,24 +64,27 @@ function Jigsaw:FormatProgress(id)
 	if count > 0 then
 		SetSelectedArtifact(id) -- omitting the second parameter selects the "current" artifact for the selected race
 
-		local base, _, total = GetArtifactProgress()
 		local item, _, rarity, icon, _, sockets = GetSelectedArtifactInfo()
 		local keystones = min(sockets, GetItemCount(self.byid[id].keystone))
 
-		local current = base
+		for i = 1, keystones do
+			SocketItemToArtifact()
+		end
+
+		local progress, bonus, total = GetArtifactProgress()
 
 		if keystones > 0 then
-			current = GREEN_FONT_COLOR_CODE .. (current + keystones * 12) .. string.rep("+", keystones) .. HIGHLIGHT_FONT_COLOR_CODE
+			progress = GREEN_FONT_COLOR_CODE .. (progress + bonus) .. string.rep("+", keystones) .. HIGHLIGHT_FONT_COLOR_CODE
 		else
-			current = HIGHLIGHT_FONT_COLOR_CODE ..current
+			progress = HIGHLIGHT_FONT_COLOR_CODE .. progress
 		end
 
 		if sockets > keystones then
-			current = current .. string.rep("+", sockets - keystones)
+			progress = progress .. string.rep("+", sockets - keystones)
 		end
 
 		-- there is no reliable way to get the artifact *item*'s quality, so fake it by converting "common" (1) to "rare" (3)
-		return name, "|T" .. icon .. ":0|t " .. select(4, GetItemQualityColor(rarity * 3)) .. item .. "|r", current .. "/" .. total .. "|r"
+		return name, "|T" .. icon .. ":0|t " .. select(4, GetItemQualityColor(rarity * 3)) .. item .. "|r", progress .. "/" .. total .. "|r"
 	else
 		return name
 	end
